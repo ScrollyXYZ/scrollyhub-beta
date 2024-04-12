@@ -130,11 +130,8 @@
 
 #cloud-intro {
   position: relative;
-  height: 100%;
-  width: 100%;
   background: url(/css/clouds/background-scrollyverse.webp);
   background-size: cover;
-  background-attachment: fixed;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-position: center;
@@ -363,10 +360,16 @@ a:hover {
 }
 
 .navbar {
+  position: fixed;
+  top: 0;
+  height: 50px;
+  width: 100%;
   --bs-navbar-padding-y: 0.85rem;
   --bs-navbar-nav-link-padding-x: 0.75rem;
   font-size: 0.875rem;
   font-weight: 500;
+  background-color: hsla(57, 95%, 42%, 0.778);
+  z-index: 1050;
 }
 
 .navbar .nav-item {
@@ -464,10 +467,6 @@ a:hover {
   border: 2px solid white;
 }
 
-.sidebar-nav {
-  width: 100vw;
-}
-
 .tech-stack {
   max-height: 30px;
 }
@@ -516,6 +515,8 @@ a:hover {
   .main-containter {
     flex: 1 0 0%;
     width: auto;
+    margin-top: 90px;
+    top: 0;
   }
 
   .page-container {
@@ -523,13 +524,29 @@ a:hover {
   }
 
   .sidebar-nav {
-    width: 260px;
+    width: 12vw; /* Adjust width as needed */
+    position: fixed; /* Changed from sticky to fixed */
+    top: 90px; /* Starts sticking after 90px scroll */
+    left: 0; /* Aligns to the left edge */
+    height: calc(100vh - 90px); /* Full height minus the header */
+    overflow-y: auto; /* Allows internal scrolling */
+    z-index: 1000; /* High index to ensure it's on top of other content */
   }
+}
+#sidebar2 {
+  margin-top: 90px;
 }
 
 /* Mobile only */
-@media only screen and (max-width: 767px) {
+/* Mobile only */
+@media only screen and (max-width: 1000px) {
   .scroll-500 {
     margin-bottom: 500px;
+  }
+  .sidebar-nav {
+    margin-top: 70px;
+  }
+  .main-containter {
+    margin-top: 70px;
   }
 }

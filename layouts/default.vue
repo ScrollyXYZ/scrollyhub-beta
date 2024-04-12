@@ -7,85 +7,159 @@
 
       <Meta property="og:title" :content="$config.projectMetadataTitle" />
       <Meta property="og:description" :content="$config.projectDescription" />
-      <Meta property="og:image" :content="$config.projectUrl+$config.previewImage" />
+      <Meta
+        property="og:image"
+        :content="$config.projectUrl + $config.previewImage"
+      />
 
       <Meta name="twitter:card" content="summary_large_image" />
       <Meta name="twitter:site" :content="$config.projectTwitter" />
       <Meta name="twitter:creator" :content="$config.projectTwitter" />
       <Meta name="twitter:title" :content="$config.projectMetadataTitle" />
       <Meta name="twitter:description" :content="$config.projectDescription" />
-      <Meta name="twitter:image" :content="$config.projectUrl+$config.previewImage" />
+      <Meta
+        name="twitter:image"
+        :content="$config.projectUrl + $config.previewImage"
+      />
     </Head>
 
     <div id="cloud-intro">
-    <NavbarDesktop v-if="!isMobile" />
-    <NavbarMobile v-if="isMobile" :lSidebar="lSidebar" :rSidebar="rSidebar" />
+      <NavbarDesktop v-if="!isMobile" />
+      <NavbarMobile v-if="isMobile" :lSidebar="lSidebar" :rSidebar="rSidebar" />
 
-    <!-- Main content with sidebars -->
-    <div class="container-fluid page-container">
-      <div class="row flex-nowrap">
+      <!-- Main content with sidebars -->
+      <div class="container-fluid page-container">
+        <div class="row flex-nowrap">
+          <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
 
-        <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
+          <main
+            class="col col-lg-4 ps-md-2 pt-2 main-containter"
+            v-show="sidebarStore.showMainContent"
+          >
+            <slot></slot>
+          </main>
 
-        <main class="col col-lg-4 ps-md-2 pt-2 main-containter" v-show="sidebarStore.showMainContent">
-          <slot></slot>
-        </main>
-
-        <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
-        
+          <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
+        </div>
       </div>
-    </div>
     </div>
 
     <!-- Connect Wallet modal -->
-    <div class="modal modal-sm fade" id="connectModal" tabindex="-1" aria-labelledby="connectModalLabel" aria-hidden="true">
+    <div
+      class="modal modal-sm fade"
+      id="connectModal"
+      tabindex="-1"
+      aria-labelledby="connectModalLabel"
+      aria-hidden="true"
+    >
       <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Connect your wallet</h5>
-            <button id="closeConnectModal" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close">
+            <button
+              id="closeConnectModal"
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            >
               <span aria-hidden="true"></span>
             </button>
           </div>
           <div class="modal-body row">
-
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/metamask.png" class="card-img-top card-img-wallet" alt="MetaMask">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/metamask.png"
+                class="card-img-top card-img-wallet"
+                alt="MetaMask"
+              />
               <small class="text-center mb-3 text-muted">MetaMask</small>
             </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/rabby.png" class="card-img-top card-img-wallet" alt="Rabby">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/rabby.png"
+                class="card-img-top card-img-wallet"
+                alt="Rabby"
+              />
               <small class="text-center mb-3 text-muted">Rabby</small>
-            </div> 
+            </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/bifrost.png" class="card-img-top card-img-wallet" alt="Bifrost">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/bifrost.png"
+                class="card-img-top card-img-wallet"
+                alt="Bifrost"
+              />
               <small class="text-center mb-3 text-muted">Bifrost</small>
-            </div> 
+            </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/zerion.png" class="card-img-top card-img-wallet" alt="Zerion">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/zerion.png"
+                class="card-img-top card-img-wallet"
+                alt="Zerion"
+              />
               <small class="text-center mb-3 text-muted">Zerion</small>
-            </div> 
+            </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectCoinbase">
-              <img src="@/assets/img/wallets/coinbase.png" class="card-img-top card-img-wallet" alt="Coinbase">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectCoinbase"
+            >
+              <img
+                src="@/assets/img/wallets/coinbase.png"
+                class="card-img-top card-img-wallet"
+                alt="Coinbase"
+              />
               <small class="text-center mb-3 text-muted">Coinbase</small>
             </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/brave.png" class="card-img-top card-img-wallet" alt="Brave">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/brave.png"
+                class="card-img-top card-img-wallet"
+                alt="Brave"
+              />
               <small class="text-center mb-3 text-muted">Brave</small>
             </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/trust.png" class="card-img-top card-img-wallet" alt="Trust Wallet">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/trust.png"
+                class="card-img-top card-img-wallet"
+                alt="Trust Wallet"
+              />
               <small class="text-center mb-3 text-muted">Trust Wallet</small>
             </div>
 
-            <div class="card col-6 cursor-pointer wallet-img-wrapper" @click="connectMetaMask">
-              <img src="@/assets/img/wallets/imtoken.png" class="card-img-top card-img-wallet" alt="imToken">
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/imtoken.png"
+                class="card-img-top card-img-wallet"
+                alt="imToken"
+              />
               <small class="text-center mb-3 text-muted">imToken</small>
             </div>
           </div>
@@ -103,34 +177,36 @@
     <ReferralModal />
 
     <VerifyAccountOwnership />
-
   </div>
 
   <!-- Do not delete: ugly hack to make "global" work with Vite -->
-  <component :is="'script'">
-  var global = global || window;
-  </component>
+  <component :is="'script'"> var global = global || window; </component>
 </template>
 
 <script>
-import { ethers } from 'ethers';
-import { MetaMaskConnector, CoinbaseWalletConnector, useEthers, useWallet } from 'vue-dapp';
-import { useNotificationsStore } from '~/store/notifications';
-import { useSidebarStore } from '~/store/sidebars';
-import { useSiteStore } from '~/store/site';
-import { useUserStore } from '~/store/user';
+import { ethers } from "ethers";
+import {
+  MetaMaskConnector,
+  CoinbaseWalletConnector,
+  useEthers,
+  useWallet,
+} from "vue-dapp";
+import { useNotificationsStore } from "~/store/notifications";
+import { useSidebarStore } from "~/store/sidebars";
+import { useSiteStore } from "~/store/site";
+import { useUserStore } from "~/store/user";
 import NavbarDesktop from "~/components/navbars/NavbarDesktop.vue";
 import NavbarMobile from "~/components/navbars/NavbarMobile.vue";
 import SidebarLeft from "~/components/sidebars/SidebarLeft.vue";
 import SidebarRight from "~/components/sidebars/SidebarRight.vue";
 import ChatSettingsModal from "~/components/ChatSettingsModal.vue";
-import { getActivityPoints } from '~/utils/balanceUtils';
-import { getDomainHolder, getDomainName } from '~/utils/domainUtils';
-import { storeReferrer, storeUsername } from '~/utils/storageUtils';
-import VerifyAccountOwnership from '~/components/VerifyAccountOwnership.vue';
-import ReferralModal from '~/components/referrals/ReferralModal.vue';
-import ChangeUsernameModal from '~/components/names/ChangeUsernameModal.vue';
-import FindUserModal from '~/components/search/FindUserModal.vue';
+import { getActivityPoints } from "~/utils/balanceUtils";
+import { getDomainHolder, getDomainName } from "~/utils/domainUtils";
+import { storeReferrer, storeUsername } from "~/utils/storageUtils";
+import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
+import ReferralModal from "~/components/referrals/ReferralModal.vue";
+import ChangeUsernameModal from "~/components/names/ChangeUsernameModal.vue";
+import FindUserModal from "~/components/search/FindUserModal.vue";
 
 export default {
   data() {
@@ -140,8 +216,8 @@ export default {
       lSidebar: null,
       referrer: null,
       rSidebar: null,
-      width: null
-    }
+      width: null,
+    };
   },
 
   components: {
@@ -153,18 +229,21 @@ export default {
     ReferralModal,
     SidebarLeft,
     SidebarRight,
-    VerifyAccountOwnership
+    VerifyAccountOwnership,
   },
 
   mounted() {
     this.isMounted = true;
 
     // set color mode
-    document.documentElement.setAttribute("data-bs-theme", this.siteStore.getColorMode);
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      this.siteStore.getColorMode,
+    );
 
     // set sidebar collapse
-    this.lSidebar = new bootstrap.Collapse('#sidebar1', {toggle: false});
-    this.rSidebar = new bootstrap.Collapse('#sidebar2', {toggle: false});
+    this.lSidebar = new bootstrap.Collapse("#sidebar1", { toggle: false });
+    this.rSidebar = new bootstrap.Collapse("#sidebar2", { toggle: false });
     this.width = window.innerWidth;
 
     if (this.width < this.breakpoint) {
@@ -179,21 +258,21 @@ export default {
       this.sidebarStore.setRightSidebar(true);
     }
 
-    window.addEventListener('resize', this.onWidthChange);
+    window.addEventListener("resize", this.onWidthChange);
 
     // connect to wallet if user was connected before
     if (!this.isActivated) {
-			if (localStorage.getItem("connected") == "metamask") {
-				this.connectMetaMask();
-			} else if (localStorage.getItem("connected") == "coinbase") {
-				this.connectCoinbase();
-			}
-		}
+      if (localStorage.getItem("connected") == "metamask") {
+        this.connectMetaMask();
+      } else if (localStorage.getItem("connected") == "coinbase") {
+        this.connectCoinbase();
+      }
+    }
 
     // enable popovers everywhere
     new bootstrap.Popover(document.body, {
       selector: "[data-bs-toggle='popover']",
-    })
+    });
 
     // check if file upload is enabled
     this.siteStore.setFileUploadEnabled(this.$config.fileUploadEnabled);
@@ -206,11 +285,11 @@ export default {
   },
 
   unmounted() {
-    window.removeEventListener('resize', onWidthChange);
+    window.removeEventListener("resize", onWidthChange);
   },
 
   computed: {
-    isConnectedToOrbis () {
+    isConnectedToOrbis() {
       return this.userStore.getIsConnectedToOrbis;
     },
 
@@ -228,7 +307,7 @@ export default {
         // get the last item (address) from did parent
         return this.userStore.getDidParent.split(":").pop();
       }
-    }
+    },
   },
 
   methods: {
@@ -237,20 +316,23 @@ export default {
     getDomainName, // imported function from utils/domainUtils.js
 
     async connectCoinbase() {
-			await this.connectWith(this.coinbaseConnector);
-			localStorage.setItem("connected", "coinbase"); // store in local storage to autoconnect next time
-			document.getElementById('closeConnectModal').click();
-		},
+      await this.connectWith(this.coinbaseConnector);
+      localStorage.setItem("connected", "coinbase"); // store in local storage to autoconnect next time
+      document.getElementById("closeConnectModal").click();
+    },
 
-		async connectMetaMask() {
-			await this.connectWith(this.mmConnector);
-			localStorage.setItem("connected", "metamask"); // store in local storage to autoconnect next time
-			document.getElementById('closeConnectModal').click();
-		},
+    async connectMetaMask() {
+      await this.connectWith(this.mmConnector);
+      localStorage.setItem("connected", "metamask"); // store in local storage to autoconnect next time
+      document.getElementById("closeConnectModal").click();
+    },
 
     async fetchActivityPoints() {
       if (this.$config.activityPointsAddress) {
-        const activityPoints = await this.getActivityPoints(this.address, this.signer);
+        const activityPoints = await this.getActivityPoints(
+          this.address,
+          this.signer,
+        );
 
         this.userStore.setCurrentUserActivityPoints(activityPoints);
       }
@@ -262,7 +344,11 @@ export default {
           "function balanceOf(address owner) view returns (uint256)",
         ]);
 
-        const chatTokenContract = new ethers.Contract(this.$config.chatTokenAddress, chatTokenInterface, this.signer);
+        const chatTokenContract = new ethers.Contract(
+          this.$config.chatTokenAddress,
+          chatTokenInterface,
+          this.signer,
+        );
 
         const balance = await chatTokenContract.balanceOf(this.address);
 
@@ -275,28 +361,33 @@ export default {
         this.notificationsStore.setLoadingNotifications(true);
 
         // fetch new notifications count
-        let { data, error, status } = await this.$orbis.getNotificationsCount({type: "social", context: this.$config.chatChannels.general}); 
+        let { data, error, status } = await this.$orbis.getNotificationsCount({
+          type: "social",
+          context: this.$config.chatChannels.general,
+        });
 
         if (status === 200 && data?.count_new_notifications) {
-          this.notificationsStore.setUnreadNotificationsCount(data.count_new_notifications);
+          this.notificationsStore.setUnreadNotificationsCount(
+            data.count_new_notifications,
+          );
         } else if (error) {
           console.log("New notifications count error", error);
         }
 
         // fetch notifications
-        let { 
-          data: notifications, 
-          error: notificationsError, 
-          status: notificationsStatus 
-        } = await this.$orbis.getNotifications(
-          {
-            type: "social", 
-            context: this.$config.chatChannels.general
-          }
-        );
+        let {
+          data: notifications,
+          error: notificationsError,
+          status: notificationsStatus,
+        } = await this.$orbis.getNotifications({
+          type: "social",
+          context: this.$config.chatChannels.general,
+        });
 
         if (notificationsStatus === 200 && notifications) {
-          const newNotifications = notifications.filter(function(item) { return (item.status === "new"); });
+          const newNotifications = notifications.filter(function (item) {
+            return item.status === "new";
+          });
 
           this.notificationsStore.setNotifications(newNotifications);
         } else if (notificationsError) {
@@ -321,7 +412,9 @@ export default {
           if (profile) {
             this.userStore.setFollowers(profile.data.count_followers);
             this.userStore.setFollowing(profile.data.count_following);
-            this.userStore.setLastActivityTimestamp(profile.data.last_activity_timestamp);
+            this.userStore.setLastActivityTimestamp(
+              profile.data.last_activity_timestamp,
+            );
           }
 
           // fetch notifications
@@ -336,7 +429,7 @@ export default {
         this.address != this.userStore.getCurrentUserAddress
       ) {
         this.userStore.setCurrentUserAddress(this.address);
-        
+
         let userDomain;
 
         if (this.signer) {
@@ -345,11 +438,13 @@ export default {
           userDomain = await this.getDomainName(this.address);
         }
 
-        
-
         if (userDomain) {
-          this.userStore.setDefaultDomain(userDomain+this.$config.tldName);
-          storeUsername(window, this.address, userDomain+this.$config.tldName);
+          this.userStore.setDefaultDomain(userDomain + this.$config.tldName);
+          storeUsername(
+            window,
+            this.address,
+            userDomain + this.$config.tldName,
+          );
         } else {
           this.userStore.setDefaultDomain(null);
         }
@@ -368,7 +463,7 @@ export default {
         this.userStore.setDidParent(this.$orbis.session.did._parentId);
       }
     },
-    
+
     onWidthChange() {
       this.width = window.innerWidth;
     },
@@ -396,17 +491,23 @@ export default {
       }
 
       if (this.address) {
-        if (String(this.address).toLowerCase() === String(this.referrer).toLowerCase()) {
+        if (
+          String(this.address).toLowerCase() ===
+          String(this.referrer).toLowerCase()
+        ) {
           return; // cannot refer yourself
         }
       }
 
       // check if referrer is a valid address and not a zero address
-      if (ethers.utils.isAddress(this.referrer) && this.referrer != ethers.constants.AddressZero) {
+      if (
+        ethers.utils.isAddress(this.referrer) &&
+        this.referrer != ethers.constants.AddressZero
+      ) {
         // store into local storage as referrer
         storeReferrer(window, this.referrer);
       }
-    }
+    },
   },
 
   setup() {
@@ -421,18 +522,27 @@ export default {
     //const localStorageConnected = useLocalStorage('connected', null); // when localStorageConnected.value is updated, localStorage is updated too
 
     const coinbaseConnector = new CoinbaseWalletConnector({
-			appName: config.projectName,
-			jsonRpcUrl: config.rpcCustom,
-		});
+      appName: config.projectName,
+      jsonRpcUrl: config.rpcCustom,
+    });
 
-		const mmConnector = new MetaMaskConnector({
-			appUrl: config.projectUrl,
-		});
-    
-    return { 
-      address, chainId, coinbaseConnector, connectWith, isActivated, mmConnector, signer, 
-      notificationsStore, sidebarStore, siteStore, userStore 
-    }
+    const mmConnector = new MetaMaskConnector({
+      appUrl: config.projectUrl,
+    });
+
+    return {
+      address,
+      chainId,
+      coinbaseConnector,
+      connectWith,
+      isActivated,
+      mmConnector,
+      signer,
+      notificationsStore,
+      sidebarStore,
+      siteStore,
+      userStore,
+    };
   },
 
   watch: {
@@ -458,16 +568,17 @@ export default {
     },
 
     isActivated(newVal, oldVal) {
-			if (oldVal === true && newVal === false) { // if user disconnects, clear the local storage
+      if (oldVal === true && newVal === false) {
+        // if user disconnects, clear the local storage
         console.log("user disconnected");
         localStorage.setItem("connected", "");
         this.orbisLogout();
-			} else {
+      } else {
         if (!this.userStore.getDid) {
           this.getOrbisDids();
         }
       }
-		},
+    },
 
     isConnectedToOrbis(newVal, oldVal) {
       if (newVal && oldVal === false) {
@@ -477,8 +588,12 @@ export default {
 
     orbisAddress(newVal, oldVal) {
       if (newVal && this.address) {
-        if (String(newVal).toLowerCase() != String(this.address).toLowerCase()) {
-          console.log("Logging out of Orbis because the address in signed Orbis credentials does not matched the current user's address.");
+        if (
+          String(newVal).toLowerCase() != String(this.address).toLowerCase()
+        ) {
+          console.log(
+            "Logging out of Orbis because the address in signed Orbis credentials does not matched the current user's address.",
+          );
           this.orbisLogout();
         }
       }
@@ -499,6 +614,6 @@ export default {
         this.sidebarStore.setRightSidebar(false);
       }
     },
-  }
-}
+  },
+};
 </script>

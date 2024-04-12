@@ -26,11 +26,15 @@
             </h6>
 
             <!-- Chat tokens -->
-            <!--
-          <button v-if="userStore.getChatTokenBalanceWei > 0 && $config.chatTokenAddress" class="btn btn-outline-primary btn-sm mt-2 mb-2 disabled">
-            {{ userStore.getChatTokenBalance }} {{ $config.chatTokenSymbol }}
-          </button>
-          -->
+
+            <button
+              v-if="
+                userStore.getChatTokenBalanceWei > 0 && $config.chatTokenAddress
+              "
+              class="btn btn-outline-primary btn-sm mt-2 mb-2 disabled"
+            >
+              {{ userStore.getChatTokenBalance }} {{ $config.chatTokenSymbol }}
+            </button>
 
             <!-- Activity Points -->
             <div
@@ -108,7 +112,7 @@
           </li>
           -->
 
-            <!-- NFT Launchpad -->
+            <!-- NFT Launchpad
             <li
               class="nav-item p-1"
               @click="closeLeftSidebar"
@@ -125,8 +129,8 @@
               >
                 <i class="bi bi-rocket-takeoff"></i> NFT Launchpad
               </NuxtLink>
-            </li>
-            <!-- Domain Names -->
+            </li> -->
+            <!-- Domain Names 
             <li
               class="nav-item p-1"
               v-if="$config.showFeatures.domainName"
@@ -136,7 +140,7 @@
                 <i class="bi bi-box2"></i> Scrolly's Domains
                 <small><i class="bi bi-box-arrow-up-right ms-1"></i></small>
               </a>
-            </li>
+            </li>-->
             <!-- Notifications -->
             <li
               v-if="isActivated"
@@ -165,7 +169,7 @@
               </NuxtLink>
             </li>
 
-            <!-- Profile -->
+            <!-- Profile 
             <li
               v-if="isActivated"
               class="nav-item p-1"
@@ -179,7 +183,7 @@
               >
                 <i class="bi bi-person"></i> Profile
               </NuxtLink>
-            </li>
+            </li>-->
 
             <!-- Activity Points -->
             <li
@@ -228,7 +232,12 @@
 
             <!-- Search Posts -->
             <li class="nav-item p-1" @click="closeLeftSidebar">
-              <NuxtLink class="nav-link" :class="$route.path.startsWith('/search-posts') ? 'active' : ''" aria-current="page" to="/search-posts">
+              <NuxtLink
+                class="nav-link"
+                :class="$route.path.startsWith('/search-posts') ? 'active' : ''"
+                aria-current="page"
+                to="/search-posts"
+              >
                 <i class="bi bi-search"></i> Search Posts
               </NuxtLink>
             </li>
@@ -251,7 +260,7 @@
               </NuxtLink>
             </li>
 
-            <!-- Swap -->
+            <!-- Swap 
             <li
               class="nav-item p-1"
               @click="closeLeftSidebar"
@@ -265,7 +274,7 @@
               >
                 <i class="bi bi-arrow-down-up"></i> Swap
               </NuxtLink>
-            </li>
+            </li>-->
 
             <!-- Friend Keys -->
             <li
