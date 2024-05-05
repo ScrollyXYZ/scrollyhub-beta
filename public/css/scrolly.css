@@ -1,4 +1,4 @@
-[data-bs-theme=scrolly] {
+[data-bs-theme="scrolly"] {
   --bs-blue: #1d3b53;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -68,9 +68,16 @@
   --bs-white-rgb: 255, 255, 255;
   --bs-black-rgb: 0, 0, 0;
   --bs-body-bg-rgb: 255, 255, 255;
-  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --bs-gradient: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0)
+  );
   --bs-body-font-family: "DM Sans", sans-serif;
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
@@ -121,25 +128,25 @@
   --bs-white-black-toggle: #000;
 }
 
-[data-bs-theme=scrolly] body {
+[data-bs-theme="scrolly"] body {
   background-color: #007ced;
 }
 
-[data-bs-theme=scrolly] .bg-mode {
+[data-bs-theme="scrolly"] .bg-mode {
   background-color: var(--bs-mode) !important;
 }
 
-[data-bs-theme=scrolly] .link-without-color {
+[data-bs-theme="scrolly"] .link-without-color {
   color: var(--bs-gray-700);
   text-decoration: none;
 }
 
-[data-bs-theme=scrolly] .text-muted {
+[data-bs-theme="scrolly"] .text-muted {
   color: var(--bs-gray-700) !important;
 }
 
-[data-bs-theme=scrolly] .navbar-brand-text {
-  color: white;
+[data-bs-theme="scrolly"] .navbar-brand-text {
+  color: #000000;
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 1.9rem;
 }

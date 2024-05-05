@@ -243,7 +243,12 @@
 
             <!-- Search Posts -->
             <li class="nav-item p-1" @click="closeLeftSidebar">
-              <NuxtLink class="nav-link" :class="$route.path.startsWith('/search-posts') ? 'active' : ''" aria-current="page" to="/search-posts">
+              <NuxtLink
+                class="nav-link"
+                :class="$route.path.startsWith('/search-posts') ? 'active' : ''"
+                aria-current="page"
+                to="/search-posts"
+              >
                 <i class="bi bi-search"></i> Search Posts
               </NuxtLink>
             </li>

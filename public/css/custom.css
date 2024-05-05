@@ -132,7 +132,7 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: url(/css/clouds/background-scrollyverse.webp);
+  background: url(/css/clouds/1500x500.jpg);
   background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
@@ -379,13 +379,10 @@ a:hover {
 }
 
 /* @todo Add your custom navbar background color */
-/*
+
 .navbar-bg-custom {
-  background: linear-gradient(40deg,#ff6ec4,#007ced);
-  border-bottom-right-radius: 15px;
-  border-bottom-left-radius: 15px;
+  background-color: #ffffff57;
 }
-*/
 
 .navbar-brand,
 .navbar-brand:hover,
@@ -398,6 +395,7 @@ a:hover {
   color: var(--bs-primary);
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 1.9rem;
+  margin-right: 20px;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
@@ -418,9 +416,66 @@ a:hover {
   border-radius: var(--bs-navbar-toggler-border-radius);
   transition: var(--bs-navbar-toggler-transition);
 }
+/* @todo Navbar User Profile */
+/* Custom styles for the navigation button */
+.filtered-shadow {
+  filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 1));
+}
+.nav-custom-button {
+  margin-top: 5%;
+  margin-bottom: 10%;
+  color: #000000; /* Set the text color to white */
+  border: 0.5px solid #000000; /* White border, 2px thick */
+  border-radius: 15px; /* Increased border-radius for more rounded corners */
+  font-family: "Comic Sans MS", "Comic Neue", cursive; /* Cartoon-style font */
+  padding: 8px 8px; /* Padding around the text */
+  text-transform: uppercase; /* Uppercase text for a more button-like appearance */
+  font-weight: bold; /* Bold text to make it stand out */
+  outline: none; /* Remove the default focus outline */
+  box-shadow: none; /* Remove any default box shadows */
+  background-color: hsla(0, 0%, 0%, 0);
+  transition:
+    background-color 0.3s,
+    color 0.3s; /* Smooth transition for hover effects */
+}
+.nav-custom-button:hover,
+.nav-custom-button:focus {
+  background-color: rebeccapurple; /* Change background to a darker violet on hover/focus */
+  color: white; /* Ensure text color remains white on hover/focus */
+  border-color: white; /* Ensure border color remains white on hover/focus */
+}
 
+.nav-custom-button:disabled,
+.nav-custom-button.disabled {
+  opacity: 0.5; /* Make the button half transparent when disabled */
+  cursor: not-allowed; /* Change cursor to indicate the button is disabled */
+}
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the content vertically */
+  justify-content: center; /* Centers the content horizontally */
+  gap: 10px; /* Provides a gap between elements */
+}
+
+.profile-image {
+  width: 70px; /* Specify the width */
+  height: 70px; /* Ensure the height matches the width for a circle */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+}
+
+.user-name {
+  font-weight: bold;
+  margin-top: 0.5rem;
+  color: hwb(0 0% 100%);
+}
+
+.user-name a {
+  color: inherit;
+  text-decoration: none;
+}
+/* END UX */
 .navbar-toggler:focus {
-  /* Remove the shadow effect */
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -516,6 +571,7 @@ a:hover {
   .main-containter {
     flex: 1 0 0%;
     width: auto;
+    background-color: #2b2b2b78;
   }
 
   .page-container {
