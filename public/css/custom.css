@@ -136,10 +136,8 @@
   background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   background-position: center;
   animation: wind 20s linear infinite;
-  background-size: 100% 100%;
 }
 
 .alert-primary {
@@ -194,6 +192,7 @@ a:hover {
   --bs-btn-active-bg: var(--bs-link-hover-color);
   --bs-btn-active-border-color: var(--bs-link-hover-color);
   --bs-btn-disabled-bg: var(--bs-primary);
+  border-radius: 50px;
 }
 
 .btn-primary-soft {
@@ -268,15 +267,21 @@ a:hover {
 .cursor-pointer {
   cursor: pointer;
 }
-
+/* Hub Feed*/
+.card.mb-2 {
+  background-color: transparent;
+  border-width: 0px !important;
+}
 /* EmojiPicker.vue + <Picker class="emoji-mart-category" */
 .emoji-mart-category {
-  color: #0f1110;
+  color: hsl(305, 100%, 21%);
 }
-
+.emoji-mart-static {
+  background-color: #ffffff;
+}
 .emoji-mart-static .emoji-mart-category-label,
 .emoji-mart-static .emoji-mart-category-label h3 {
-  background-color: #222529;
+  background-color: #7c0072;
   color: #ffffff;
 }
 
@@ -305,7 +310,7 @@ a:hover {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   -webkit-transition:
     border-color 0.15s ease-in-out,
     -webkit-box-shadow 0.15s ease-in-out;
@@ -364,14 +369,14 @@ a:hover {
 
 .navbar {
   --bs-navbar-padding-y: 0.85rem;
-  --bs-navbar-nav-link-padding-x: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  --bs-navbar-nav-link-padding-x: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 0.5rem;
 }
 
 .navbar .nav-item {
-  margin-right: 0.5rem;
-  margin-left: 0.5rem;
+  margin-right: 0.1rem;
+  margin-left: 0.1rem;
 }
 
 .navbar .navbar-nav .nav-link {
@@ -422,22 +427,27 @@ a:hover {
   filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 1));
 }
 .nav-custom-button {
-  margin-top: 5%;
-  margin-bottom: 10%;
-  color: #000000; /* Set the text color to white */
-  border: 0.5px solid #000000; /* White border, 2px thick */
-  border-radius: 15px; /* Increased border-radius for more rounded corners */
-  font-family: "Comic Sans MS", "Comic Neue", cursive; /* Cartoon-style font */
-  padding: 8px 8px; /* Padding around the text */
-  text-transform: uppercase; /* Uppercase text for a more button-like appearance */
-  font-weight: bold; /* Bold text to make it stand out */
-  outline: none; /* Remove the default focus outline */
-  box-shadow: none; /* Remove any default box shadows */
-  background-color: hsla(0, 0%, 0%, 0);
+  padding: 4px 12px; /* Uniform padding, corrected from '6x' to '6px' */
+  font-size: 12px; /* Standard font size */
+  border: 2px solid #000; /* Example border */
+  border-radius: 15px; /* Consistent rounded corners */
+  background-color: hsla(
+    0,
+    0%,
+    100%,
+    0
+  ); /* Corrected background transparency */
+  color: #000; /* Text color */
+  text-decoration: none; /* Remove underline from links */
+  display: flex;
+  align-items: center; /* Center content within buttons */
+  justify-content: center;
+  text-align: center;
   transition:
     background-color 0.3s,
     color 0.3s; /* Smooth transition for hover effects */
 }
+
 .nav-custom-button:hover,
 .nav-custom-button:focus {
   background-color: rebeccapurple; /* Change background to a darker violet on hover/focus */
@@ -455,18 +465,18 @@ a:hover {
   flex-direction: column;
   align-items: center; /* Centers the content vertically */
   justify-content: center; /* Centers the content horizontally */
-  gap: 10px; /* Provides a gap between elements */
+  gap: 0px; /* Provides a gap between elements */
 }
 
 .profile-image {
-  width: 70px; /* Specify the width */
-  height: 70px; /* Ensure the height matches the width for a circle */
+  width: 50px; /* Specify the width */
+  height: 50px; /* Ensure the height matches the width for a circle */
   object-fit: cover; /* Ensures the image covers the area without distortion */
 }
 
 .user-name {
   font-weight: bold;
-  margin-top: 0.5rem;
+  margin-top: 0rem;
   color: hwb(0 0% 100%);
 }
 
@@ -579,7 +589,7 @@ a:hover {
   }
 
   .sidebar-nav {
-    width: 260px;
+    width: 300px;
   }
 }
 

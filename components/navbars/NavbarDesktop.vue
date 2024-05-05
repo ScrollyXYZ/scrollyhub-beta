@@ -69,7 +69,7 @@
           />
         </li>
         <div>
-          <li class="nav-item dropdown">
+          <li v-if="!isActivated" class="nav-item dropdown">
             <a
               class="nav-link dropdown-toggle"
               data-bs-toggle="dropdown"
@@ -140,8 +140,7 @@
             v-if="
               isActivated &&
               $config.activityPointsAddress &&
-              $config.showFeatures.activityPoints &&
-              userStore.getDefaultDomain
+              $config.showFeatures.activityPoints
             "
             class="mt-2"
           >
@@ -226,6 +225,12 @@
                 >
                 <span
                   class="dropdown-item cursor-pointer"
+                  data-bs-toggle="modal"
+                  data-bs-target="#themeSelectionModal"
+                  >Theme</span
+                >
+                <span
+                  class="dropdown-item cursor-pointer"
                   @click="disconnectWallet"
                   >Disconnect</span
                 >
@@ -234,6 +239,58 @@
           </div>
         </div>
       </ul>
+    </div>
+    <div
+      class="modal fade"
+      id="themeSelectionModal"
+      tabindex="-1"
+      aria-labelledby="themeSelectionModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="themeSelectionModalLabel">
+              Choose Theme
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <button
+              class="btn btn-primary w-100 mb-2"
+              @click="
+                changeColorMode('scrolly');
+                $bvModal.hide('themeSelectionModal');
+              "
+            >
+              Scrolly
+            </button>
+            <button
+              class="btn btn-secondary w-100 mb-2"
+              @click="
+                changeColorMode('dark');
+                $bvModal.hide('themeSelectionModal');
+              "
+            >
+              Dark
+            </button>
+            <button
+              class="btn btn-light w-100"
+              @click="
+                changeColorMode('light');
+                $bvModal.hide('themeSelectionModal');
+              "
+            >
+              Light
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </nav>
 </template>

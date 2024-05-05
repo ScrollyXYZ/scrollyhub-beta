@@ -9,7 +9,7 @@
         class="sidebar-nav list-group border-0 rounded-0 text-sm-start min-vh-100"
       >
         <div class="card m-2 p-2 bg-light">
-          <div v-if="isActivated" class="text-center">
+          <div v-if="isActivated && isMobile" class="text-center">
             <NuxtLink to="/profile">
               <ProfileImage
                 :key="userStore.getOrbisImage"
@@ -24,7 +24,33 @@
             <h6 class="mt-3" v-if="userStore.getDefaultDomain">
               {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
             </h6>
+          </div>
 
+          <div v-else class="text-left">
+            <div
+              style="
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+              "
+            >
+              <NuxtLink to="/profile" style="margin-right: 10px">
+                <ProfileImage
+                  :key="userStore.getOrbisImage"
+                  class="rounded-circle"
+                  :address="address"
+                  :domain="userStore.getDefaultDomain"
+                  :image="userStore.getOrbisImage"
+                  style="width: 33px; height: 33px"
+                />
+              </NuxtLink>
+              <NuxtLink
+                to="/profile"
+                style="text-decoration: none; color: inherit"
+              >
+                <h6 style="margin-bottom: 0"><strong>My Scrollie</strong></h6>
+              </NuxtLink>
+            </div>
             <!-- Chat tokens -->
             <!--
           <button v-if="userStore.getChatTokenBalanceWei > 0 && $config.chatTokenAddress" class="btn btn-outline-primary btn-sm mt-2 mb-2 disabled">
@@ -36,7 +62,9 @@
             <div
               v-if="
                 $config.activityPointsAddress &&
-                $config.showFeatures.activityPoints
+                $config.showFeatures.activityPoints &&
+                isMobile &&
+                isActivated
               "
               class="mt-2"
             >
@@ -129,7 +157,8 @@
               @click="closeLeftSidebar"
               v-if="
                 $config.nftLaunchpadBondingAddress &&
-                $config.showFeatures.nftLaunchpad
+                $config.showFeatures.nftLaunchpad &&
+                isMobile
               "
             >
               <NuxtLink
@@ -144,7 +173,7 @@
             <!-- Domain Names -->
             <li
               class="nav-item p-1"
-              v-if="$config.showFeatures.domainName"
+              v-if="$config.showFeatures.domainName && isMobile"
               @click="closeLeftSidebar"
             >
               <a class="nav-link" :href="$config.domainUrl" target="_blank">
@@ -182,7 +211,7 @@
 
             <!-- Profile -->
             <li
-              v-if="isActivated"
+              v-if="isActivated && isMobile"
               class="nav-item p-1"
               @click="closeLeftSidebar"
             >
@@ -202,7 +231,8 @@
               @click="closeLeftSidebar"
               v-if="
                 $config.showFeatures.activityPoints &&
-                $config.activityPointsAddress
+                $config.activityPointsAddress &&
+                isMobile
               "
             >
               <NuxtLink
@@ -275,7 +305,11 @@
             <li
               class="nav-item p-1"
               @click="closeLeftSidebar"
-              v-if="$config.swapRouterAddress && $config.showFeatures.swap"
+              v-if="
+                $config.swapRouterAddress &&
+                $config.showFeatures.swap &&
+                isMobile
+              "
             >
               <NuxtLink
                 class="nav-link"
