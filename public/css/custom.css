@@ -368,7 +368,7 @@ a:hover {
 }
 
 .navbar {
-  --bs-navbar-padding-y: 0.85rem;
+  --bs-navbar-padding-y: 0rem;
   --bs-navbar-nav-link-padding-x: 0.6rem;
   font-size: 0.85rem;
   font-weight: 0.5rem;
@@ -395,7 +395,26 @@ a:hover {
 .navbar-brand:focus {
   color: var(--bs-primary);
 }
+/* Style spécifique pour la nouvelle catégorie SpecialLink dans la barre de navigation */
+.navbar .navbar-nav .special-link {
+  font-family: "GlitterySnowfall", Arial, sans-serif; /* Même police que les autres éléments de la navbar */
+  font-size: 1rem; /* Taille de police standard pour la navbar */
+  color: var(--bs-primary); /* Couleur principale pour la cohérence */
+  text-decoration: none; /* Pas de soulignement pour garder la netteté */
+  transition: color 0.3s ease; /* Transition douce pour les survols */
+  color: var(--bs-primary);
+  font-family: "GlitterySnowfall", Arial, sans-serif;
+  font-size: 1.9rem;
+  margin-right: 20px;
+}
 
+/* Modification de la couleur lors du survol pour la classe SpecialLink */
+.navbar .navbar-nav .special-link:hover {
+  color: var(
+    --bs-link-hover-color
+  ); /* Couleur lors du survol pour améliorer l'interaction */
+  background-color: transparent; /* Aucun fond ajouté lors du survol */
+}
 .navbar-brand-text {
   color: var(--bs-primary);
   font-family: "GlitterySnowfall", Arial, sans-serif;
@@ -421,8 +440,21 @@ a:hover {
   border-radius: var(--bs-navbar-toggler-border-radius);
   transition: var(--bs-navbar-toggler-transition);
 }
+.button-container {
+  display: flex; /* Active Flexbox */
+  align-items: center; /* Alignement vertical au centre */
+  justify-content: center; /* Centre les éléments horizontalement */
+  gap: 10px; /* Espacement entre les éléments */
+  margin-top: 10 px;
+}
+
+.activity-points-link {
+  margin-top: 0; /* Enlève la marge supérieure pour aligner correctement avec le bouton */
+  margin-bottom: 0; /* Enlève la marge inférieure pour un alignement uniforme */
+}
 /* @todo Navbar User Profile */
 /* Custom styles for the navigation button */
+
 .filtered-shadow {
   filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 1));
 }
