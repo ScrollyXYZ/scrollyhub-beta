@@ -11,10 +11,14 @@
   --bs-primary: #007ced !important; /* TODO: Replace is with your primary color */
   --bs-primary-rgb: 10, 88, 202; /* TODO: This should be an RGB version of --bs-primary hex color */
   --bs-btn-disabled-border-color: #007ced; /* TODO: Replace is with your primary color */
-  --bs-link-color: #007ced; /* TODO: Replace is with your primary color */
+  --bs-link-color: #000000; /* TODO: Replace is with your primary color */
   --bs-nav-pills-link-active-bg: #007ced !important; /* TODO: Replace is with your primary color */
-  --bs-link-color: #007ced; /* TODO: Replace is with your primary color */
-  --bs-link-hover-color: #3e83ea; /* TODO: A slightly darker shade of the primary color */
+  --bs-link-color: #000000; /* TODO: Replace is with your primary color */
+  --bs-link-hover-color: hsl(
+    0,
+    0%,
+    100%
+  ); /* TODO: A slightly darker shade of the primary color */
   --bs-blue: #1d3b53;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;

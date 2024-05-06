@@ -17,6 +17,15 @@
         <li class="nav-item">
           <NuxtLink class="nav-link" to="/">
             <span class="navbar-brand-text align-middle">Hub</span>
+            <span
+              class="badge text-bg-secondary"
+              v-if="
+                !notificationsStore.getLoadingNotifications &&
+                notificationsStore.getUnreadNotificationsCount > 0
+              "
+            >
+              {{ notificationsStore.getUnreadNotificationsCount }}
+            </span>
           </NuxtLink>
         </li>
         <li class="nav-item dropdown special-link">
@@ -214,7 +223,7 @@
                       userStore.getChatTokenBalanceWei > 0 &&
                       $config.chatTokenAddress
                     "
-                    class="btn btn-outline-primary btn-sm me-2"
+                    class="nav-custom-button btn btn-outline-primary btn-sm me-2"
                     data-bs-toggle="dropdown"
                     aria-haspopup="true"
                     aria-expanded="false"
@@ -245,7 +254,7 @@
                       $config.showFeatures.activityPoints &&
                       isActivated
                     "
-                    class="btn btn-outline-primary btn-sm"
+                    class="nav-custom-button btn btn-outline-primary btn-sm me-2"
                   >
                     <NuxtLink to="/activity-points">
                       {{ getUserAp }} MP
@@ -322,6 +331,7 @@ import SwitchChainButton from "~/components/SwitchChainButton.vue";
 import { addTokenToMetaMask } from "~/utils/tokenUtils";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
+import { useNotificationsStore } from "~/store/notifications";
 
 export default {
   name: "Navbar",
@@ -397,11 +407,12 @@ export default {
     const { address, isActivated } = useEthers();
     const siteStore = useSiteStore();
     const userStore = useUserStore();
-
+    const notificationsStore = useNotificationsStore();
     return {
       address,
       disconnect,
       isActivated,
+      notificationsStore,
       shortenAddress,
       siteStore,
       userStore,
