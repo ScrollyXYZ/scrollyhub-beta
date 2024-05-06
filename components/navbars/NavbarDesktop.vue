@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-bg-custom">
     <div class="container-fluid mx-3">
-      <!-- Logo Left -->
+      <!-- Scrolly Logo Left -->
       <NuxtLink class="navbar-brand" to="/">
         <img
           src="/img/favicon2.png"
@@ -64,59 +64,9 @@
             <span class="navbar-brand-text align-middle">SNS</span>
           </NuxtLink>
         </li>
-        <!-- NFT Setttings -->
-        <li v-if="isActivated" class="av-item dropdown special-link">
-          <a
-            class="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-            href="#"
-            role="button"
-            aria-expanded="false"
-          >
-            Settings
-          </a>
-          <div class="dropdown-menu dropdown-menu-end">
-            <NuxtLink class="dropdown-item cursor-pointer" to="/profile"
-              >Profile</NuxtLink
-            >
-            <span
-              class="dropdown-item cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#chatSettingsModal"
-              >Settings</span
-            >
-            <span
-              class="dropdown-item cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#changeUsernameModal"
-              >Change username</span
-            >
-            <span
-              class="dropdown-item cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#findUserModal"
-              >Find user</span
-            >
-            <span
-              class="dropdown-item cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#referralModal"
-              >Share referral link</span
-            >
-            <span
-              class="dropdown-item cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#themeSelectionModal"
-              >Theme</span
-            >
-            <span class="dropdown-item cursor-pointer" @click="disconnectWallet"
-              >Disconnect</span
-            >
-          </div>
-        </li>
       </ul>
 
-      <!-- UI Account-->
+      <!--Account-->
       <ul class="navbar-nav">
         <div class="d-flex align-items-center">
           <li v-if="!isActivated" class="nav-item">
@@ -157,81 +107,152 @@
                 >
               </div>
             </li>
-            <!-- Chat tokens -->
-            <!-- Activity Points -->
           </div>
+          <!-- Activity Points -->
           <div
             v-if="
               isActivated &&
               $config.activityPointsAddress &&
               $config.showFeatures.activityPoints
             "
-            class="mt-3"
+            class="mt-3 user-and-settings-container d-flex align-items-start border p-3"
+            style="width: 350px"
           >
-            <div
-              class="user-profile-container d-flex flex-column align-items-center justify-content-center"
-            >
-              <!-- Check if userStore.getDefaultDomain exists before displaying ProfileImage and link -->
+            <div style="flex-grow: 0">
+              <!-- Image Left -->
               <NuxtLink to="/profile" v-if="userStore.getDefaultDomain">
                 <ProfileImage
                   :key="userStore.getOrbisImage"
                   @click="closeLeftSidebar"
-                  class="img-fluid rounded-circle profile-image"
+                  class="img-fluid rounded-circle"
                   :address="address"
                   :domain="userStore.getDefaultDomain"
                   :image="userStore.getOrbisImage"
+                  style="width: 60px; height: 60px"
                 />
               </NuxtLink>
+              <!-- Settings & Chain bar -->
+              <div>
+                <SwitchChainButton
+                  v-if="isActivated"
+                  :navbar="true"
+                  :dropdown="true"
+                  v-b-tooltip.hover
+                  :title="networkMessage"
+                />
+              </div>
+            </div>
+            <!-- NAME / TOKENS / MAPPY POINTS -->
+            <div style="flex-grow: 1; padding-left: 20px">
+              <div class="d-flex flex-column align-items-start">
+                <!-- Username or Get your username -->
+                <div class="dropdown">
+                  <a
+                    class="dropdown-toggle"
+                    href="#"
+                    id="dropdownMenuLink"
+                    role="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false"
+                  >
+                    <h6 class="m-0" v-if="userStore.getDefaultDomain">
+                      {{
+                        getTextWithoutBlankCharacters(
+                          userStore.getDefaultDomain,
+                        )
+                      }}
+                    </h6>
+                    <h6 class="m-0" v-else>Get your Scrolly Domain</h6>
+                  </a>
 
-              <!-- Display user name or a clickable link if the domain name is null -->
-              <h6 class="user-name" v-if="userStore.getDefaultDomain">
-                {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
-              </h6>
-              <a
-                href="https://sns.scrolly.xyz"
-                target="_blank"
-                rel="noopener noreferrer"
-                v-else
-              >
-                <h6 class="user-name">Get your Scrolly Domain</h6>
-              </a>
-              <!-- Chat tokens -->
-              <div class="button-container">
-                <button
-                  v-if="
-                    userStore.getChatTokenBalanceWei > 0 &&
-                    $config.chatTokenAddress
-                  "
-                  class="btn btn-outline-primary btn-sm"
-                >
-                  {{ userStore.getChatTokenBalance }}
-                  {{ $config.chatTokenSymbol }}
-                </button>
+                  <!-- Settings Dropdown -->
+                  <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
+                    <NuxtLink class="dropdown-item" to="/profile"
+                      >Profile</NuxtLink
+                    >
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#chatSettingsModal"
+                      >Settings</span
+                    >
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#changeUsernameModal"
+                      >Change username</span
+                    >
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#findUserModal"
+                      >Find user</span
+                    >
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#referralModal"
+                      >Share referral link</span
+                    >
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#themeSelectionModal"
+                      >Theme</span
+                    >
+                    <span class="dropdown-item" @click="disconnectWallet"
+                      >Disconnect</span
+                    >
+                  </div>
+                </div>
 
-                <!-- Activity Points -->
-                <div
-                  v-if="
-                    $config.activityPointsAddress &&
-                    $config.showFeatures.activityPoints &&
-                    isActivated
-                  "
-                  class="activity-points-link"
-                >
-                  <NuxtLink
-                    to="/activity-points"
+                <!-- Tokens & Mappy Points div -->
+                <div class="d-flex justify-content-start mt-2">
+                  <!-- sub-tokens-->
+                  <button
+                    v-if="
+                      userStore.getChatTokenBalanceWei > 0 &&
+                      $config.chatTokenAddress
+                    "
+                    class="btn btn-outline-primary btn-sm me-2"
+                    data-bs-toggle="dropdown"
+                    aria-haspopup="true"
+                    aria-expanded="false"
+                  >
+                    {{ userStore.getChatTokenBalance }}
+                    {{ $config.chatTokenSymbol }}
+                  </button>
+                  <div class="dropdown-menu">
+                    <NuxtLink
+                      class="dropdown-item"
+                      to="/stake"
+                      v-if="
+                        $config.stakingContractAddress &&
+                        $config.showFeatures.stake
+                      "
+                    >
+                      Stake & earn weekly {{ $config.tokenSymbol }} rewards
+                    </NuxtLink>
+                    <span class="dropdown-item" @click="addToMetaMask"
+                      >Add {{ $config.chatTokenSymbol }} to MetaMask</span
+                    >
+                  </div>
+
+                  <!-- sub-Activity Points -->
+                  <div
+                    v-if="
+                      $config.activityPointsAddress &&
+                      $config.showFeatures.activityPoints &&
+                      isActivated
+                    "
                     class="btn btn-outline-primary btn-sm"
                   >
-                    {{ getUserAp }} MP
-                  </NuxtLink>
+                    <NuxtLink to="/activity-points">
+                      {{ getUserAp }} MP
+                    </NuxtLink>
+                  </div>
                 </div>
               </div>
-              <!-- Settings & Chain bar -->
-
-              <SwitchChainButton
-                v-if="isActivated"
-                :navbar="true"
-                :dropdown="true"
-              />
             </div>
           </div>
         </div>
