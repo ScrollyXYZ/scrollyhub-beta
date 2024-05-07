@@ -35,17 +35,21 @@
 
           <!-- Post text -->
           <div @click="openPostDetails">
-            <p
-              class="card-text text-break"
-              v-if="parsedText.length > postLengthLimit && !showFullText"
-            >
-              {{ parsedText.substring(0, postLengthLimit) + " ... " }}
+            <div v-if="parsedText.length > postLengthLimit && !showFullText">
+              <p
+                class="card-text text-break"
+                v-html="
+                  parsedText
+                    .substring(0, postLengthLimit)
+                    .replace(/(<br\s*\/?>)*$/g, '') + ' ... '
+                "
+              ></p>
               <span
                 class="cursor-pointer hover-color"
-                @click="showFullText = true"
+                @click.stop="showFullText = true"
                 >Read more</span
               >
-            </p>
+            </div>
             <p
               v-if="parsedText.length < postLengthLimit || showFullText"
               class="card-text text-break"
