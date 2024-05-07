@@ -124,7 +124,7 @@
               $config.activityPointsAddress &&
               $config.showFeatures.activityPoints
             "
-            class="mt-3 user-and-settings-container d-flex align-items-start"
+            class="connect-wallet-button mt-3 user-and-settings-container d-flex align-items-start"
             style="width: 350px"
           >
             <div style="flex-grow: 0">
