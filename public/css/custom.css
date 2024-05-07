@@ -11,10 +11,14 @@
   --bs-primary: #007ced !important; /* TODO: Replace is with your primary color */
   --bs-primary-rgb: 10, 88, 202; /* TODO: This should be an RGB version of --bs-primary hex color */
   --bs-btn-disabled-border-color: #007ced; /* TODO: Replace is with your primary color */
-  --bs-link-color: #007ced; /* TODO: Replace is with your primary color */
+  --bs-link-color: #000000; /* TODO: Replace is with your primary color */
   --bs-nav-pills-link-active-bg: #007ced !important; /* TODO: Replace is with your primary color */
-  --bs-link-color: #007ced; /* TODO: Replace is with your primary color */
-  --bs-link-hover-color: #3e83ea; /* TODO: A slightly darker shade of the primary color */
+  --bs-link-color: #000000; /* TODO: Replace is with your primary color */
+  --bs-link-hover-color: hsl(
+    0,
+    0%,
+    100%
+  ); /* TODO: A slightly darker shade of the primary color */
   --bs-blue: #1d3b53;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -132,14 +136,12 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: url(/css/clouds/background-scrollyverse.webp);
+  background: url(/css/clouds/1500x500.jpg);
   background-size: cover;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  background-attachment: fixed;
   background-position: center;
   animation: wind 20s linear infinite;
-  background-size: 100% 100%;
 }
 
 .alert-primary {
@@ -194,6 +196,7 @@ a:hover {
   --bs-btn-active-bg: var(--bs-link-hover-color);
   --bs-btn-active-border-color: var(--bs-link-hover-color);
   --bs-btn-disabled-bg: var(--bs-primary);
+  border-radius: 50px;
 }
 
 .btn-primary-soft {
@@ -268,15 +271,21 @@ a:hover {
 .cursor-pointer {
   cursor: pointer;
 }
-
+/* Hub Feed*/
+.card.mb-2 {
+  background-color: transparent;
+  border-width: 0px !important;
+}
 /* EmojiPicker.vue + <Picker class="emoji-mart-category" */
 .emoji-mart-category {
-  color: #0f1110;
+  color: hsl(305, 100%, 21%);
 }
-
+.emoji-mart-static {
+  background-color: #ffffff;
+}
 .emoji-mart-static .emoji-mart-category-label,
 .emoji-mart-static .emoji-mart-category-label h3 {
-  background-color: #222529;
+  background-color: #7c0072;
   color: #ffffff;
 }
 
@@ -305,7 +314,7 @@ a:hover {
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  border-radius: 0.5rem;
+  border-radius: 1rem;
   -webkit-transition:
     border-color 0.15s ease-in-out,
     -webkit-box-shadow 0.15s ease-in-out;
@@ -363,15 +372,15 @@ a:hover {
 }
 
 .navbar {
-  --bs-navbar-padding-y: 0.85rem;
-  --bs-navbar-nav-link-padding-x: 0.75rem;
-  font-size: 0.875rem;
-  font-weight: 500;
+  --bs-navbar-padding-y: 0rem;
+  --bs-navbar-nav-link-padding-x: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 0.5rem;
 }
 
 .navbar .nav-item {
-  margin-right: 0.5rem;
-  margin-left: 0.5rem;
+  margin-right: 0.1rem;
+  margin-left: 0.1rem;
 }
 
 .navbar .navbar-nav .nav-link {
@@ -379,13 +388,10 @@ a:hover {
 }
 
 /* @todo Add your custom navbar background color */
-/*
+
 .navbar-bg-custom {
-  background: linear-gradient(40deg,#ff6ec4,#007ced);
-  border-bottom-right-radius: 15px;
-  border-bottom-left-radius: 15px;
+  background-color: #ffffff57;
 }
-*/
 
 .navbar-brand,
 .navbar-brand:hover,
@@ -393,11 +399,31 @@ a:hover {
 .navbar-brand:focus {
   color: var(--bs-primary);
 }
+/* Style spécifique pour la nouvelle catégorie SpecialLink dans la barre de navigation */
+.navbar .navbar-nav .special-link {
+  font-family: "GlitterySnowfall", Arial, sans-serif; /* Même police que les autres éléments de la navbar */
+  font-size: 1rem; /* Taille de police standard pour la navbar */
+  color: var(--bs-primary); /* Couleur principale pour la cohérence */
+  text-decoration: none; /* Pas de soulignement pour garder la netteté */
+  transition: color 0.3s ease; /* Transition douce pour les survols */
+  color: var(--bs-primary);
+  font-family: "GlitterySnowfall", Arial, sans-serif;
+  font-size: 1.9rem;
+  margin-right: 20px;
+}
 
+/* Modification de la couleur lors du survol pour la classe SpecialLink */
+.navbar .navbar-nav .special-link:hover {
+  color: var(
+    --bs-link-hover-color
+  ); /* Couleur lors du survol pour améliorer l'interaction */
+  background-color: transparent; /* Aucun fond ajouté lors du survol */
+}
 .navbar-brand-text {
   color: var(--bs-primary);
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 1.9rem;
+  margin-right: 20px;
 }
 
 .navbar-dark .navbar-nav .nav-link:hover {
@@ -418,9 +444,84 @@ a:hover {
   border-radius: var(--bs-navbar-toggler-border-radius);
   transition: var(--bs-navbar-toggler-transition);
 }
+.button-container {
+  display: flex; /* Active Flexbox */
+  align-items: center; /* Alignement vertical au centre */
+  justify-content: center; /* Centre les éléments horizontalement */
+  gap: 10px; /* Espacement entre les éléments */
+  margin-top: 10 px;
+}
 
+.activity-points-link {
+  margin-top: 0; /* Enlève la marge supérieure pour aligner correctement avec le bouton */
+  margin-bottom: 0; /* Enlève la marge inférieure pour un alignement uniforme */
+}
+/* @todo Navbar User Profile */
+/* Custom styles for the navigation button */
+
+.filtered-shadow {
+  filter: drop-shadow(10px 10px 10px rgba(0, 0, 0, 1));
+}
+.nav-custom-button {
+  padding: 4px 12px; /* Uniform padding, corrected from '6x' to '6px' */
+  font-size: 12px; /* Standard font size */
+  border: 2px solid #000; /* Example border */
+  border-radius: 15px; /* Consistent rounded corners */
+  background-color: hsla(
+    0,
+    0%,
+    100%,
+    0
+  ); /* Corrected background transparency */
+  color: #000; /* Text color */
+  text-decoration: none; /* Remove underline from links */
+  display: flex;
+  align-items: center; /* Center content within buttons */
+  justify-content: center;
+  text-align: center;
+  transition:
+    background-color 0.3s,
+    color 0.3s; /* Smooth transition for hover effects */
+}
+
+.nav-custom-button:hover,
+.nav-custom-button:focus {
+  background-color: rebeccapurple; /* Change background to a darker violet on hover/focus */
+  color: white; /* Ensure text color remains white on hover/focus */
+  border-color: white; /* Ensure border color remains white on hover/focus */
+}
+
+.nav-custom-button:disabled,
+.nav-custom-button.disabled {
+  opacity: 0.5; /* Make the button half transparent when disabled */
+  cursor: not-allowed; /* Change cursor to indicate the button is disabled */
+}
+.profile-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centers the content vertically */
+  justify-content: center; /* Centers the content horizontally */
+  gap: 0px; /* Provides a gap between elements */
+}
+
+.profile-image {
+  width: 50px; /* Specify the width */
+  height: 50px; /* Ensure the height matches the width for a circle */
+  object-fit: cover; /* Ensures the image covers the area without distortion */
+}
+
+.user-name {
+  font-weight: bold;
+  margin-top: 0rem;
+  color: hwb(0 0% 100%);
+}
+
+.user-name a {
+  color: inherit;
+  text-decoration: none;
+}
+/* END UX */
 .navbar-toggler:focus {
-  /* Remove the shadow effect */
   border: 0 !important;
   box-shadow: none !important;
 }
@@ -516,6 +617,7 @@ a:hover {
   .main-containter {
     flex: 1 0 0%;
     width: auto;
+    background-color: #2b2b2b78;
   }
 
   .page-container {
@@ -523,7 +625,7 @@ a:hover {
   }
 
   .sidebar-nav {
-    width: 260px;
+    width: 300px;
   }
 }
 

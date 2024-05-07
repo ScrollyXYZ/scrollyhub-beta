@@ -1,4 +1,4 @@
-[data-bs-theme=scrolly] {
+[data-bs-theme="scrolly"] {
   --bs-blue: #1d3b53;
   --bs-indigo: #6610f2;
   --bs-purple: #6f42c1;
@@ -31,7 +31,7 @@
   --bs-light: #f5f5f6;
   --bs-dark: #0b0a12;
   --bs-orange: #fd7e14;
-  --bs-mode: #fff;
+  --bs-mode: hwb(0 89% 11%); <!-- // maincontainer //--!>
   --bs-white-rgb: 255, 255, 255;
   --bs-secondary-rgb: 133, 135, 138;
   --bs-success-rgb: 12, 188, 135;
@@ -49,6 +49,7 @@
   --bs-danger-text: #b02a37;
   --bs-light-text: #6c757d;
   --bs-dark-text: #495057;
+  --bs-primary: #FFFFFF;
   --bs-primary-bg-subtle: #cfe2ff;
   --bs-secondary-bg-subtle: #f8f9fa;
   --bs-success-bg-subtle: #d1e7dd;
@@ -68,9 +69,16 @@
   --bs-white-rgb: 255, 255, 255;
   --bs-black-rgb: 0, 0, 0;
   --bs-body-bg-rgb: 255, 255, 255;
-  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  --bs-gradient: linear-gradient(180deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+  --bs-font-sans-serif: system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif,
+    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  --bs-font-monospace: SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  --bs-gradient: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.15),
+    rgba(255, 255, 255, 0)
+  );
   --bs-body-font-family: "DM Sans", sans-serif;
   --bs-body-font-size: 1rem;
   --bs-body-font-weight: 400;
@@ -91,7 +99,7 @@
   --bs-body-bg-rgb: 245, 245, 246;
   --bs-heading-color: var(--bs-gray-900);
   --bs-link-decoration: none;
-  --bs-link-hover-color-rgb: 65, 54, 174;
+  --bs-link-hover-color-rgb: 255, 54, 223;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fff3cd;
   --bs-border-width: 1px;
@@ -121,25 +129,40 @@
   --bs-white-black-toggle: #000;
 }
 
-[data-bs-theme=scrolly] body {
-  background-color: #007ced;
+[data-bs-theme="scrolly"] body {
+  background-color: #810067;
 }
-
-[data-bs-theme=scrolly] .bg-mode {
+[data-bs-theme="scrolly"] .bg-mode {
   background-color: var(--bs-mode) !important;
 }
 
-[data-bs-theme=scrolly] .link-without-color {
+[data-bs-theme="scrolly"] .link-without-color {
   color: var(--bs-gray-700);
   text-decoration: none;
 }
 
-[data-bs-theme=scrolly] .text-muted {
+[data-bs-theme="scrolly"] .text-muted {
   color: var(--bs-gray-700) !important;
 }
 
-[data-bs-theme=scrolly] .navbar-brand-text {
-  color: white;
+[data-bs-theme="scrolly"] .navbar-brand-text {
+  color: #000000;
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 1.9rem;
+}
+[data-bs-theme="scrolly"] .btn-primary {
+  background-color: var(--bs-indigo);
+  border-radius: 50px;
+  text-decoration: none;
+  --bs-btn-bg: var(--bs-primary);
+  --bs-btn-border-color: var(--bs-primary);
+  --bs-btn-hover-bg: var(--bs-link-hover-color-rgb);
+  --bs-btn-hover-border-color: var(--bs-link-hover-color-rgb);
+  --bs-btn-active-bg: var(--bs-link-hover-color-rgb);
+  --bs-btn-active-border-color: var(--bs-link-hover-color-rgb);
+  --bs-btn-disabled-bg: var(--bs-primary);
+}
+
+[data-bs-theme="scrolly"].btn-primary:hover {
+  background-color: var(--bs-purple); /* Darker purple on hover */
 }
