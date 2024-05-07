@@ -560,10 +560,19 @@ a:hover {
   margin-top: 0rem;
   color: hwb(0 0% 100%);
 }
-
+.user-name:hover {
+  font-weight: bold;
+  margin-top: 0rem;
+  color: rgb(77, 0, 57) ;!important
+}
 .user-name a {
   color: inherit;
   text-decoration: none;
+}
+.user-name a:hover {
+  font-weight: bold;
+  margin-top: 0rem;
+  color: hwb(315 0% 47%);
 }
 /* END UX */
 .navbar-toggler:focus {

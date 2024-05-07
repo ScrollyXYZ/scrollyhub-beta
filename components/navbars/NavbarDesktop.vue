@@ -155,9 +155,9 @@
             <div style="flex-grow: 1; padding-left: 20px">
               <div class="d-flex flex-column align-items-start">
                 <!-- Username or Get your username -->
-                <div class="dropdown">
+                <div class="">
                   <a
-                    class="dropdown-toggle"
+                    class=""
                     href="#"
                     id="dropdownMenuLink"
                     role="button"
@@ -165,15 +165,21 @@
                     aria-expanded="false"
                   >
                     <h6 class="m-0" v-if="userStore.getDefaultDomain">
-                      {{
+                      <i class="user-name">{{
                         getTextWithoutBlankCharacters(
                           userStore.getDefaultDomain,
                         )
-                      }}
+                      }}</i>
+                      <i
+                        class="user-name bi bi-nut-fill"
+                        style="margin-left: 5px"
+                      ></i>
                     </h6>
-                    <h6 class="m-0" v-else>Get your Scrolly Domain</h6>
+                    <h6 class="m-0" v-else>
+                      Get your Scrolly Domain
+                      <i class="bi bi-nut-fill" style="margin-left: 5px"></i>
+                    </h6>
                   </a>
-
                   <!-- Settings Dropdown -->
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <NuxtLink class="dropdown-item" to="/profile"
