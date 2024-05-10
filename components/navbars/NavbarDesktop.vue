@@ -41,24 +41,9 @@
             NFT Launchpad
           </a>
           <div class="dropdown-menu dropdown-menu-end">
-            <NuxtLink class="dropdown-item" to="/nft">NFT Launchpad</NuxtLink>
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#chatSettingsModal"
-              >Collection</span
-            >
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#changeUsernameModal"
-              >My NFTs</span
-            >
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#findUserModal"
-              >Create a collection</span
+            <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
+            <NuxtLink class="dropdown-item" to="/nft/create"
+              >Create a collection</NuxtLink
             >
           </div>
         </li>
@@ -117,7 +102,7 @@
               </div>
             </li>
           </div>
-          <!-- Activity Points -->
+          <!-- Mappy Points -->
           <div
             v-if="
               isActivated &&
