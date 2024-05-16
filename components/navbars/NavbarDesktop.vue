@@ -41,24 +41,9 @@
             NFT Launchpad
           </a>
           <div class="dropdown-menu dropdown-menu-end">
-            <NuxtLink class="dropdown-item" to="/nft">NFT Launchpad</NuxtLink>
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#chatSettingsModal"
-              >Collection</span
-            >
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#changeUsernameModal"
-              >My NFTs</span
-            >
-            <span
-              class="dropdown-item"
-              data-bs-toggle="modal"
-              data-bs-target="#findUserModal"
-              >Create a collection</span
+            <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
+            <NuxtLink class="dropdown-item" to="/nft/create"
+              >Create a collection</NuxtLink
             >
           </div>
         </li>
@@ -117,14 +102,14 @@
               </div>
             </li>
           </div>
-          <!-- Activity Points -->
+          <!-- Mappy Points -->
           <div
             v-if="
               isActivated &&
               $config.activityPointsAddress &&
               $config.showFeatures.activityPoints
             "
-            class="mt-3 user-and-settings-container d-flex align-items-start"
+            class="connect-wallet-button mt-3 user-and-settings-container d-flex align-items-start"
             style="width: 350px"
           >
             <div style="flex-grow: 0">
@@ -155,9 +140,9 @@
             <div style="flex-grow: 1; padding-left: 20px">
               <div class="d-flex flex-column align-items-start">
                 <!-- Username or Get your username -->
-                <div class="dropdown">
+                <div class="">
                   <a
-                    class="dropdown-toggle"
+                    class=""
                     href="#"
                     id="dropdownMenuLink"
                     role="button"
@@ -165,15 +150,21 @@
                     aria-expanded="false"
                   >
                     <h6 class="m-0" v-if="userStore.getDefaultDomain">
-                      {{
+                      <i class="user-name">{{
                         getTextWithoutBlankCharacters(
                           userStore.getDefaultDomain,
                         )
-                      }}
+                      }}</i>
+                      <i
+                        class="user-name bi bi-nut-fill"
+                        style="margin-left: 5px"
+                      ></i>
                     </h6>
-                    <h6 class="m-0" v-else>Get your Scrolly Domain</h6>
+                    <h6 class="m-0" v-else>
+                      Get your Scrolly Domain
+                      <i class="bi bi-nut-fill" style="margin-left: 5px"></i>
+                    </h6>
                   </a>
-
                   <!-- Settings Dropdown -->
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
                     <NuxtLink class="dropdown-item" to="/profile"
