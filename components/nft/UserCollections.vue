@@ -21,9 +21,6 @@
             <p class="card-text mb-1">
               <strong>{{ nft.name }}</strong>
             </p>
-            <small class="card-text">
-              {{ formatPrice(nft.price) }} {{ $config.tokenSymbol }}
-            </small>
           </div>
         </div>
       </NuxtLink>
@@ -94,7 +91,6 @@ export default {
     async parseNftsArray(inputArray, outputArray, provider) {
       const nftInterface = new ethers.utils.Interface([
         "function collectionPreview() public view returns (string memory)",
-        "function getMintPrice() public view returns (uint256)",
         "function name() public view returns (string memory)",
       ]);
 
@@ -110,43 +106,35 @@ export default {
           collection = { address: inputArray[i] };
         }
 
-        let cName = collection.name || (await nftContract.name());
-        let mintPriceWei = await nftContract.getMintPrice();
-        let cImage =
-          collection.image || (await nftContract.collectionPreview());
+        try {
+          let cName = collection.name || (await nftContract.name());
+          let cImage =
+            collection.image || (await nftContract.collectionPreview());
 
-        if (cImage.includes(".ipfs.sphn.link/")) {
-          const linkParts = cImage.split(".ipfs.sphn.link/");
-          const cid = linkParts[0].replace("https://", "");
-          const newImageLink =
-            this.$config.ipfsGateway + cid + "/" + linkParts[1];
-          collection.image = newImageLink;
-          cImage = newImageLink;
+          if (cImage.includes(".ipfs.sphn.link/")) {
+            const linkParts = cImage.split(".ipfs.sphn.link/");
+            const cid = linkParts[0].replace("https://", "");
+            const newImageLink =
+              this.$config.ipfsGateway + cid + "/" + linkParts[1];
+            collection.image = newImageLink;
+            cImage = newImageLink;
+          }
+
+          collection.name = cName;
+          storeCollection(window, inputArray[i], collection);
+
+          outputArray.push({
+            address: inputArray[i],
+            image: cImage,
+            name: cName,
+          });
+        } catch (error) {
+          console.error(
+            `Failed to fetch metadata for NFT: ${inputArray[i]}`,
+            error,
+          );
         }
-
-        collection.name = cName;
-        storeCollection(window, inputArray[i], collection);
-
-        outputArray.push({
-          address: inputArray[i],
-          image: cImage,
-          name: cName,
-          price: mintPriceWei,
-        });
       }
-    },
-    formatPrice(priceWei) {
-      if (priceWei === null) return null;
-      const price = Number(ethers.utils.formatEther(priceWei));
-      if (price > 100) return price.toFixed(0);
-      if (price > 1) return price.toFixed(2);
-      if (price > 0.1) return price.toFixed(4);
-      if (price > 0.01) return price.toFixed(5);
-      if (price > 0.001) return price.toFixed(6);
-      if (price > 0.0001) return price.toFixed(7);
-      if (price > 0.00001) return price.toFixed(8);
-      if (price > 0.000001) return price.toFixed(9);
-      return price;
     },
   },
 };
