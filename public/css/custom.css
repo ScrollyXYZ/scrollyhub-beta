@@ -689,3 +689,58 @@ a:hover {
     margin-bottom: 500px;
   }
 }
+.sidebar-card-body {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.sidebar-card-body-img {
+  width: 100px; 
+  height: auto;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.speech-bubble {
+  position: relative;
+  background: #00aabb;
+  border-radius: .4em;
+  padding: 10px;
+  color: white;
+  width: 200px; 
+  text-align: center;
+  margin-top: 10px;
+}
+
+.speech-bubble:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: -10px;
+  margin-top: -10px;
+  width: 0;
+  height: 0;
+  border: 10px solid transparent;
+  border-right-color: #00aabb;
+}
+
+.button-container {
+  text-align: center;
+  margin-top: 10px;
+}
+
+.create-domain-button {
+  display: inline-block;
+  background-color: #00aabb;
+  color: white;
+  padding: 10px 20px;
+  text-decoration: none;
+  border-radius: 5px;
+  transition: background-color 0.3s, transform 0.3s;
+}
+
+.create-domain-button:hover {
+  background-color: #008899;
+  transform: scale(1.05);
+}

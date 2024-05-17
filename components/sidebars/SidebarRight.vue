@@ -53,47 +53,43 @@
 
         <!-- Register a domain name OR say Hello -->
         <div class="card m-2 bg-light">
-          <div class="card-header bg-light">Welcome !</div>
-          <div class="card-body sidebar-card-body">
-            <!-- Afficher un message personnalisé si l'utilisateur est connecté et a un nom de domaine -->
+          <div class="card-header bg-light">Welcome!</div>
+          <div class="sidebar-card-body">
+            <img
+              src="~/public/img/scrollyimg.png"
+              class="sidebar-card-body-img"
+            />
+            <div class="speech-bubble">
+              <!-- Greeting for users who are connected and have a domain -->
+              <template v-if="isActivated && userStore.getDefaultDomain">
+                Nice to see you again!
+                {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
+              </template>
 
-            <!-- Greeting for users who are connected and have a domain -->
-            <h6
-              class="user-name"
-              v-if="isActivated && userStore.getDefaultDomain"
-            >
-              Nice to see you again!
-              {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
-            </h6>
+              <!-- Greeting for connected users who do not have a domain -->
+              <template v-else-if="isActivated && !userStore.getDefaultDomain">
+                Nice to meet you! We saw that you don't have a Domain yet.
+                Choose your Nickname and join us on the Hub.
+              </template>
 
-            <!-- Greeting for connected users who do not have a domain -->
-            <h6
-              class="user-name"
-              v-else-if="isActivated && !userStore.getDefaultDomain"
-            >
-              Nice to meet you! We saw that you don't have a Domain yet. Choose
-              your Nickname and join us on the Hub.
-              <a
-                href="https://sns.scrolly.xyz"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Create a domain
-              </a>
-            </h6>
-
-            <!-- Message for users who are not connected -->
-            <h6 class="user-name" v-else>
-              You can create your Scrolly Domain now.
-              <a
-                href="https://sns.scrolly.xyz"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                Create a domain
-              </a>
-            </h6>
+              <!-- Message for users who are not connected -->
+              <template v-else>
+                You can create your Scrolly Domain now.
+              </template>
+            </div>
           </div>
+          <template v-if="!userStore.getDefaultDomain">
+            <div class="button-container">
+              <a
+                href="https://sns.scrolly.xyz/"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="create-domain-button"
+              >
+                Create a domain
+              </a>
+            </div>
+          </template>
         </div>
         <!-- Referrals 
         <ReferralWidget />-->
