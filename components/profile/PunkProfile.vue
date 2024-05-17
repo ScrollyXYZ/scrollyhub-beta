@@ -37,11 +37,16 @@
           </div>
 
           <div class="col-md-9 mt-3">
+            <h3
+              v-if="domain && isCurrentUser"
+              class="mb-3 cursor-pointer"
+              data-bs-toggle="modal"
+              data-bs-target="#changeUsernameModal"
+            >
+              {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
+            </h3>
             <h3 v-if="domain && !isCurrentUser" class="mb-3">
               {{ getTextWithoutBlankCharacters(domain) }}
-            </h3>
-            <h3 v-if="domain && isCurrentUser" class="mb-3">
-              {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
             </h3>
 
             <!-- Data -->
@@ -63,9 +68,7 @@
               >
                 <i class="bi bi-wallet me-1"></i>
                 {{ balanceAp }} AP
-              </p>
-              <p class="me-4">
-                <strong>Tier: {{ userTier }}</strong>
+                <span class="badge bg-primary ms-2">{{ userTier }}</span>
               </p>
               <p class="me-4">
                 <i class="bi bi-box-arrow-up-right me-2"></i>
@@ -315,7 +318,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { useEthers, shortenAddress } from "vue-dapp";
 import { ethers } from "ethers";
@@ -367,14 +369,8 @@ export default {
   },
 
   mounted() {
-    // get profileCurrentTab from localStorage
-    this.currentTab = localStorage.getItem("profileCurrentTab");
+    this.currentTab = localStorage.getItem("profileCurrentTab") || "posts";
 
-    if (!this.currentTab) {
-      this.currentTab = "posts";
-    }
-
-    // if uAddress and/or domain is not provided via props, then find it yourself
     if (!this.pAddress || !this.pDomain) {
       this.fetchAddressAndDomain();
     }
@@ -385,30 +381,18 @@ export default {
   computed: {
     balanceChatToken() {
       const bal = ethers.utils.formatEther(this.balanceChatTokenWei);
-
-      if (bal >= 0) {
-        return Math.floor(Number(bal));
-      } else {
-        return Number(bal).toFixed(4);
-      }
+      return bal >= 0 ? Math.floor(Number(bal)) : Number(bal).toFixed(4);
     },
 
     balanceEth() {
       const bal = ethers.utils.formatEther(this.uBalance);
-
-      if (bal > 0) {
-        return Number(bal).toFixed(2);
-      } else {
-        return Number(bal).toFixed(4);
-      }
+      return bal > 0 ? Number(bal).toFixed(2) : Number(bal).toFixed(4);
     },
 
     getOrbisContext() {
-      if (this.$config.orbisTest) {
-        return this.$config.orbisTestContext;
-      } else {
-        return this.$config.chatChannels.general;
-      }
+      return this.$config.orbisTest
+        ? this.$config.orbisTestContext
+        : this.$config.chatChannels.general;
     },
 
     isCurrentUser() {
@@ -419,29 +403,11 @@ export default {
     },
 
     isEmail() {
-      if (this.newEmail) {
-        if (this.newEmail.includes("@") && this.newEmail.includes(".")) {
-          return true;
-        }
-      }
-
-      return false;
-    },
-
-    isImage() {
-      if (this.newImageLink) {
-        if (
-          this.newImageLink.includes(".jpg") ||
-          this.newImageLink.includes(".jpeg") ||
-          this.newImageLink.includes(".png") ||
-          this.newImageLink.includes(".gif") ||
-          this.newImageLink.includes(".webp")
-        ) {
-          return true;
-        }
-      }
-
-      return false;
+      return (
+        this.newEmail &&
+        this.newEmail.includes("@") &&
+        this.newEmail.includes(".")
+      );
     },
 
     userTier() {
@@ -484,10 +450,7 @@ export default {
         this.waitingImageUpdate = true;
 
         if (!this.orbisProfile) {
-          this.orbisProfile = {
-            pfp: "",
-            username: "",
-          };
+          this.orbisProfile = { pfp: "", username: "" };
         }
 
         this.orbisProfile.pfp = this.newImageLink;
@@ -638,13 +601,10 @@ export default {
     },
 
     async fetchOrbisProfile() {
-      this.orbisProfile = {
-        pfp: "",
-        username: "",
-      };
+      this.orbisProfile = { pfp: "", username: "" };
 
       if (this.uAddress) {
-        let { data, error } = await this.$orbis.getDids(this.uAddress);
+        let { data } = await this.$orbis.getDids(this.uAddress);
 
         if (data[0]?.did) {
           this.uDid = data[0].did;
@@ -738,7 +698,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .profile-image-container {
   position: relative;
