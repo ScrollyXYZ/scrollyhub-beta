@@ -7,15 +7,33 @@
         </p>
 
         <div class="row">
-          <div class="col-md-3 mt-3">
-            <ProfileImage
-              :key="orbisImage"
-              v-if="uAddress"
-              class="img-fluid img-thumbnail rounded-circle col-6 col-md-12"
-              :address="uAddress"
-              :domain="domain"
-              :image="orbisImage"
-            />
+          <div class="col-md-3 mt-3 position-relative">
+            <div
+              class="profile-image-container"
+              @click="
+                isCurrentUser &&
+                  userStore.getIsConnectedToOrbis &&
+                  openFileUploadModal
+              "
+            >
+              <ProfileImage
+                :key="orbisImage"
+                v-if="uAddress"
+                class="img-fluid img-thumbnail rounded-circle col-6 col-md-12"
+                :address="uAddress"
+                :domain="domain"
+                :image="orbisImage"
+              />
+              <div
+                v-if="isCurrentUser && userStore.getIsConnectedToOrbis"
+                class="edit-overlay"
+                :class="!userStore.getIsConnectedToOrbis ? 'disabled' : ''"
+                data-bs-toggle="modal"
+                :data-bs-target="'#fileUploadModal' + $.uid"
+              >
+                <i class="bi bi-camera-fill edit-icon"></i>
+              </div>
+            </div>
           </div>
 
           <div class="col-md-9 mt-3">
@@ -45,6 +63,9 @@
               >
                 <i class="bi bi-wallet me-1"></i>
                 {{ balanceAp }} AP
+              </p>
+              <p class="me-4">
+                <strong>Tier: {{ userTier }}</strong>
               </p>
               <p class="me-4">
                 <i class="bi bi-box-arrow-up-right me-2"></i>
@@ -422,12 +443,40 @@ export default {
 
       return false;
     },
+
+    userTier() {
+      const tiers = [
+        { name: "Scrolly Baby", points: 1 },
+        { name: "Scrolly Novice", points: 333 },
+        { name: "Scrolly Explorer", points: 777 },
+        { name: "Scrolly Mapper", points: 1337 },
+        { name: "Carto Maestro", points: 2442 },
+        { name: "Grand Cartographer of Scrolly", points: 4200 },
+      ];
+      const userPoints = this.balanceAp;
+      let userTier = "Unknown";
+      for (let i = tiers.length - 1; i >= 0; i--) {
+        if (userPoints >= tiers[i].points) {
+          userTier = tiers[i].name;
+          break;
+        }
+      }
+      return userTier;
+    },
   },
 
   methods: {
     changeCurrentTab(tab) {
       this.currentTab = tab;
       localStorage.setItem("profileCurrentTab", tab);
+    },
+
+    openFileUploadModal() {
+      const modal = document.getElementById(`fileUploadModal${this.$.uid}`);
+      if (modal) {
+        const modalInstance = new bootstrap.Modal(modal);
+        modalInstance.show();
+      }
     },
 
     async changeImage() {
@@ -689,3 +738,34 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.profile-image-container {
+  position: relative;
+  width: fit-content;
+  margin: auto;
+  cursor: pointer;
+}
+
+.profile-image-container:hover .edit-overlay {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
+}
+
+.edit-overlay {
+  display: none;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.edit-icon {
+  color: white;
+  font-size: 2rem;
+}
+</style>
