@@ -1,64 +1,87 @@
 <template>
-<div class="card mb-3 border" v-if="post">
-  <div class="card-body row">
-    <div class="col-2 col-md-1 pfp-sizing">
-      <NuxtLink :to="'/profile/?id='+String(showDomainOrFullAddress)">
-        <ProfileImage 
-          class="img-fluid rounded-circle"
-          :address="authorAddress" 
-          :domain="authorDomain"
-          :image="getOrbisImage"
-        />
-      </NuxtLink>
-    </div>
-
-    <div class="col-10 col-md-11 post-sizing">
-      
-      <!-- post author and timestamp -->
-      <p class="card-subtitle mb-1 text-muted">
-        <NuxtLink v-if="authorDomain" class="link-without-color hover-color" :to="'/profile/?id='+authorDomain">{{showDomainOrAddressOrAnon}}</NuxtLink>
-        <span v-if="!authorDomain">{{showDomainOrAddressOrAnon}}</span>
-      </p>
-
-      <!-- post text -->
-      <div v-if="post.body" @click="openPostDetails">
-        <p
-          class="card-text text-break"
-          v-if="parsedText.length > postLengthLimit && !showFullText"
-        >
-          <span 
-            v-html="parsedText.substring(0, postLengthLimit) + ' ... '">
-          </span>
-          <span class="cursor-pointer hover-color" @click="showFullText = true">Read more</span>
-        </p>
-
-        <p v-if="parsedText.length < postLengthLimit || showFullText" class="card-text text-break" v-html="parsedText"></p>
+  <div class="card mb-3 border" v-if="post">
+    <div class="card-body row">
+      <div class="col-2 col-md-1 pfp-sizing">
+        <NuxtLink :to="'/profile/?id=' + String(showDomainOrFullAddress)">
+          <ProfileImage
+            class="img-fluid rounded-circle"
+            :address="authorAddress"
+            :domain="authorDomain"
+            :image="getOrbisImage"
+          />
+        </NuxtLink>
       </div>
 
-      <div v-if="!post.body">
-        <p class="card-text"><small><em>(deleted)</em></small></p>
+      <div class="col-10 col-md-11 post-sizing">
+        <!-- post author and timestamp -->
+        <p class="card-subtitle mb-1 text-muted">
+          <UserLabel :address="authorAddress" :domain="authorDomain">
+            <NuxtLink
+              v-if="authorDomain"
+              class="link-without-color hover-color"
+              :to="'/profile/?id=' + authorDomain"
+            >
+              {{ showDomainOrAddressOrAnon }}
+            </NuxtLink>
+            <span v-if="!authorDomain">{{ showDomainOrAddressOrAnon }}</span>
+          </UserLabel>
+        </p>
+
+        <!-- post text -->
+        <div v-if="post.body" @click="openPostDetails">
+          <p
+            class="card-text text-break"
+            v-if="parsedText.length > postLengthLimit && !showFullText"
+          >
+            <span v-html="parsedText.substring(0, postLengthLimit) + ' ... '">
+            </span>
+            <span
+              class="cursor-pointer hover-color"
+              @click="showFullText = true"
+              >Read more</span
+            >
+          </p>
+
+          <p
+            v-if="parsedText.length < postLengthLimit || showFullText"
+            class="card-text text-break"
+            v-html="parsedText"
+          ></p>
+        </div>
+
+        <div v-if="!post.body">
+          <p class="card-text">
+            <small><em>(deleted)</em></small>
+          </p>
+        </div>
       </div>
     </div>
   </div>
-
-</div>
 </template>
 
 <script>
-import sanitizeHtml from 'sanitize-html';
-import { useEthers, shortenAddress } from 'vue-dapp';
-import { useUserStore } from '~/store/user';
+import sanitizeHtml from "sanitize-html";
+import { useEthers, shortenAddress } from "vue-dapp";
+import { useUserStore } from "~/store/user";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
-import { getDomainName } from '~/utils/domainUtils';
-import { fetchUsername, storeUsername } from '~/utils/storageUtils';
-import { getTextWithoutBlankCharacters, imgParsing, imgWithoutExtensionParsing, urlParsing, youtubeParsing } from '~/utils/textUtils';
+import UserLabel from "~/components/UserLabel.vue";
+import { getDomainName } from "~/utils/domainUtils";
+import { fetchUsername, storeUsername } from "~/utils/storageUtils";
+import {
+  getTextWithoutBlankCharacters,
+  imgParsing,
+  imgWithoutExtensionParsing,
+  urlParsing,
+  youtubeParsing,
+} from "~/utils/textUtils";
 
 export default {
   name: "ChatQuote",
   props: ["post"], // quote post: body, stream_id, pfp, username, address
 
   components: {
-    ProfileImage
+    ProfileImage,
+    UserLabel,
   },
 
   data() {
@@ -67,8 +90,8 @@ export default {
       authorDomain: null,
       parsedText: null,
       postLengthLimit: 300,
-      showFullText: false
-    }
+      showFullText: false,
+    };
   },
 
   created() {
@@ -122,9 +145,14 @@ export default {
           this.authorDomain = storedDomain;
         } else {
           // fetch provider from hardcoded RPCs
-          let provider = this.$getFallbackProvider(this.$config.supportedChainId);
+          let provider = this.$getFallbackProvider(
+            this.$config.supportedChainId,
+          );
 
-          if (this.isActivated && this.chainId === this.$config.supportedChainId) {
+          if (
+            this.isActivated &&
+            this.chainId === this.$config.supportedChainId
+          ) {
             // fetch provider from user's MetaMask
             provider = this.signer;
           }
@@ -134,21 +162,21 @@ export default {
           if (domainName) {
             this.authorDomain = domainName + this.$config.tldName;
             storeUsername(window, this.authorAddress, this.authorDomain);
-          } 
+          }
         }
       }
     },
 
     openPostDetails() {
-      this.$router.push({ name: 'post', query: { id: this.post.stream_id } });
+      this.$router.push({ name: "post", query: { id: this.post.stream_id } });
     },
 
     parsePostText() {
       let postText = this.post.body;
 
       postText = sanitizeHtml(postText, {
-        allowedTags: [ 'li', 'ul', 'ol', 'br', 'em', 'strong', 'i', 'b' ],
-        allowedAttributes: {}
+        allowedTags: ["li", "ul", "ol", "br", "em", "strong", "i", "b"],
+        allowedAttributes: {},
       });
 
       postText = imgParsing(postText);
@@ -157,7 +185,7 @@ export default {
       postText = urlParsing(postText);
 
       this.parsedText = postText.replace(/(\r\n|\n|\r)/gm, "<br/>");
-    }
+    },
   },
 
   setup() {
@@ -165,7 +193,15 @@ export default {
     const { address, chainId, isActivated, signer } = useEthers();
     const userStore = useUserStore();
 
-    return { address, chainId, isActivated, route, shortenAddress, signer, userStore }
+    return {
+      address,
+      chainId,
+      isActivated,
+      route,
+      shortenAddress,
+      signer,
+      userStore,
+    };
   },
-}
+};
 </script>

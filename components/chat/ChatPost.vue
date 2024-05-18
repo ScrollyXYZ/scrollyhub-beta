@@ -18,19 +18,23 @@
         <div class="col-12 post-sizing">
           <!-- Post author and timestamp -->
           <p class="card-subtitle mb-2 text-muted">
-            <NuxtLink
-              class="link-without-color hover-color"
-              :to="'/profile/?id=' + String(showDomainOrFullAddress)"
-              >{{ showDomainOrAddressOrAnon }}</NuxtLink
-            >
+            <UserLabel :address="authorAddress" :domain="authorDomain">
+              <NuxtLink
+                class="link-without-color hover-color"
+                :to="'/profile/?id=' + String(showDomainOrFullAddress)"
+              >
+                {{ showDomainOrAddressOrAnon }}
+              </NuxtLink>
+            </UserLabel>
             <span v-if="post.timestamp">
               ·
               <NuxtLink
                 class="link-without-color hover-color"
                 :to="'/post/?id=' + post.stream_id"
-                >{{ timeSince }}</NuxtLink
-              ></span
-            >
+              >
+                {{ timeSince }}
+              </NuxtLink>
+            </span>
           </p>
 
           <!-- Post text -->
@@ -47,8 +51,9 @@
               <span
                 class="cursor-pointer hover-color"
                 @click.stop="showFullText = true"
-                >Read more</span
               >
+                Read more
+              </span>
             </div>
             <p
               v-if="parsedText.length < postLengthLimit || showFullText"
@@ -66,7 +71,6 @@
                 class="text-decoration-none text-reset"
               >
                 <img :src="linkPreview.image.url" class="card-img-top" />
-
                 <div
                   class="card-body bg-body rounded-bottom-3 border-end border-bottom border-start"
                 >
@@ -91,7 +95,6 @@
                 class="text-decoration-none text-reset"
               >
                 <img :src="collection?.image" class="card-img-top" />
-
                 <div
                   class="card-body bg-body rounded-bottom-3 border-end border-bottom border-start"
                 >
@@ -331,6 +334,7 @@ import ProfileImage from "~/components/profile/ProfileImage.vue";
 import IggyPostMint from "~/components/minted-posts/IggyPostMint.vue";
 import MintedPostImage from "~/components/minted-posts/MintedPostImage.vue";
 import ChatQuote from "~/components/chat/ChatQuote.vue";
+import UserLabel from "~/components/UserLabel.vue"; // Import the new component
 import { getDomainName } from "~/utils/domainUtils";
 import {
   getTextWithoutBlankCharacters,
@@ -347,6 +351,7 @@ import {
   storeCollection,
   storeUsername,
 } from "~/utils/storageUtils";
+import { getActivityPoints } from "~/utils/balanceUtils";
 
 export default {
   name: "ChatPost",
@@ -359,6 +364,7 @@ export default {
     MintedPostImage,
     ProfileImage,
     TokenTipModal,
+    UserLabel, // Register the new component
   },
 
   data() {
@@ -377,6 +383,8 @@ export default {
       replyText: null,
       showFullText: false,
       waitingDeletePost: false,
+      balanceAp: 0,
+      userTier: "Unknown",
     };
   },
 
@@ -386,6 +394,7 @@ export default {
     }
 
     this.parsePostText();
+    this.fetchActivityPointsAndTier();
 
     if (
       this.route.href === "/post/?id=" + this.post.stream_id ||
@@ -463,7 +472,6 @@ export default {
 
     getNftCollectionDescription() {
       if (this.customDataType === "nftCollectionCreated") {
-        // if description length is too long, shorten it and attach "..."
         const maxLength = 100;
 
         if (this.collection.description.length > maxLength) {
@@ -562,18 +570,47 @@ export default {
   },
 
   methods: {
+    async fetchActivityPointsAndTier() {
+      if (this.post.creator_details.metadata.address) {
+        const provider = this.$getFallbackProvider(
+          this.$config.supportedChainId,
+        );
+        this.balanceAp = await getActivityPoints(
+          this.post.creator_details.metadata.address,
+          provider,
+        );
+        this.userTier = this.getUserTier(this.balanceAp);
+      }
+    },
+
+    getUserTier(points) {
+      const tiers = [
+        { name: "Scrolly Baby", points: 1 },
+        { name: "Scrolly Novice", points: 333 },
+        { name: "Scrolly Explorer", points: 777 },
+        { name: "Scrolly Mapper", points: 1337 },
+        { name: "Carto Maestro", points: 2442 },
+        { name: "Grand Cartographer of Scrolly", points: 4200 },
+      ];
+
+      for (let i = tiers.length - 1; i >= 0; i--) {
+        if (points >= tiers[i].points) {
+          return tiers[i].name;
+        }
+      }
+      return "Unknown";
+    },
+
     async checkIfAlreadyLiked() {
-      // check if user has already liked this post
       if (this.userStore.getIsConnectedToOrbis) {
         let res = await this.$orbis.getReaction(
           String(this.post.stream_id),
-          String(this.userStore.getDidParent), // current user's did
+          String(this.userStore.getDidParent),
         );
 
-        /** Check if request is successful or not */
         if (res.status == 200) {
           if (res.data && res.data.type === "like") {
-            this.alreadyLiked = true; // mark as liked
+            this.alreadyLiked = true;
           }
         }
       }
@@ -585,7 +622,6 @@ export default {
         lit: false,
       });
 
-      /** Check if connection is successful or not */
       if (res.status == 200) {
         this.userStore.setIsConnectedToOrbis(true);
 
@@ -605,7 +641,6 @@ export default {
 
         let res = await this.$orbis.deletePost(String(this.post.stream_id));
 
-        /** Check if request is successful or not */
         if (res.status == 200) {
           this.toast("Post deleted successfully", { type: "success" });
           this.$emit("removePost", this.post.stream_id);
@@ -627,17 +662,14 @@ export default {
     },
 
     async fetchAuthorDomain() {
-      // find out if post author has a domain name
       this.authorAddress = this.post.creator_details.metadata.address;
 
       if (this.authorAddress) {
-        // check storage if author's domain is already stored
         const storedDomain = fetchUsername(window, this.authorAddress);
 
         if (storedDomain) {
           this.authorDomain = storedDomain;
         } else {
-          // fetch provider from hardcoded RPCs
           let provider = this.$getFallbackProvider(
             this.$config.supportedChainId,
           );
@@ -646,7 +678,6 @@ export default {
             this.isActivated &&
             this.chainId === this.$config.supportedChainId
           ) {
-            // fetch provider from user's MetaMask
             provider = this.signer;
           }
 
@@ -663,22 +694,18 @@ export default {
     async fetchCollectionData(cAddress) {
       this.customDataType = "nftCollectionCreated";
 
-      // check storage if collection data is already stored
       this.collection = fetchCollection(window, cAddress);
 
       if (!this.collection) {
-        // fetch provider from hardcoded RPCs
         let provider = this.$getFallbackProvider(this.$config.supportedChainId);
 
         if (
           this.isActivated &&
           this.chainId === this.$config.supportedChainId
         ) {
-          // fetch provider from user's MetaMask
           provider = this.signer;
         }
 
-        // fetch collection data from blockchain
         const nftInterface = new ethers.utils.Interface([
           "function collectionPreview() public view returns (string memory)",
           "function name() public view returns (string memory)",
@@ -700,7 +727,6 @@ export default {
           image: collectionImage,
         };
       } else {
-        // sometimes the collection object does not have the address property
         this.collection["address"] = cAddress;
       }
     },
@@ -716,7 +742,6 @@ export default {
           return;
         }
 
-        // check in localStorage if link preview is already stored (key is the link)
         const storedLinkPreviewString = localStorage.getItem(this.firstLink);
 
         if (storedLinkPreviewString) {
@@ -756,7 +781,6 @@ export default {
               if (response?.data) {
                 this.linkPreview = response["data"];
 
-                // store link preview in localStorage
                 if (this.linkPreview?.title) {
                   localStorage.setItem(
                     this.firstLink,
@@ -774,42 +798,30 @@ export default {
 
     async likePost() {
       if (this.userStore.getIsConnectedToOrbis && !this.alreadyLiked) {
-        // mark as liked
         this.alreadyLiked = true;
         this.post.count_likes++;
 
-        // like the post
         let res = await this.$orbis.react(this.post.stream_id, "like");
 
-        /** Check if request is successful or not */
         if (res.status !== 200) {
-          // if failed request, unmark as liked
           this.alreadyLiked = false;
           this.post.count_likes--;
           console.log("Error liking the post: ", res);
           this.toast(res.result, { type: "error" });
         }
       } else if (this.userStore.getIsConnectedToOrbis && this.alreadyLiked) {
-        // un-mark as liked
         this.alreadyLiked = false;
         this.post.count_likes--;
 
-        // remove reaction ("un-like" the post)
-        let res = await this.$orbis.react(
-          this.post.stream_id,
-          "none", // "none" removes the previous "like" reaction
-        );
+        let res = await this.$orbis.react(this.post.stream_id, "none");
 
-        /** Check if request is successful or not */
         if (res.status !== 200) {
-          // if failed request, mark as liked again
           this.alreadyLiked = true;
           this.post.count_likes++;
           console.log("Error un-liking the post: ", res);
           this.toast(res.result, { type: "error" });
         }
       } else {
-        // @todo: open a modal to sign into chat instead
         await this.connectToOrbis();
 
         this.toast("Signed into chat, now please try to like the post again.", {
@@ -821,18 +833,15 @@ export default {
     async replyPost() {
       if (this.userStore.getIsConnectedToOrbis) {
         const options = {
-          master: this.post.master, // the main post in the thread
-          reply_to: this.post.stream_id, // important: reply_to needs to be filled out even if the reply is directly to the master post
+          master: this.post.master,
+          reply_to: this.post.stream_id,
           body: this.replyText,
           context: this.getOrbisContext,
         };
 
-        // post on Orbis & Ceramic
         let res = await this.$orbis.createPost(options);
 
-        /** Check if posting is successful or not */
         if (res.status == 200) {
-          // success
           this.toast("Reply successfully posted", { type: "success" });
           this.$emit(
             "insertReply",
@@ -858,19 +867,6 @@ export default {
     },
 
     openPostDetails() {
-      // navigate to post details page if you're not already there
-      /*
-      if (
-        this.route.path !== "/post/" && // no post on any /post page is clickable
-        this.route.path !== "/post" && // no post on any /post page is clickable
-        this.route.href !== "/post?id=" + this.post.stream_id &&
-        this.route.href !== "/post/?id=" + this.post.stream_id
-      ) {
-        console.log("navigate to post details page")
-        this.$router.push({ name: 'post', query: { id: this.post.stream_id } });
-      }
-      */
-
       this.$router.push({ name: "post", query: { id: this.post.stream_id } });
     },
 
@@ -883,7 +879,6 @@ export default {
       });
 
       if (this.$config.linkPreviews) {
-        // get first link in post
         this.firstLink = findFirstUrl(postText);
         if (this.firstLink) {
           this.fetchLinkPreview();
@@ -897,7 +892,6 @@ export default {
 
       this.parsedText = postText.replace(/(\r\n|\n|\r)/gm, "<br/>");
 
-      // check if there is an NFT collection URL shared in the post
       const collectionUrl = findFirstCollectionUrl(postText);
 
       if (collectionUrl) {
