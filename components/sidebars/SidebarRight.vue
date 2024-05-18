@@ -53,7 +53,6 @@
 
         <!-- Register a domain name OR say Hello -->
         <div class="card m-2 bg-light">
-          <div class="card-header bg-light">Welcome!</div>
           <div class="sidebar-card-body">
             <img
               src="~/public/img/scrollyimg.png"
@@ -94,13 +93,13 @@
         <!-- Referrals 
         <ReferralWidget />-->
 
-        <!-- Swap tokens -->
+        <!-- Swap tokens 
         <SimpleSwapWidget
           v-if="$config.swapRouterAddress && $config.showFeatures.swap"
           :routerAddress="$config.swapRouterAddress"
           :tokens="tokens"
           title="Swap tokens"
-        />
+        /> -->
 
         <!-- Playlist -->
         <div class="card m-2 bg-light" v-if="$config.showFeatures.spotify">

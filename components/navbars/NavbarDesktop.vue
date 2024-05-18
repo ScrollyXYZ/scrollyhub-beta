@@ -42,8 +42,12 @@
           </a>
           <div class="dropdown-menu dropdown-menu-end">
             <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
+            <NuxtLink class="dropdown-item" to="/nft/mynfts">My Nfts</NuxtLink>
             <NuxtLink class="dropdown-item" to="/nft/create"
               >Create a collection</NuxtLink
+            >
+            <NuxtLink class="dropdown-item" to="/nft/mycreatednfts"
+              >Manage my Collections</NuxtLink
             >
           </div>
         </li>
@@ -54,9 +58,9 @@
           </NuxtLink>
         </li>
         <li class="nav-item">
-          <NuxtLink class="nav-link" to="/">
+          <a class="nav-link" href="https://sns.scrolly.xyz" target="_blank">
             <span class="navbar-brand-text align-middle">SNS</span>
-          </NuxtLink>
+          </a>
         </li>
       </ul>
 
