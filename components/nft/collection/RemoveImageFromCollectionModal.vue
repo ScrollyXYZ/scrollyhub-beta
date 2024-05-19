@@ -1,88 +1,48 @@
 <template>
-  <div
-    class="modal fade"
-    id="removeImageFromCollectionModal"
-    tabindex="-1"
-    :aria-labelledby="'modalLabel-' + componentId"
-    aria-hidden="true"
-  >
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h1 class="modal-title fs-5" :id="'modalLabel-' + componentId">
-            Remove Image From Collection
-          </h1>
-          <button
-            :id="'closeModal-' + componentId"
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
-        </div>
+  <div>
+    <h5>Remove Image From Collection</h5>
+    <div>
+      <button
+        class="btn btn-primary"
+        @click="loadImages"
+        :disabled="waitingLoad"
+      >
+        <span
+          v-if="waitingLoad"
+          class="spinner-border spinner-border-sm"
+          role="status"
+          aria-hidden="true"
+        ></span>
+        Load images
+      </button>
+    </div>
 
-        <div class="modal-body">
-          <div class="row">
-            <label :for="'input-' + componentId" class="form-label">
-              <strong> Load images from collection: </strong>
-            </label>
-          </div>
-
-          <div>
+    <div class="row mt-3" v-if="images.length > 0">
+      <div v-for="(image, index) in images" :key="image" class="col-md-4 mb-3">
+        <div class="card">
+          <img :src="image" class="card-img-top" />
+          <div class="card-body">
             <button
-              class="btn btn-primary"
-              @click="loadImages"
-              :disabled="waitingLoad"
+              class="btn btn-danger"
+              @click="removeImage(index)"
+              :disabled="waitingRemove || images.length == 1"
             >
               <span
-                v-if="waitingLoad"
+                v-if="waitingRemove"
                 class="spinner-border spinner-border-sm"
                 role="status"
                 aria-hidden="true"
               ></span>
-              Load images
+              Delete
             </button>
           </div>
-
-          <div class="row mt-3" v-if="images.length > 0">
-            <div
-              v-for="(image, index) in images"
-              :key="index"
-              class="col-md-4 mb-3"
-            >
-              <div class="card">
-                <img :src="image" class="card-img-top" />
-                <div class="card-body">
-                  <div class="row">
-                    <button
-                      class="btn btn-danger"
-                      @click="removeImage(index)"
-                      :disabled="waitingRemove || images.length == 1"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div v-if="images.length === 0 && !waitingLoad">
-            <p>No images found in this collection.</p>
-          </div>
-        </div>
-
-        <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
         </div>
       </div>
     </div>
+
+    <button type="button" class="btn btn-secondary mt-3" @click="closeModal">
+      Close
+    </button>
   </div>
 </template>
 
@@ -101,6 +61,7 @@ export default {
     return {
       componentId: null,
       images: [],
+      imageUrl: null,
       waitingLoad: false,
       waitingRemove: false,
     };
@@ -175,7 +136,6 @@ export default {
 
         if (receipt.status === 1) {
           this.toast.dismiss(toastWait);
-
           this.toast(
             "You have successfully removed an image from the NFT collection.",
             {
@@ -190,12 +150,14 @@ export default {
             },
           );
 
-          // Remove image from array by index
-          this.images.splice(imageIndex, 1);
-          this.waitingRemove = false;
+          // remove image from array by index
+          const newImgArray = [...this.images];
+          newImgArray.splice(imageIndex, 1);
+          this.images = newImgArray;
 
-          // Emit the saveCollection event to update the collection
           this.$emit("saveCollection", { images: this.images });
+
+          this.waitingRemove = false;
         } else {
           this.toast.dismiss(toastWait);
           this.waitingRemove = false;
@@ -232,6 +194,10 @@ export default {
 
         this.waitingRemove = false;
       }
+    },
+
+    closeModal() {
+      document.getElementById("closeModal-" + this.componentId).click();
     },
   },
 

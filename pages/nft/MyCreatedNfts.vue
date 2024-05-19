@@ -324,7 +324,6 @@ export default {
     ChangeNftTypeModal,
   },
   props: ["hideBackButton"],
-
   data() {
     return {
       allNftsArrayLength: 0,
@@ -341,51 +340,41 @@ export default {
       },
     };
   },
-
   mounted() {
     if (this.$config.nftLaunchpadBondingAddress) {
       this.fetchCreatedNfts();
     }
   },
-
   computed: {
     showLoadMoreButton() {
       return this.allNftsIndexEnd > 0;
     },
   },
-
   methods: {
     async fetchCreatedNfts() {
       this.waitingData = true;
-
       let provider = this.$getFallbackProvider(this.$config.supportedChainId);
-
       if (this.isActivated && this.chainId === this.$config.supportedChainId) {
         provider = this.signer;
       }
-
       const launchpadInterface = new ethers.utils.Interface([
         "function getNftContracts(uint256 fromIndex, uint256 toIndex) external view returns(address[] memory)",
         "function getNftContractsArrayLength() external view returns(uint256)",
       ]);
-
       const launchpadContract = new ethers.Contract(
         this.$config.nftLaunchpadBondingAddress,
         launchpadInterface,
         provider,
       );
-
       if (Number(this.allNftsArrayLength) === 0) {
         this.allNftsArrayLength =
           await launchpadContract.getNftContractsArrayLength();
       }
-
       const allNfts = await launchpadContract.getNftContracts(
         0,
         this.allNftsArrayLength - 1,
       );
       const createdNfts = [];
-
       for (const nftAddress of allNfts) {
         const nftInterface = new ethers.utils.Interface([
           "function owner() external view returns (address)",
@@ -394,33 +383,25 @@ export default {
           "function name() public view returns (string memory)",
           "function pricingType() public view returns (string memory)",
         ]);
-
         const nftContract = new ethers.Contract(
           nftAddress,
           nftInterface,
           provider,
         );
         const owner = await nftContract.owner();
-
         if (owner.toLowerCase() === this.address.toLowerCase()) {
           const collection = fetchCollection(window, nftAddress) || {};
-
           if (!collection.name) {
             collection.name = await nftContract.name();
           }
-
           if (!collection.image) {
             collection.image = await nftContract.collectionPreview();
           }
-
           if (!collection.pricingType) {
             collection.pricingType = await nftContract.pricingType();
           }
-
           const totalSupply = await nftContract.totalSupply();
-
           storeCollection(window, nftAddress, collection);
-
           createdNfts.push({
             address: nftAddress,
             image: collection.image,
@@ -434,11 +415,9 @@ export default {
           });
         }
       }
-
       this.createdNfts = createdNfts;
       this.waitingData = false;
     },
-
     openSettingsModal(nft) {
       this.selectedNft = nft;
       const modal = new bootstrap.Modal(
@@ -447,11 +426,9 @@ export default {
       modal.show();
       console.log("Opened modal for NFT:", nft);
     },
-
     async refreshMetadata(nft) {
       nft.waitingRefresh = true;
       const provider = this.$getFallbackProvider(this.$config.supportedChainId);
-
       const nftInterface = new ethers.utils.Interface([
         "function owner() external view returns (address)",
         "function collectionPreview() public view returns (string memory)",
@@ -459,13 +436,11 @@ export default {
         "function name() public view returns (string memory)",
         "function pricingType() public view returns (string memory)",
       ]);
-
       const nftContract = new ethers.Contract(
         nft.address,
         nftInterface,
         provider,
       );
-
       const updatedCollection = {
         address: nft.address,
         image: await nftContract.collectionPreview(),
@@ -473,17 +448,13 @@ export default {
         totalSupply: (await nftContract.totalSupply()).toString(),
         isBonding: (await nftContract.pricingType()).includes("bonding"),
       };
-
       const collection = fetchCollection(window, nft.address) || {};
       Object.assign(collection, updatedCollection);
       storeCollection(window, nft.address, collection);
-
       this.saveCollection(updatedCollection);
       nft.waitingRefresh = false;
-
       this.toast("Metadata refreshed successfully.", { type: "success" });
     },
-
     saveCollection(updatedData) {
       const index = this.createdNfts.findIndex(
         (nft) => nft.address === updatedData.address,
@@ -498,11 +469,9 @@ export default {
       }
     },
   },
-
   setup() {
     const { address, chainId, isActivated, signer } = useEthers();
     const toast = useToast();
-
     return { address, chainId, isActivated, signer, toast };
   },
 };
@@ -524,17 +493,17 @@ export default {
 }
 
 .nav-tabs .nav-link.active {
-  background-color: #007bff;
+  background-color: var(--bs-primary);
   color: white;
 }
 
 .btn-outline-primary {
-  border-color: #007bff;
-  color: #007bff;
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
 }
 
 .btn-outline-primary:hover {
-  background-color: #007bff;
+  background-color: var(--bs-primary);
   color: white;
 }
 
