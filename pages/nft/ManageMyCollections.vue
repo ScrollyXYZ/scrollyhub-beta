@@ -392,7 +392,7 @@ import RemoveImageFromCollectionModal from "~/components/nft/collection/RemoveIm
 import ChangeNftTypeModal from "~/components/nft/collection/ChangeNftTypeModal.vue";
 
 export default {
-  name: "MyCreatedNfts",
+  name: "ManageMyCollections",
   components: {
     ChangeDescriptionModal,
     ChangeCollectionPreviewModal,
@@ -501,7 +501,16 @@ export default {
         document.getElementById("settingsModal"),
       );
       modal.show();
-      console.log("Opened modal for NFT:", nft);
+      this.$nextTick(() => {
+        this.updateModalData(nft);
+      });
+    },
+    updateModalData(nft) {
+      this.$refs.changeDescriptionModal.updateData(nft.description);
+      this.$refs.changeCollectionPreviewModal.updateData(nft.image);
+      this.$refs.addImageToCollectionModal.updateData(nft);
+      this.$refs.removeImageFromCollectionModal.updateData(nft);
+      this.$refs.changeNftTypeModal.updateData(nft.type);
     },
     async refreshMetadata(nft) {
       nft.waitingRefresh = true;
