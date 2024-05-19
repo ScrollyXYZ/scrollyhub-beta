@@ -1,9 +1,9 @@
 <template>
   <Head>
-    <Title>My Created NFTs | {{ $config.projectMetadataTitle }}</Title>
+    <Title>Manage my Collections | {{ $config.projectMetadataTitle }}</Title>
     <Meta
       property="og:title"
-      :content="'My Created NFTs | ' + $config.projectMetadataTitle"
+      :content="'Manage my Collections | ' + $config.projectMetadataTitle"
     />
     <Meta
       name="description"
@@ -46,7 +46,7 @@
       </p>
 
       <h3 class="d-flex flex-row flex-wrap mt-3">
-        <div class="mb-3 me-auto">My Created NFTs</div>
+        <div class="mb-3 me-auto">Manage my Collections</div>
       </h3>
 
       <div v-if="!isActivated" class="alert alert-info">
@@ -54,7 +54,9 @@
       </div>
 
       <div v-else>
-        <h4 class="mt-3 mb-3" v-if="createdNfts.length > 0">My Created NFTs</h4>
+        <h4 class="mt-3 mb-3" v-if="createdNfts.length > 0">
+          Manage my Collections
+        </h4>
 
         <div v-if="waitingData" class="alert alert-info">
           Searching for your created NFTs on the blockchain. Please wait a
@@ -62,29 +64,49 @@
         </div>
 
         <div v-else-if="createdNfts.length === 0" class="alert alert-warning">
-          You haven't created any NFTs.
+          You haven't created any collections.
+          <button
+            class="btn btn-primary mt-3"
+            @click="$router.push('/nft/create')"
+          >
+            Create a Collection
+          </button>
         </div>
 
         <div
           v-for="nft in createdNfts"
           :key="nft.address"
-          class="row mb-4 align-items-center"
+          class="row mb-4 align-items-center position-relative"
         >
-          <div class="col-md-3 text-center">
+          <div class="col-md-3 text-center position-relative">
             <img
               :src="nft.image"
-              class="img-fluid img-thumbnail rounded"
+              class="img-fluid img-thumbnail rounded nft-image"
               :alt="nft.name"
             />
+            <div class="overlay">
+              <i
+                class="bi bi-eye eye-icon"
+                @click="$router.push(`/nft/collection?id=${nft.address}`)"
+              ></i>
+            </div>
           </div>
           <div class="col-md-6">
             <h5>{{ nft.name }}</h5>
-            <p>Number of NFTs minted: {{ nft.totalSupply }}</p>
+            <p>Minted NFTs: {{ nft.totalSupply }}</p>
             <p v-if="nft.isBonding">
               <span class="badge bg-primary">Bonding</span>
             </p>
+          </div>
+          <div class="col-md-3 text-end">
             <button
-              class="btn btn-secondary mt-3"
+              class="btn btn-outline-primary"
+              @click="openSettingsModal(nft)"
+            >
+              Manage NFT
+            </button>
+            <button
+              class="btn btn-secondary mt-2"
               @click="refreshMetadata(nft)"
             >
               <span
@@ -94,14 +116,6 @@
                 aria-hidden="true"
               ></span>
               Refresh Metadata
-            </button>
-          </div>
-          <div class="col-md-3 text-end">
-            <button
-              class="btn btn-outline-primary"
-              @click="openSettingsModal(nft)"
-            >
-              Manage NFT
             </button>
           </div>
         </div>
@@ -211,6 +225,20 @@
                     Metadata
                   </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                  <button
+                    class="nav-link"
+                    id="about-tab"
+                    data-bs-toggle="tab"
+                    data-bs-target="#about"
+                    type="button"
+                    role="tab"
+                    aria-controls="about"
+                    aria-selected="false"
+                  >
+                    About
+                  </button>
+                </li>
               </ul>
               <div class="tab-content" id="settingsTabContent">
                 <div
@@ -244,16 +272,22 @@
                   role="tabpanel"
                   aria-labelledby="images-tab"
                 >
-                  <add-image-to-collection-modal
-                    :cAddress="selectedNft.address"
-                    :mdAddress="selectedNft.mdAddress"
-                    @saveCollection="saveCollection"
-                  ></add-image-to-collection-modal>
-                  <remove-image-from-collection-modal
-                    :cAddress="selectedNft.address"
-                    :mdAddress="selectedNft.mdAddress"
-                    @saveCollection="saveCollection"
-                  ></remove-image-from-collection-modal>
+                  <div class="row">
+                    <div class="col-md-6">
+                      <add-image-to-collection-modal
+                        :cAddress="selectedNft.address"
+                        :mdAddress="selectedNft.mdAddress"
+                        @saveCollection="saveCollection"
+                      ></add-image-to-collection-modal>
+                    </div>
+                    <div class="col-md-6">
+                      <remove-image-from-collection-modal
+                        :cAddress="selectedNft.address"
+                        :mdAddress="selectedNft.mdAddress"
+                        @saveCollection="saveCollection"
+                      ></remove-image-from-collection-modal>
+                    </div>
+                  </div>
                 </div>
                 <div
                   class="tab-pane fade"
@@ -267,6 +301,49 @@
                     :mdAddress="selectedNft.mdAddress"
                     @saveCollection="saveCollection"
                   ></change-nft-type-modal>
+                </div>
+                <div
+                  class="tab-pane fade"
+                  id="about"
+                  role="tabpanel"
+                  aria-labelledby="about-tab"
+                >
+                  <div class="mt-3">
+                    <p>
+                      <strong>About:</strong> Learn more about managing your NFT
+                      collections.
+                    </p>
+                    <p>
+                      <strong>Q1:</strong> How do I update the description of my
+                      NFT collection?
+                      <br />
+                      <strong>A:</strong> Go to the "Description" tab and use
+                      the provided form to update the collection's description.
+                    </p>
+                    <p>
+                      <strong>Q2:</strong> How do I change the preview image of
+                      my NFT collection?
+                      <br />
+                      <strong>A:</strong> Go to the "Preview Image" tab and
+                      upload or link to the new image you want to use as the
+                      preview.
+                    </p>
+                    <p>
+                      <strong>Q3:</strong> How can I add or remove images from
+                      my NFT collection?
+                      <br />
+                      <strong>A:</strong> Use the "Images" tab to add new images
+                      or remove existing ones from your collection.
+                    </p>
+                    <p>
+                      <strong>Q4:</strong> What is metadata and how do I update
+                      it?
+                      <br />
+                      <strong>A:</strong> Metadata provides details about each
+                      NFT. Use the "Metadata" tab to update the metadata URL or
+                      type.
+                    </p>
+                  </div>
                 </div>
               </div>
               <div class="tab-pane fade show active mt-3">
@@ -486,6 +563,36 @@ export default {
 .img-thumbnail {
   max-height: 200px;
   object-fit: cover;
+  transition: transform 0.3s ease-in-out;
+}
+
+.img-thumbnail:hover {
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.overlay .eye-icon {
+  color: white;
+  font-size: 2rem;
+  cursor: pointer;
+}
+
+.nft-image:hover + .overlay,
+.overlay:hover {
+  opacity: 1;
 }
 
 .nav-tabs .nav-link {
