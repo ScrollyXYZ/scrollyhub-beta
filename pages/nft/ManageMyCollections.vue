@@ -1,42 +1,7 @@
 <template>
   <Head>
     <Title>Manage my Collections | {{ $config.projectMetadataTitle }}</Title>
-    <Meta
-      property="og:title"
-      :content="'Manage my Collections | ' + $config.projectMetadataTitle"
-    />
-    <Meta
-      name="description"
-      :content="
-        'Check out these awesome NFT collections created by you on ' +
-        $config.projectName +
-        '!'
-      "
-    />
-    <Meta
-      property="og:image"
-      :content="$config.projectUrl + $config.previewImageNftLaunchpad"
-    />
-    <Meta
-      property="og:description"
-      :content="
-        'Check out these awesome NFT collections created by you on ' +
-        $config.projectName +
-        '!'
-      "
-    />
-    <Meta
-      name="twitter:image"
-      :content="$config.projectUrl + $config.previewImageNftLaunchpad"
-    />
-    <Meta
-      name="twitter:description"
-      :content="
-        'Check out these awesome NFT collections created by you on ' +
-        $config.projectName +
-        '!'
-      "
-    />
+    <!-- Meta tags -->
   </Head>
 
   <div class="card border scroll-500">
@@ -392,7 +357,7 @@ import RemoveImageFromCollectionModal from "~/components/nft/collection/RemoveIm
 import ChangeNftTypeModal from "~/components/nft/collection/ChangeNftTypeModal.vue";
 
 export default {
-  name: "ManageMyCollections",
+  name: "MyCreatedNfts",
   components: {
     ChangeDescriptionModal,
     ChangeCollectionPreviewModal,
@@ -501,16 +466,7 @@ export default {
         document.getElementById("settingsModal"),
       );
       modal.show();
-      this.$nextTick(() => {
-        this.updateModalData(nft);
-      });
-    },
-    updateModalData(nft) {
-      this.$refs.changeDescriptionModal.updateData(nft.description);
-      this.$refs.changeCollectionPreviewModal.updateData(nft.image);
-      this.$refs.addImageToCollectionModal.updateData(nft);
-      this.$refs.removeImageFromCollectionModal.updateData(nft);
-      this.$refs.changeNftTypeModal.updateData(nft.type);
+      console.log("Opened modal for NFT:", nft);
     },
     async refreshMetadata(nft) {
       nft.waitingRefresh = true;
