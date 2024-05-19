@@ -69,7 +69,7 @@
           <NuxtLink
             v-if="isActivated"
             class="btn btn-outline-primary btn-sm ms-2"
-            to="/nft/mycreatednfts"
+            to="/nft/ManageMyCollections"
           >
             <i class="bi bi-file-earmark"></i> My Created NFTs
           </NuxtLink>
