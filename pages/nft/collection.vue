@@ -1,203 +1,364 @@
 <template>
   <Head>
     <Title>NFT Collection Details | {{ $config.projectMetadataTitle }}</Title>
-    <Meta property="og:title" :content="'NFT Collection Details | ' + $config.projectMetadataTitle" />
-
-    <Meta name="description" :content="'Check this NFT collection on ' + $config.projectName + '!'" />
-
-    <Meta property="og:image" :content="$config.projectUrl+$config.previewImageNftCollection" />
-    <Meta property="og:description" :content="'Check this NFT collection on ' + $config.projectName + '!'" />
-
-    <Meta name="twitter:image" :content="$config.projectUrl+$config.previewImageNftCollection" />
-    <Meta name="twitter:description" :content="'Check this NFT collection on ' + $config.projectName + '!'" />
+    <Meta
+      property="og:title"
+      :content="'NFT Collection Details | ' + $config.projectMetadataTitle"
+    />
+    <Meta
+      name="description"
+      :content="'Check this NFT collection on ' + $config.projectName + '!'"
+    />
+    <Meta
+      property="og:image"
+      :content="$config.projectUrl + $config.previewImageNftCollection"
+    />
+    <Meta
+      property="og:description"
+      :content="'Check this NFT collection on ' + $config.projectName + '!'"
+    />
+    <Meta
+      name="twitter:image"
+      :content="$config.projectUrl + $config.previewImageNftCollection"
+    />
+    <Meta
+      name="twitter:description"
+      :content="'Check this NFT collection on ' + $config.projectName + '!'"
+    />
   </Head>
 
   <div class="card border">
     <div class="card-body">
       <p class="fs-3">
-        <i @click="$router.push({ path: '/nft' })" class="bi bi-arrow-left-circle cursor-pointer"></i>
+        <i
+          @click="$router.push({ path: '/nft' })"
+          class="bi bi-arrow-left-circle cursor-pointer"
+        ></i>
       </p>
 
       <h3 class="mb-3 mt-3" v-if="!cName">NFT Collection Details</h3>
       <h3 class="mb-3 mt-3" v-if="cName">{{ cName }}</h3>
 
       <div class="d-flex justify-content-center mb-3" v-if="waitingData">
-        <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span>
+        <span
+          class="spinner-border spinner-border-lg"
+          role="status"
+          aria-hidden="true"
+        ></span>
       </div>
 
       <div class="row">
-
         <div class="col-md-5 text-center mb-3">
           <img :src="cImage" class="img-fluid img-thumbnail rounded col-12" />
 
           <div class="dropdown mt-3">
-            <button class="btn btn-outline-primary btn-sm dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <button
+              class="btn btn-outline-primary btn-sm dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+            >
               Actions
             </button>
             <ul class="dropdown-menu">
-
               <li v-if="isCurrentAddressOwner">
-                <span class="dropdown-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#changeDescriptionModal">
-                  Change description
+                <span
+                  class="dropdown-item cursor-pointer"
+                  @click="openManageModal"
+                >
+                  Manage my Collection
                 </span>
               </li>
-
-              <li v-if="isCurrentAddressOwner">
-                <span class="dropdown-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#changeCollectionPreviewModal">
-                  Change collection preview image
-                </span>
+              <li>
+                <span
+                  class="dropdown-item cursor-pointer"
+                  @click="getCollectionDetails(true)"
+                  >Refresh metadata</span
+                >
               </li>
-
-              <li v-if="isCurrentAddressOwner && cType == 0">
-                <span class="dropdown-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#addImageToCollectionModal">
-                  Add additional image to collection
-                </span>
-              </li>
-
-              <li v-if="isCurrentAddressOwner && cType == 0">
-                <span class="dropdown-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#removeImageFromCollectionModal">
-                  Remove image from collection
-                </span>
-              </li>
-
-              <li v-if="isCurrentAddressOwner">
-                <span class="dropdown-item cursor-pointer" data-bs-toggle="modal" data-bs-target="#changeNftTypeModal">
-                  Change collection type
-                </span>
-              </li>
-
-              <li><span class="dropdown-item cursor-pointer" @click="getCollectionDetails(true)">Refresh metadata</span></li>
-
             </ul>
           </div>
-
         </div>
 
         <div class="col-md-7">
-          <!--
-          <h3 class="mb-3">Collection: {{ cName }}</h3>
-          -->
-
-          <!-- Data -->
-          <div class="mt-1 mb-4 muted-text" style="font-size: 14px;">
-
+          <div class="mt-1 mb-4 muted-text" style="font-size: 14px">
             <p class="me-4">
               <i class="bi bi-file-earmark-text-fill me-1"></i>
               {{ cDescription }}
             </p>
-
             <p class="me-4">
               <i class="bi bi-coin me-1"></i>
-              Buy/Sell price: {{ formatPrice(priceBuyWei) }} {{ $config.tokenSymbol }} / {{ formatPrice(priceSellWei) }} {{ $config.tokenSymbol }}
+              Buy/Sell price: {{ formatPrice(priceBuyWei) }}
+              {{ $config.tokenSymbol }} / {{ formatPrice(priceSellWei) }}
+              {{ $config.tokenSymbol }}
             </p>
-
             <p class="me-4">
               <i class="bi bi-file-earmark-binary me-1"></i>
               {{ cSupply }} NFTs minted
             </p>
-
             <p class="me-4">
               <i class="bi bi-box-arrow-up-right me-2"></i>
-              <a :href="$config.blockExplorerBaseUrl+'/address/'+cAddress" target="_blank" style="text-decoration: none;">
+              <a
+                :href="$config.blockExplorerBaseUrl + '/address/' + cAddress"
+                target="_blank"
+                style="text-decoration: none"
+              >
                 {{ shortenAddress(cAddress) }}
               </a>
-              <span v-if="getUsernameOrShortAddress"> by 
-                <NuxtLink :to="'/profile/?id='+String(getUsernameOrFullAddress)">{{getUsernameOrShortAddress}}</NuxtLink>
+              <span v-if="getUsernameOrShortAddress">
+                by
+                <NuxtLink
+                  :to="'/profile/?id=' + String(getUsernameOrFullAddress)"
+                  >{{ getUsernameOrShortAddress }}</NuxtLink
+                >
               </span>
             </p>
-
             <p class="me-4">
               <i class="bi bi-box-arrow-up-right me-2"></i>
-              <a :href="$config.marketplaceNftCollectionBaseUrl+cAddress" target="_blank" style="text-decoration: none;">
+              <a
+                :href="$config.marketplaceNftCollectionBaseUrl + cAddress"
+                target="_blank"
+                style="text-decoration: none"
+              >
                 See on NFT marketplace
               </a>
             </p>
           </div>
-          <!-- END Data -->
 
-          <!-- Buttons -->
           <div class="row mb-3">
-
             <div v-if="!isActivated" class="d-grid gap-2 col">
-              <ConnectWalletButton class="btn btn-primary" btnText="Connect wallet" />
+              <ConnectWalletButton
+                class="btn btn-primary"
+                btnText="Connect wallet"
+              />
             </div>
-
             <div v-if="isActivated" class="d-grid gap-2 col">
-              <button @click="buyNft" class="btn btn-primary" type="button" :disabled="waitingData || waitingBuy" >
-                <span v-if="waitingBuy" class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>
+              <button
+                @click="buyNft"
+                class="btn btn-primary"
+                type="button"
+                :disabled="waitingData || waitingBuy"
+              >
+                <span
+                  v-if="waitingBuy"
+                  class="spinner-border spinner-border-sm mx-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
                 Buy for {{ formatPrice(priceBuyWei) }} {{ $config.tokenSymbol }}
               </button>
             </div>
-
             <div v-if="isActivated" class="d-grid gap-2 col">
-              <button @click="sellNft" class="btn btn-primary" type="button" :disabled="waitingData || waitingSell || !userTokenId || priceSellWei == 0" >
-                <span v-if="waitingSell" class="spinner-border spinner-border-sm mx-1" role="status" aria-hidden="true"></span>
-                Sell for {{ formatPrice(priceSellWei) }} {{ $config.tokenSymbol }}
+              <button
+                @click="sellNft"
+                class="btn btn-primary"
+                type="button"
+                :disabled="
+                  waitingData ||
+                  waitingSell ||
+                  !userTokenId ||
+                  priceSellWei == 0
+                "
+              >
+                <span
+                  v-if="waitingSell"
+                  class="spinner-border spinner-border-sm mx-1"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+                Sell for {{ formatPrice(priceSellWei) }}
+                {{ $config.tokenSymbol }}
               </button>
             </div>
-            
           </div>
 
           <small v-if="isActivated">
-            <em>
-              (Price may still change after pressing the button, so make sure to check the {{ $config.tokenSymbol }} amount in wallet.)
-            </em>
+            <em
+              >(Price may still change after pressing the button, so make sure
+              to check the {{ $config.tokenSymbol }} amount in wallet.)</em
+            >
           </small>
-          <!-- END Buttons -->
-
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Alert to buy an NFT to chat -->
   <div v-if="!userTokenId" class="card border mt-3 scroll-500">
     <div class="card-body">
-
       <h5 class="mb-2 mt-3 text-center">Buy an NFT to see the chat</h5>
-
       <div class="d-flex justify-content-center">
         <div class="col-12 col-lg-8">
-
           <p class="text-break text-center mt-3 mb-4">
-            This NFT's chat is open only for NFT holders. Buy an NFT to see the chat and talk with the NFT creator and other NFT holders.
+            This NFT's chat is open only for NFT holders. Buy an NFT to see the
+            chat and talk with the NFT creator and other NFT holders.
           </p>
-
         </div>
       </div>
-
     </div>
   </div>
 
-  <!-- Chat feed -->
-  <ChatFeed 
-    v-if="$config.chatChannels.nftLaunchpad && userTokenId" 
+  <ChatFeed
+    v-if="$config.chatChannels.nftLaunchpad && userTokenId"
     :key="cAddress"
-    class="mt-3 scroll-500" 
-    :showQuotedPost="$config.showRepliesOnHomepage" 
-    :orbisContext="$config.chatChannels.nftLaunchpad+':'+cAddress" 
+    class="mt-3 scroll-500"
+    :showQuotedPost="$config.showRepliesOnHomepage"
+    :orbisContext="$config.chatChannels.nftLaunchpad + ':' + cAddress"
   />
 
-  <!-- Add image modal -->
-  <AddImageToCollectionModal :cAddress="cAddress" :mdAddress="mdAddress" />
-
-  <!-- Change collection preview image modal -->
-  <ChangeCollectionPreviewModal :cAddress="cAddress" :mdAddress="mdAddress" @saveCollection="saveCollection" />
-
-  <!-- Change description modal -->
-  <ChangeDescriptionModal :cAddress="cAddress" :cDescription="cDescription" :mdAddress="mdAddress" @saveCollection="saveCollection" />
-
-  <!-- Change Metadata URL Modal -->
-  <ChangeNftTypeModal :mdAddress="mdAddress" :cType="cType" :cAddress="cAddress" @saveCollection="saveCollection" />
-
-  <!-- Remove Image From Collection Modal -->
-  <RemoveImageFromCollectionModal :mdAddress="mdAddress" :cAddress="cAddress" />
+  <!-- Manage Collection Modal -->
+  <div
+    v-if="selectedNft"
+    class="modal fade"
+    id="manageNftModal"
+    tabindex="-1"
+    aria-labelledby="manageNftModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="manageNftModalLabel">
+            Manage Collection: {{ selectedNft.name }}
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <ul class="nav nav-tabs" id="manageTab" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                id="description-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#description"
+                type="button"
+                role="tab"
+                aria-controls="description"
+                aria-selected="true"
+              >
+                Description
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="preview-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#preview"
+                type="button"
+                role="tab"
+                aria-controls="preview"
+                aria-selected="false"
+              >
+                Preview Image
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="images-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#images"
+                type="button"
+                role="tab"
+                aria-controls="images"
+                aria-selected="false"
+              >
+                Images
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                id="metadata-tab"
+                data-bs-toggle="tab"
+                data-bs-target="#metadata"
+                type="button"
+                role="tab"
+                aria-controls="metadata"
+                aria-selected="false"
+              >
+                Metadata
+              </button>
+            </li>
+          </ul>
+          <div class="tab-content" id="manageTabContent">
+            <div
+              class="tab-pane fade show active"
+              id="description"
+              role="tabpanel"
+              aria-labelledby="description-tab"
+            >
+              <change-description-modal
+                :cAddress="selectedNft.address"
+                :cDescription="selectedNft.description"
+                :mdAddress="selectedNft.mdAddress"
+                @saveCollection="saveCollection"
+              ></change-description-modal>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="preview"
+              role="tabpanel"
+              aria-labelledby="preview-tab"
+            >
+              <change-collection-preview-modal
+                :cAddress="selectedNft.address"
+                :mdAddress="selectedNft.mdAddress"
+                @saveCollection="saveCollection"
+              ></change-collection-preview-modal>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="images"
+              role="tabpanel"
+              aria-labelledby="images-tab"
+            >
+              <div class="row">
+                <div class="col-md-6">
+                  <add-image-to-collection-modal
+                    :cAddress="selectedNft.address"
+                    :mdAddress="selectedNft.mdAddress"
+                    @saveCollection="saveCollection"
+                  ></add-image-to-collection-modal>
+                </div>
+                <div class="col-md-6">
+                  <remove-image-from-collection-modal
+                    :cAddress="selectedNft.address"
+                    :mdAddress="selectedNft.mdAddress"
+                    @saveCollection="saveCollection"
+                  ></remove-image-from-collection-modal>
+                </div>
+              </div>
+            </div>
+            <div
+              class="tab-pane fade"
+              id="metadata"
+              role="tabpanel"
+              aria-labelledby="metadata-tab"
+            >
+              <change-nft-type-modal
+                :cAddress="selectedNft.address"
+                :cType="selectedNft.type"
+                :mdAddress="selectedNft.mdAddress"
+                @saveCollection="saveCollection"
+              ></change-nft-type-modal>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- End Manage Collection Modal -->
 </template>
 
 <script>
-import { ethers } from 'ethers';
-import { useEthers, shortenAddress } from 'vue-dapp';
+import { ethers } from "ethers";
+import { useEthers, shortenAddress } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import ChatFeed from "~/components/chat/ChatFeed.vue";
 import ConnectWalletButton from "~/components/ConnectWalletButton.vue";
@@ -207,12 +368,17 @@ import ChangeCollectionPreviewModal from "~/components/nft/collection/ChangeColl
 import ChangeDescriptionModal from "~/components/nft/collection/ChangeDescriptionModal";
 import ChangeNftTypeModal from "~/components/nft/collection/ChangeNftTypeModal";
 import RemoveImageFromCollectionModal from "~/components/nft/collection/RemoveImageFromCollectionModal";
-import { getDomainName } from '~/utils/domainUtils';
-import { fetchCollection, fetchUsername, storeCollection, storeUsername } from '~/utils/storageUtils';
-import { getTextWithoutBlankCharacters } from '~/utils/textUtils';
+import { getDomainName } from "~/utils/domainUtils";
+import {
+  fetchCollection,
+  fetchUsername,
+  storeCollection,
+  storeUsername,
+} from "~/utils/storageUtils";
+import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
-  name: 'NftCollection',
+  name: "NftCollection",
 
   data() {
     return {
@@ -231,7 +397,8 @@ export default {
       waitingBuy: false,
       waitingData: false,
       waitingSell: false,
-    }
+      selectedNft: null,
+    };
   },
 
   components: {
@@ -242,7 +409,7 @@ export default {
     ChatFeed,
     ConnectWalletButton,
     RemoveImageFromCollectionModal,
-    WaitingToast
+    WaitingToast,
   },
 
   mounted() {
@@ -256,7 +423,10 @@ export default {
   computed: {
     getUsernameOrFullAddress() {
       if (this.cAuthorDomain) {
-        let cleanName = String(this.cAuthorDomain).replace(this.$config.tldName, "");
+        let cleanName = String(this.cAuthorDomain).replace(
+          this.$config.tldName,
+          "",
+        );
         return getTextWithoutBlankCharacters(cleanName) + this.$config.tldName;
       } else {
         return this.cAuthorAddress;
@@ -266,8 +436,13 @@ export default {
     getUsernameOrShortAddress() {
       if (this.cAuthorAddress) {
         if (this.cAuthorDomain) {
-          let cleanName = String(this.cAuthorDomain).replace(this.$config.tldName, "");
-          return getTextWithoutBlankCharacters(cleanName) + this.$config.tldName;
+          let cleanName = String(this.cAuthorDomain).replace(
+            this.$config.tldName,
+            "",
+          );
+          return (
+            getTextWithoutBlankCharacters(cleanName) + this.$config.tldName
+          );
         } else {
           return shortenAddress(this.cAuthorAddress);
         }
@@ -278,11 +453,14 @@ export default {
 
     isCurrentAddressOwner() {
       if (this.cAuthorAddress && this.address) {
-        return String(this.cAuthorAddress).toLowerCase() === String(this.address).toLowerCase();
+        return (
+          String(this.cAuthorAddress).toLowerCase() ===
+          String(this.address).toLowerCase()
+        );
       }
 
       return false;
-    }
+    },
   },
 
   methods: {
@@ -296,30 +474,40 @@ export default {
         "function getMintPrice() public view returns (uint256)",
         "function mint(address to) external payable returns (uint256)",
         "function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256)",
-        "function totalSupply() public view returns (uint256)"
+        "function totalSupply() public view returns (uint256)",
       ]);
 
-      const nftContract = new ethers.Contract(this.cAddress, nftInterface, this.signer);
+      const nftContract = new ethers.Contract(
+        this.cAddress,
+        nftInterface,
+        this.signer,
+      );
 
       // fetch the price again to get the latest price
       this.priceBuyWei = await nftContract.getMintPrice();
 
       try {
         const tx = await nftContract.mint(this.address, {
-          value: this.priceBuyWei
+          value: this.priceBuyWei,
         });
 
         const toastWait = this.toast(
           {
             component: WaitingToast,
             props: {
-              text: "Please wait for your transaction to confirm. Click on this notification to see transaction in the block explorer."
-            }
+              text: "Please wait for your transaction to confirm. Click on this notification to see transaction in the block explorer.",
+            },
           },
           {
             type: "info",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
-          }
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
+          },
         );
 
         const receipt = await tx.wait();
@@ -329,18 +517,27 @@ export default {
 
           this.toast("You have successfully bought the NFT! Congrats!", {
             type: "success",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
           });
 
           this.priceBuyWei = await nftContract.getMintPrice();
           this.priceSellWei = await nftContract.getBurnPrice();
 
           try {
-            this.userTokenId = await nftContract.tokenOfOwnerByIndex(this.address, 0);
+            this.userTokenId = await nftContract.tokenOfOwnerByIndex(
+              this.address,
+              0,
+            );
           } catch (e) {
             this.userTokenId = null;
           }
-          
+
           this.cSupply = await nftContract.totalSupply();
 
           this.waitingBuy = false;
@@ -349,7 +546,13 @@ export default {
           this.waitingBuy = false;
           this.toast("Transaction has failed.", {
             type: "error",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
           });
           console.log(receipt);
         }
@@ -360,13 +563,16 @@ export default {
           let extractMessage = e.message.split("reason=")[1];
           extractMessage = extractMessage.split(", method=")[0];
           extractMessage = extractMessage.replace(/"/g, "");
-          extractMessage = extractMessage.replace('execution reverted:', "Error:");
+          extractMessage = extractMessage.replace(
+            "execution reverted:",
+            "Error:",
+          );
 
           console.log(extractMessage);
-          
-          this.toast(extractMessage, {type: "error"});
+
+          this.toast(extractMessage, { type: "error" });
         } catch (e) {
-          this.toast("Transaction has failed.", {type: "error"});
+          this.toast("Transaction has failed.", { type: "error" });
         }
 
         this.waitingBuy = false;
@@ -379,7 +585,11 @@ export default {
 
         if (userDomain) {
           this.cAuthorDomain = userDomain;
-          storeUsername(window, this.cAuthorAddress, userDomain+this.$config.tldName);
+          storeUsername(
+            window,
+            this.cAuthorAddress,
+            userDomain + this.$config.tldName,
+          );
         }
       }
     },
@@ -412,7 +622,7 @@ export default {
       }
     },
 
-    async getCollectionDetails(refresh=false) {
+    async getCollectionDetails(refresh = false) {
       this.waitingData = true;
 
       let collection = fetchCollection(window, this.cAddress);
@@ -422,11 +632,9 @@ export default {
         collection = null;
       }
 
-      // fetch provider from hardcoded RPCs
       let provider = this.$getFallbackProvider(this.$config.supportedChainId);
 
       if (this.isActivated && this.chainId === this.$config.supportedChainId) {
-        // fetch provider from user's MetaMask
         provider = this.signer;
       }
 
@@ -437,10 +645,14 @@ export default {
         "function name() public view returns (string memory)",
         "function owner() public view returns (address)",
         "function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256)",
-        "function totalSupply() public view returns (uint256)"
+        "function totalSupply() public view returns (uint256)",
       ]);
 
-      const nftContract = new ethers.Contract(this.cAddress, nftInterface, provider);
+      const nftContract = new ethers.Contract(
+        this.cAddress,
+        nftInterface,
+        provider,
+      );
 
       if (collection?.mdAddress) {
         this.mdAddress = collection.mdAddress;
@@ -451,44 +663,52 @@ export default {
       const metadataInterface = new ethers.utils.Interface([
         "function getCollectionDescription(address) public view returns (string memory)",
         "function getCollectionMetadataType(address nftAddress_) external view returns (uint256)",
-        "function getCollectionPreviewImage(address) public view returns (string memory)"
+        "function getCollectionPreviewImage(address) public view returns (string memory)",
       ]);
-      
-      const metadataContract = new ethers.Contract(this.mdAddress, metadataInterface, provider);
 
-      // get collection details
+      const metadataContract = new ethers.Contract(
+        this.mdAddress,
+        metadataInterface,
+        provider,
+      );
+
       this.priceBuyWei = await nftContract.getMintPrice();
       this.priceSellWei = await nftContract.getBurnPrice();
 
-      // get image
       if (collection?.image) {
         this.cImage = collection.image;
       } else {
-        this.cImage = await metadataContract.getCollectionPreviewImage(this.cAddress);
+        this.cImage = await metadataContract.getCollectionPreviewImage(
+          this.cAddress,
+        );
       }
 
-      // check if collection image uses Spheron IPFS gateway (in that case replace it with the IPFS gateway defined in the config)
       if (this.cImage.includes(".ipfs.sphn.link/")) {
         const linkParts = this.cImage.split(".ipfs.sphn.link/");
         const cid = linkParts[0].replace("https://", "");
         this.cImage = this.$config.ipfsGateway + cid + "/" + linkParts[1];
       }
 
-      // get description
-      if (collection?.description && collection.description !== "" && collection.description !== null) {
+      if (
+        collection?.description &&
+        collection.description !== "" &&
+        collection.description !== null
+      ) {
         this.cDescription = collection.description;
       } else {
-        this.cDescription = await metadataContract.getCollectionDescription(this.cAddress);
+        this.cDescription = await metadataContract.getCollectionDescription(
+          this.cAddress,
+        );
       }
 
-      // get type
       if (collection?.type >= 0) {
         this.cType = collection.type;
       } else {
-        this.cType = Number(await metadataContract.getCollectionMetadataType(this.cAddress));
+        this.cType = Number(
+          await metadataContract.getCollectionMetadataType(this.cAddress),
+        );
       }
 
-      // get name
       if (collection?.name) {
         this.cName = collection.name;
       } else {
@@ -496,7 +716,10 @@ export default {
       }
 
       try {
-        this.userTokenId = await nftContract.tokenOfOwnerByIndex(this.address, 0);
+        this.userTokenId = await nftContract.tokenOfOwnerByIndex(
+          this.address,
+          0,
+        );
       } catch (e) {
         this.userTokenId = null;
       }
@@ -505,22 +728,19 @@ export default {
 
       this.cSupply = await nftContract.totalSupply();
 
-      // get author address
       if (collection?.authorAddress) {
         this.cAuthorAddress = collection.authorAddress;
         this.cAuthorDomain = collection.authorDomain;
       } else {
         this.cAuthorAddress = await nftContract.owner();
       }
-      
-      // get username from storage
+
       this.cAuthorDomain = fetchUsername(window, this.cAuthorAddress);
 
       if (!this.cAuthorDomain) {
         this.fetchUserDomain();
       }
 
-      // create collection object, JSON.stringify it and save it to session storage
       collection = {
         address: this.cAddress,
         authorAddress: this.cAuthorAddress,
@@ -529,14 +749,21 @@ export default {
         image: this.cImage,
         mdAddress: this.mdAddress,
         name: this.cName,
-        type: this.cType
+        type: this.cType,
       };
-      
+
       storeCollection(window, this.cAddress, collection);
+
+      this.selectedNft = {
+        address: this.cAddress,
+        name: this.cName,
+        description: this.cDescription,
+        mdAddress: this.mdAddress,
+        type: this.cType,
+      };
     },
 
     saveCollection(newCollectionData) {
-
       if (newCollectionData?.type) {
         this.cType = newCollectionData.type;
       }
@@ -544,12 +771,11 @@ export default {
       if (newCollectionData?.description) {
         this.cDescription = newCollectionData.description;
       }
-      
+
       if (newCollectionData?.image) {
         this.cImage = newCollectionData.image;
       }
 
-      // create collection object, JSON.stringify it and save it to session storage
       const collection = {
         address: this.cAddress,
         authorAddress: this.cAuthorAddress,
@@ -558,10 +784,17 @@ export default {
         image: this.cImage,
         mdAddress: this.mdAddress,
         name: this.cName,
-        type: this.cType
+        type: this.cType,
       };
 
       storeCollection(window, this.cAddress, collection);
+    },
+
+    openManageModal() {
+      const modal = new bootstrap.Modal(
+        document.getElementById("manageNftModal"),
+      );
+      modal.show();
     },
 
     async sellNft() {
@@ -572,25 +805,35 @@ export default {
         "function getMintPrice() public view returns (uint256)",
         "function burn(uint256 tokenId) external returns (uint256)",
         "function tokenOfOwnerByIndex(address owner, uint256 index) public view returns (uint256)",
-        "function totalSupply() public view returns (uint256)"
+        "function totalSupply() public view returns (uint256)",
       ]);
 
-      const nftContract = new ethers.Contract(this.cAddress, nftInterface, this.signer);
+      const nftContract = new ethers.Contract(
+        this.cAddress,
+        nftInterface,
+        this.signer,
+      );
 
       try {
-        const tx = await nftContract.burn(this.userTokenId); 
+        const tx = await nftContract.burn(this.userTokenId);
 
         const toastWait = this.toast(
           {
             component: WaitingToast,
             props: {
-              text: "Please wait for your transaction to confirm. Click on this notification to see transaction in the block explorer."
-            }
+              text: "Please wait for your transaction to confirm. Click on this notification to see transaction in the block explorer.",
+            },
           },
           {
             type: "info",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
-          }
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
+          },
         );
 
         const receipt = await tx.wait();
@@ -600,14 +843,23 @@ export default {
 
           this.toast("You have dumped the NFT.", {
             type: "success",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
           });
 
           this.priceBuyWei = await nftContract.getMintPrice();
           this.priceSellWei = await nftContract.getBurnPrice();
-          
+
           try {
-            this.userTokenId = await nftContract.tokenOfOwnerByIndex(this.address, 0);
+            this.userTokenId = await nftContract.tokenOfOwnerByIndex(
+              this.address,
+              0,
+            );
           } catch (e) {
             this.userTokenId = null;
           }
@@ -620,7 +872,13 @@ export default {
           this.waitingSell = false;
           this.toast("Transaction has failed.", {
             type: "error",
-            onClick: () => window.open(this.$config.blockExplorerBaseUrl+"/tx/"+tx.hash, '_blank').focus()
+            onClick: () =>
+              window
+                .open(
+                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
+                  "_blank",
+                )
+                .focus(),
           });
           console.log(receipt);
         }
@@ -631,13 +889,16 @@ export default {
           let extractMessage = e.message.split("reason=")[1];
           extractMessage = extractMessage.split(", method=")[0];
           extractMessage = extractMessage.replace(/"/g, "");
-          extractMessage = extractMessage.replace('execution reverted:', "Error:");
+          extractMessage = extractMessage.replace(
+            "execution reverted:",
+            "Error:",
+          );
 
           console.log(extractMessage);
-          
-          this.toast(extractMessage, {type: "error"});
+
+          this.toast(extractMessage, { type: "error" });
         } catch (e) {
-          this.toast("Transaction has failed.", {type: "error"});
+          this.toast("Transaction has failed.", { type: "error" });
         }
 
         this.waitingSell = false;
@@ -649,7 +910,17 @@ export default {
     const { address, chainId, isActivated, signer } = useEthers();
     const toast = useToast();
 
-    return { address, chainId, isActivated, shortenAddress, signer, toast }
+    return { address, chainId, isActivated, shortenAddress, signer, toast };
   },
 };
 </script>
+
+<style scoped>
+.tab-content {
+  padding: 1rem;
+  border: 1px solid #ddd;
+  border-top: 0;
+  border-radius: 0 0 15px 15px;
+  background-color: #f9f9f9;
+}
+</style>

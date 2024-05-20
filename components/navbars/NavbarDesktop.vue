@@ -46,7 +46,7 @@
             <NuxtLink class="dropdown-item" to="/nft/create"
               >Create a collection</NuxtLink
             >
-            <NuxtLink class="dropdown-item" to="/nft/mycreatednfts"
+            <NuxtLink class="dropdown-item" to="/nft/ManageMyCollections"
               >Manage my Collections</NuxtLink
             >
           </div>
