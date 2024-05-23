@@ -1,163 +1,165 @@
 <template>
   <div>
-    <div class="card border">
-      <div class="card-body">
-        <p class="fs-3" @click="$router.back()">
+    <div class="card border profile-card">
+      <div class="card-body position-relative">
+        <p class="fs-3 profile-back-button" @click="$router.back()">
           <i class="bi bi-arrow-left-circle cursor-pointer"></i>
         </p>
-
-        <div class="row">
-          <div class="col-md-3 mt-3 position-relative">
-            <div
-              class="profile-image-container"
-              @click="
-                isCurrentUser &&
-                  userStore.getIsConnectedToOrbis &&
-                  openFileUploadModal
-              "
-            >
-              <ProfileImage
-                :key="orbisImage"
-                v-if="uAddress"
-                class="img-fluid img-thumbnail rounded-circle col-6 col-md-12"
-                :address="uAddress"
-                :domain="domain"
-                :image="orbisImage"
-              />
-              <div
-                v-if="isCurrentUser && userStore.getIsConnectedToOrbis"
-                class="edit-overlay"
+        <div class="dropdown position-absolute top-0 end-0 mt-3 me-3">
+          <i
+            class="bi bi-gear-fill profile-settings-icon cursor-pointer"
+            id="settingsDropdown"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          ></i>
+          <ul class="dropdown-menu" aria-labelledby="settingsDropdown">
+            <li>
+              <span
+                v-if="!userStore.getIsConnectedToOrbis"
+                class="dropdown-item cursor-pointer"
+                data-bs-toggle="modal"
+                :data-bs-target="'#verifyAccountModal'"
+              >
+                <i class="bi bi-person-check-fill"></i> Verify account ownership
+              </span>
+            </li>
+            <li>
+              <span
+                class="dropdown-item cursor-pointer"
                 :class="!userStore.getIsConnectedToOrbis ? 'disabled' : ''"
                 data-bs-toggle="modal"
                 :data-bs-target="'#fileUploadModal' + $.uid"
               >
+                <i class="bi bi-person-circle"></i> Change your profile picture
+              </span>
+            </li>
+            <li>
+              <span
+                class="dropdown-item cursor-pointer"
+                data-bs-toggle="modal"
+                data-bs-target="#changeUsernameModal"
+              >
+                <i class="bi bi-pencil-square"></i> Change your username
+              </span>
+            </li>
+            <li>
+              <span
+                class="dropdown-item cursor-pointer"
+                data-bs-toggle="modal"
+                data-bs-target="#setEmailModal"
+              >
+                <i class="bi bi-envelope-at-fill"></i> Set email notification
+                for chat
+              </span>
+            </li>
+            <li>
+              <span
+                class="dropdown-item cursor-pointer"
+                data-bs-toggle="modal"
+                data-bs-target="#chatSettingsModal"
+              >
+                <i class="bi bi-gear-fill"></i> Other settings
+              </span>
+            </li>
+            <li>
+              <span
+                class="dropdown-item cursor-pointer"
+                data-bs-toggle="modal"
+                data-bs-target="#referralModal"
+              >
+                <i class="bi bi-person-plus-fill"></i> Share referral link
+              </span>
+            </li>
+          </ul>
+        </div>
+        <div
+          v-if="!userStore.getIsConnectedToOrbis"
+          class="d-flex justify-content-center align-items-center"
+          style="height: 200px"
+        >
+          <p class="text-center">
+            Connect to your account to access your profile
+          </p>
+        </div>
+        <div v-else class="row">
+          <div class="col-md-3 mt-3 position-relative profile-image-column">
+            <div class="profile-image-container" @click="openFileUploadModal">
+              <img
+                :src="orbisImage || 'path/to/default/avatar.png'"
+                alt="Profile Image"
+                class="img-fluid rounded-circle profile-image"
+              />
+              <div v-if="isCurrentUser" class="edit-overlay">
                 <i class="bi bi-camera-fill edit-icon"></i>
               </div>
             </div>
           </div>
 
           <div class="col-md-9 mt-3">
-            <h3
-              v-if="domain && isCurrentUser"
-              class="mb-3 cursor-pointer"
-              data-bs-toggle="modal"
-              data-bs-target="#changeUsernameModal"
-            >
-              {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
+            <h3 class="mb-1 profile-username">
+              {{ domain }}
+              <i
+                v-if="isCurrentUser"
+                class="bi bi-pencil-square cursor-pointer profile-edit-username-icon"
+                data-bs-toggle="modal"
+                data-bs-target="#changeUsernameModal"
+              ></i>
             </h3>
-            <h3 v-if="domain && !isCurrentUser" class="mb-3">
-              {{ getTextWithoutBlankCharacters(domain) }}
-            </h3>
-
-            <!-- Data -->
-            <div class="mt-4 muted-text" style="font-size: 14px">
-              <p class="me-4">
-                <i class="bi bi-wallet me-1"></i>
-                {{ balanceEth }} {{ $config.tokenSymbol }}
-              </p>
-              <p class="me-4" v-if="$config.chatTokenAddress">
-                <i class="bi bi-wallet me-1"></i>
-                {{ balanceChatToken }} {{ $config.chatTokenSymbol }}
-              </p>
-              <p
-                class="me-4"
-                v-if="
-                  $config.activityPointsAddress &&
-                  $config.showFeatures.activityPoints
-                "
+            <p class="profile-address-link">
+              <i class="bi bi-box-arrow-up-right me-2"></i>
+              <a
+                :href="$config.blockExplorerBaseUrl + '/address/' + uAddress"
+                target="_blank"
+                style="text-decoration: none"
               >
-                <i class="bi bi-wallet me-1"></i>
-                {{ balanceAp }} AP
-                <span class="badge bg-primary ms-2">{{ userTier }}</span>
-              </p>
-              <p class="me-4">
-                <i class="bi bi-box-arrow-up-right me-2"></i>
-                <a
-                  :href="$config.blockExplorerBaseUrl + '/address/' + uAddress"
-                  target="_blank"
-                  style="text-decoration: none"
-                >
-                  {{ shortenAddress(uAddress) }}
-                </a>
-              </p>
-            </div>
-            <!-- END Data -->
-
-            <!-- Buttons -->
-            <div class="mt-2" v-if="isCurrentUser">
-              <div class="dropdown mt-2">
-                <button
-                  class="btn btn-primary dropdown-toggle"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false"
-                >
-                  <i class="bi bi-sliders"></i>
-                  Profile settings
-                </button>
-                <div class="dropdown-menu">
-                  <span
-                    v-if="!userStore.getIsConnectedToOrbis"
-                    class="dropdown-item cursor-pointer"
-                    data-bs-toggle="modal"
-                    :data-bs-target="'#verifyAccountModal'"
-                  >
-                    <i class="bi bi-person-check-fill"></i> Verify account
-                    ownership
-                  </span>
-                  <span
-                    class="dropdown-item cursor-pointer"
-                    :class="!userStore.getIsConnectedToOrbis ? 'disabled' : ''"
-                    data-bs-toggle="modal"
-                    :data-bs-target="'#fileUploadModal' + $.uid"
-                  >
-                    <i class="bi bi-person-circle"></i> Change your profile
-                    picture
-                  </span>
-                  <span
-                    class="dropdown-item cursor-pointer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#changeUsernameModal"
-                  >
-                    <i class="bi bi-pencil-square"></i> Change your username
-                  </span>
-                  <span
-                    class="dropdown-item cursor-pointer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#setEmailModal"
-                  >
-                    <i class="bi bi-envelope-at-fill"></i> Set email
-                    notification for chat
-                  </span>
-                  <span
-                    class="dropdown-item cursor-pointer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#chatSettingsModal"
-                  >
-                    <i class="bi bi-gear-fill"></i> Other settings
-                  </span>
-                  <span
-                    class="dropdown-item cursor-pointer"
-                    data-bs-toggle="modal"
-                    data-bs-target="#referralModal"
-                  >
-                    <i class="bi bi-person-plus-fill"></i> Share referral link
-                  </span>
-                </div>
+                {{ shortenAddress(uAddress) }}
+              </a>
+            </p>
+            <span class="badge bg-primary profile-scrolly-grade">{{
+              userTier
+            }}</span>
+            <hr class="profile-separator" />
+          </div>
+        </div>
+        <div class="row mt-4">
+          <div class="col-md-9 offset-md-3 profile-categories-data">
+            <div class="profile-category-item">
+              <img
+                src="path/to/eth_icon.png"
+                alt="ETH Icon"
+                class="profile-category-icon"
+              />
+              <div class="profile-category-text">
+                <p class="profile-category-title">ETH</p>
+                <p class="profile-category-value">{{ balanceEth }} ETH</p>
               </div>
             </div>
-            <!-- END Buttons -->
-
-            <!-- Send tokens to user -->
-            <NuxtLink
-              v-if="domain && !isCurrentUser && $config.showFeatures.sendTokens"
-              class="btn btn-primary mt-2"
-              :to="'/send-tokens/?to=' + domain"
-            >
-              <i class="bi bi-send"></i>
-              Send tokens to {{ domain }}
-            </NuxtLink>
-            <!-- END Send tokens to user -->
+            <hr class="profile-category-separator" />
+            <div class="profile-category-item">
+              <img
+                src="path/to/scrolly_icon.png"
+                alt="SCROLLY Icon"
+                class="profile-category-icon"
+              />
+              <div class="profile-category-text">
+                <p class="profile-category-title">SCROLLY</p>
+                <p class="profile-category-value">
+                  {{ balanceChatToken }} SCROLLY
+                </p>
+              </div>
+            </div>
+            <hr class="profile-category-separator" />
+            <div class="profile-category-item">
+              <img
+                src="path/to/mappy_icon.png"
+                alt="Mappy Points Icon"
+                class="profile-category-icon"
+              />
+              <div class="profile-category-text">
+                <p class="profile-category-title">Mappy Points</p>
+                <p class="profile-category-value">{{ balanceAp }} MP</p>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -262,7 +264,7 @@
     <div class="card border mt-3 mb-3">
       <div class="card-body">
         <!-- Tabs Navigation -->
-        <ul class="nav nav-tabs nav-fill">
+        <ul class="nav nav-tabs nav-fill profile-tabs">
           <li class="nav-item">
             <button
               class="nav-link"
@@ -318,6 +320,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { useEthers, shortenAddress } from "vue-dapp";
 import { ethers } from "ethers";
@@ -567,6 +570,7 @@ export default {
 
       await this.fetchOrbisProfile();
       await this.fetchBalance();
+      this.refreshCollections();
     },
 
     async fetchBalance() {
@@ -672,6 +676,15 @@ export default {
         this.toast("Please connect to chat first", { type: "error" });
       }
     },
+
+    refreshCollections() {
+      this.$nextTick(() => {
+        this.currentTab = "nftCollection";
+        this.$nextTick(() => {
+          this.currentTab = "posts";
+        });
+      });
+    },
   },
 
   setup() {
@@ -698,12 +711,29 @@ export default {
   },
 };
 </script>
+
 <style scoped>
+.profile-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 15px;
+  padding: 20px;
+}
+
+.profile-image-column {
+  text-align: center;
+}
+
 .profile-image-container {
   position: relative;
   width: fit-content;
-  margin: auto;
+  margin: 0 auto;
   cursor: pointer;
+}
+
+.profile-image {
+  width: 150px;
+  height: 150px;
+  border: none;
 }
 
 .profile-image-container:hover .edit-overlay {
@@ -726,5 +756,114 @@ export default {
 .edit-icon {
   color: white;
   font-size: 2rem;
+}
+
+.profile-data {
+  display: flex;
+  flex-direction: column;
+}
+
+.profile-edit-username-icon {
+  margin-left: 10px;
+}
+
+.profile-scrolly-grade {
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+.profile-separator {
+  margin: 15px 0;
+  border: 1px solid #6f42c1;
+  width: calc(100% - 170px);
+}
+
+.profile-categories-data {
+  background-color: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  margin-top: 20px;
+  padding: 10px;
+  width: calc(100% - 170px);
+  margin-left: calc(170px);
+}
+
+.profile-category-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.profile-category-icon {
+  width: 30px;
+  height: 30px;
+  margin-right: 10px;
+}
+
+.profile-category-text {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.profile-category-title {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.profile-category-value {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.profile-category-separator {
+  margin: 0;
+  border: 0.5px solid #d3d3d3;
+}
+
+.profile-settings-icon {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.profile-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+.profile-tabs .nav-link {
+  color: #6f42c1;
+}
+
+.profile-tabs .nav-link.active {
+  background-color: #6f42c1;
+  color: #ffffff;
+}
+
+.profile-address-link {
+  margin-top: 5px;
+  font-size: 14px;
+}
+
+.profile-username {
+  font-weight: bold;
+}
+
+.profile-back-button {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .profile-back-button {
+    display: block;
+  }
+
+  .profile-image-column {
+    text-align: center;
+  }
+
+  .profile-categories-data {
+    margin-left: 0;
+    width: 100%;
+  }
 }
 </style>
