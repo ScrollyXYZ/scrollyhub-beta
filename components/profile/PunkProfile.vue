@@ -703,7 +703,6 @@ export default {
       toast,
     };
   },
-
   watch: {
     address() {
       this.fetchAddressAndDomain();
