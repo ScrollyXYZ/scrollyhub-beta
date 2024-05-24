@@ -125,7 +125,7 @@
           <div class="col-md-9 offset-md-3 profile-categories-data">
             <div class="profile-category-item">
               <img
-                src="path/to/eth_icon.png"
+                src="@/assets/img/icon/eth_icon.png"
                 alt="ETH Icon"
                 class="profile-category-icon"
               />
@@ -137,7 +137,7 @@
             <hr class="profile-category-separator" />
             <div class="profile-category-item">
               <img
-                src="path/to/scrolly_icon.png"
+                src="@/assets/img/icon/scrolly_icon.png"
                 alt="SCROLLY Icon"
                 class="profile-category-icon"
               />
@@ -151,7 +151,7 @@
             <hr class="profile-category-separator" />
             <div class="profile-category-item">
               <img
-                src="path/to/mappy_icon.png"
+                src="@/assets/img/icon/mappy_icon.png"
                 alt="Mappy Points Icon"
                 class="profile-category-icon"
               />
