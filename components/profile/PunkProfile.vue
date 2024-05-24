@@ -5,7 +5,10 @@
         <p class="fs-3 profile-back-button" @click="$router.back()">
           <i class="bi bi-arrow-left-circle cursor-pointer"></i>
         </p>
-        <div class="dropdown position-absolute top-0 end-0 mt-3 me-3">
+        <div
+          v-if="isCurrentUser"
+          class="dropdown position-absolute top-0 end-0 mt-3 me-3"
+        >
           <i
             class="bi bi-gear-fill profile-settings-icon cursor-pointer"
             id="settingsDropdown"
@@ -73,7 +76,7 @@
           </ul>
         </div>
         <div
-          v-if="!userStore.getIsConnectedToOrbis"
+          v-if="!userStore.getIsConnectedToOrbis && isCurrentUser"
           class="d-flex justify-content-center align-items-center"
           style="height: 200px"
         >
@@ -83,7 +86,11 @@
         </div>
         <div v-else class="row">
           <div class="col-md-3 mt-3 position-relative profile-image-column">
-            <div class="profile-image-container" @click="openFileUploadModal">
+            <div
+              v-if="isCurrentUser"
+              class="profile-image-container"
+              @click="openFileUploadModal"
+            >
               <img
                 :src="orbisImage || 'path/to/default/avatar.png'"
                 alt="Profile Image"
@@ -92,6 +99,13 @@
               <div v-if="isCurrentUser" class="edit-overlay">
                 <i class="bi bi-camera-fill edit-icon"></i>
               </div>
+            </div>
+            <div v-else>
+              <img
+                :src="orbisImage || 'path/to/default/avatar.png'"
+                alt="Profile Image"
+                class="img-fluid rounded-circle profile-image"
+              />
             </div>
           </div>
 
@@ -251,7 +265,7 @@
 
       <!-- Change Image Modal -->
       <FileUploadModal
-        v-if="userStore.getIsConnectedToOrbis"
+        v-if="userStore.getIsConnectedToOrbis && isCurrentUser"
         @processFileUrl="insertImage"
         title="Change profile image"
         infoText="Upload a new profile picture."
