@@ -90,11 +90,6 @@
 import { ethers } from "ethers";
 import { useUserStore } from "~/store/user";
 import { getActivityPoints } from "~/utils/balanceUtils";
-import { useRuntimeConfig } from "#app";
-
-const SCROLLY_DOMAINS_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-];
 
 export default {
   name: "QuestPage",
@@ -113,16 +108,14 @@ export default {
           points: 50,
           validated: true,
           tbd: false,
-          maxPoints: 50,
         },
         {
           id: 1,
-          title: "Scrolly Domains",
+          title: "Quest 1",
           description: "Create your Scrolly Domains",
           points: 0,
           validated: false,
           tbd: false,
-          maxPoints: 507,
         },
         {
           id: 2,
@@ -131,7 +124,6 @@ export default {
           points: 0,
           validated: false,
           tbd: true,
-          maxPoints: 0,
         },
         {
           id: 3,
@@ -140,7 +132,6 @@ export default {
           points: 0,
           validated: false,
           tbd: true,
-          maxPoints: 0,
         },
         {
           id: 4,
@@ -149,7 +140,6 @@ export default {
           points: 0,
           validated: false,
           tbd: true,
-          maxPoints: 0,
         },
       ],
     };
@@ -170,12 +160,12 @@ export default {
     },
     async checkDomainOwnership() {
       const userAddress = this.userStore.getCurrentUserAddress;
-      const config = this.getConfig();
       if (userAddress) {
+        const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
-          config.punkTldAddress,
-          SCROLLY_DOMAINS_ABI,
+          config.public.punkTldAddress,
+          ["function balanceOf(address owner) view returns (uint256)"],
           provider,
         );
         const balance = await contract.balanceOf(userAddress);
@@ -185,13 +175,14 @@ export default {
         this.quests[1].validated = balance.toNumber() > 0;
       }
     },
-    getConfig() {
-      return useRuntimeConfig().public;
-    },
     showQuestDetails(questId) {
       const quest = this.quests.find((q) => q.id === questId);
       this.selectedQuest = quest;
       this.questDetails = quest.description;
+      if (quest.id === 1) {
+        this.questDetails +=
+          "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
+      }
       this.showModal = true;
     },
     closeModal() {
