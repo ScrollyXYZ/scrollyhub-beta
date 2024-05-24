@@ -144,12 +144,23 @@ export default {
       ],
     };
   },
-  async created() {
+  async mounted() {
     this.userStore = useUserStore();
-    await this.fetchActivityPoints();
-    await this.checkDomainOwnership();
+    await this.updateData();
+  },
+  watch: {
+    // Watch for changes in the user's address
+    "userStore.getCurrentUserAddress": async function (newAddress, oldAddress) {
+      if (newAddress !== oldAddress) {
+        await this.updateData();
+      }
+    },
   },
   methods: {
+    async updateData() {
+      await this.fetchActivityPoints();
+      await this.checkDomainOwnership();
+    },
     async fetchActivityPoints() {
       const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
@@ -193,6 +204,11 @@ export default {
     hoverQuest(questId) {
       this.hoveredQuest = questId;
     },
+  },
+  beforeRouteEnter(to, from, next) {
+    next((vm) => {
+      vm.updateData();
+    });
   },
 };
 </script>

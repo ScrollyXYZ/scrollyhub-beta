@@ -30,11 +30,7 @@
       <!-- Main content with sidebars -->
       <div class="container-fluid page-container">
         <div class="row flex-nowrap">
-          <SidebarLeft
-            v-if="!isQuestPage"
-            :lSidebar="lSidebar"
-            :isMobile="isMobile"
-          />
+          <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
 
           <main
             class="col col-lg-4 ps-md-2 pt-2 main-containter"
@@ -43,11 +39,7 @@
             <slot></slot>
           </main>
 
-          <SidebarRight
-            v-if="!isQuestPage"
-            :rSidebar="rSidebar"
-            :isMobile="isMobile"
-          />
+          <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
         </div>
       </div>
     </div>
@@ -70,7 +62,9 @@
               class="btn-close"
               data-bs-dismiss="modal"
               aria-label="Close"
-            ></button>
+            >
+              <span aria-hidden="true"></span>
+            </button>
           </div>
           <div class="modal-body row">
             <div
@@ -84,6 +78,7 @@
               />
               <small class="text-center mb-3 text-muted">MetaMask</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -95,6 +90,7 @@
               />
               <small class="text-center mb-3 text-muted">Rabby</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -106,6 +102,7 @@
               />
               <small class="text-center mb-3 text-muted">Bifrost</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -117,6 +114,7 @@
               />
               <small class="text-center mb-3 text-muted">Zerion</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectCoinbase"
@@ -128,6 +126,7 @@
               />
               <small class="text-center mb-3 text-muted">Coinbase</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -139,6 +138,7 @@
               />
               <small class="text-center mb-3 text-muted">Brave</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -150,6 +150,7 @@
               />
               <small class="text-center mb-3 text-muted">Trust Wallet</small>
             </div>
+
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -168,9 +169,13 @@
     <!-- END Connect Wallet modal -->
 
     <ChatSettingsModal />
+
     <ChangeUsernameModal />
+
     <FindUserModal />
+
     <ReferralModal />
+
     <VerifyAccountOwnership />
   </div>
 
@@ -227,17 +232,72 @@ export default {
     VerifyAccountOwnership,
   },
 
-  computed: {
-    isQuestPage() {
-      return this.$route.name === "quest";
-    },
+  mounted() {
+    this.isMounted = true;
 
+    // set color mode
+    document.documentElement.setAttribute(
+      "data-bs-theme",
+      this.siteStore.getColorMode,
+    );
+
+    // set sidebar collapse
+    this.lSidebar = new bootstrap.Collapse("#sidebar1", { toggle: false });
+    this.rSidebar = new bootstrap.Collapse("#sidebar2", { toggle: false });
+    this.width = window.innerWidth;
+
+    if (this.width < this.breakpoint) {
+      this.sidebarStore.setLeftSidebar(false);
+      this.sidebarStore.setRightSidebar(false);
+      this.lSidebar.hide();
+      this.rSidebar.hide();
+    } else {
+      this.lSidebar.show();
+      //this.rSidebar.show();
+      this.sidebarStore.setLeftSidebar(true);
+      this.sidebarStore.setRightSidebar(true);
+    }
+
+    window.addEventListener("resize", this.onWidthChange);
+
+    // connect to wallet if user was connected before
+    if (!this.isActivated) {
+      if (localStorage.getItem("connected") == "metamask") {
+        this.connectMetaMask();
+      } else if (localStorage.getItem("connected") == "coinbase") {
+        this.connectCoinbase();
+      }
+    }
+
+    // enable popovers everywhere
+    new bootstrap.Popover(document.body, {
+      selector: "[data-bs-toggle='popover']",
+    });
+
+    // check if file upload is enabled
+    this.siteStore.setFileUploadEnabled(this.$config.fileUploadEnabled);
+
+    // check if referrer in the URL
+    this.referrer = this.$route.query.ref;
+    if (this.referrer) {
+      this.parseReferrer();
+    }
+  },
+
+  unmounted() {
+    window.removeEventListener("resize", onWidthChange);
+  },
+
+  computed: {
     isConnectedToOrbis() {
       return this.userStore.getIsConnectedToOrbis;
     },
 
     isMobile() {
-      return this.width < this.breakpoint;
+      if (this.width < this.breakpoint) {
+        return true;
+      }
+      return false;
     },
 
     orbisAddress() {
@@ -273,6 +333,7 @@ export default {
           this.address,
           this.signer,
         );
+
         this.userStore.setCurrentUserActivityPoints(activityPoints);
       }
     },
@@ -288,7 +349,9 @@ export default {
           chatTokenInterface,
           this.signer,
         );
+
         const balance = await chatTokenContract.balanceOf(this.address);
+
         this.userStore.setChatTokenBalanceWei(balance);
       }
     },
@@ -322,9 +385,10 @@ export default {
         });
 
         if (notificationsStatus === 200 && notifications) {
-          const newNotifications = notifications.filter(
-            (item) => item.status === "new",
-          );
+          const newNotifications = notifications.filter(function (item) {
+            return item.status === "new";
+          });
+
           this.notificationsStore.setNotifications(newNotifications);
         } else if (notificationsError) {
           console.log("Notifications fetching error", notificationsError);
@@ -336,7 +400,7 @@ export default {
 
     async fetchOrbisProfile() {
       if (this.isActivated) {
-        let { data } = await this.$orbis.getDids(this.address);
+        let { data, error } = await this.$orbis.getDids(this.address);
 
         if (data[0].did) {
           const profile = await this.$orbis.getProfile(data[0].did);
@@ -455,6 +519,8 @@ export default {
     const { address, chainId, isActivated, signer } = useEthers();
     const { connectWith } = useWallet();
 
+    //const localStorageConnected = useLocalStorage('connected', null); // when localStorageConnected.value is updated, localStorage is updated too
+
     const coinbaseConnector = new CoinbaseWalletConnector({
       appName: config.projectName,
       jsonRpcUrl: config.rpcCustom,
@@ -477,62 +543,6 @@ export default {
       siteStore,
       userStore,
     };
-  },
-
-  mounted() {
-    this.isMounted = true;
-
-    // set color mode
-    document.documentElement.setAttribute(
-      "data-bs-theme",
-      this.siteStore.getColorMode,
-    );
-
-    // set sidebar collapse
-    this.lSidebar = new bootstrap.Collapse("#sidebar1", { toggle: false });
-    this.rSidebar = new bootstrap.Collapse("#sidebar2", { toggle: false });
-    this.width = window.innerWidth;
-
-    if (this.width < this.breakpoint) {
-      this.sidebarStore.setLeftSidebar(false);
-      this.sidebarStore.setRightSidebar(false);
-      this.lSidebar.hide();
-      this.rSidebar.hide();
-    } else {
-      this.lSidebar.show();
-      // this.rSidebar.show();
-      this.sidebarStore.setLeftSidebar(true);
-      this.sidebarStore.setRightSidebar(true);
-    }
-
-    window.addEventListener("resize", this.onWidthChange);
-
-    // connect to wallet if user was connected before
-    if (!this.isActivated) {
-      if (localStorage.getItem("connected") == "metamask") {
-        this.connectMetaMask();
-      } else if (localStorage.getItem("connected") == "coinbase") {
-        this.connectCoinbase();
-      }
-    }
-
-    // enable popovers everywhere
-    new bootstrap.Popover(document.body, {
-      selector: "[data-bs-toggle='popover']",
-    });
-
-    // check if file upload is enabled
-    this.siteStore.setFileUploadEnabled(this.$config.fileUploadEnabled);
-
-    // check if referrer in the URL
-    this.referrer = this.$route.query.ref;
-    if (this.referrer) {
-      this.parseReferrer();
-    }
-  },
-
-  unmounted() {
-    window.removeEventListener("resize", onWidthChange);
   },
 
   watch: {
