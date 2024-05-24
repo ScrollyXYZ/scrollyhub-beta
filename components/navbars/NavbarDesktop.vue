@@ -11,60 +11,68 @@
         />
       </NuxtLink>
 
-      <!-- Activities -->
-
-      <ul class="navbar-nav mx-auto">
-        <li class="nav-item">
-          <NuxtLink class="nav-link" to="/">
-            <span class="navbar-brand-text align-middle">Hub</span>
-            <span
-              class="badge text-bg-secondary"
-              v-if="
-                !notificationsStore.getLoadingNotifications &&
-                notificationsStore.getUnreadNotificationsCount > 0
-              "
+      <!-- Navbar Content -->
+      <div class="collapse navbar-collapse">
+        <ul class="navbar-nav mx-auto">
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/">
+              <span class="navbar-brand-text align-middle">Hub</span>
+              <span
+                class="badge text-bg-secondary"
+                v-if="
+                  !notificationsStore.getLoadingNotifications &&
+                  notificationsStore.getUnreadNotificationsCount > 0
+                "
+              >
+                {{ notificationsStore.getUnreadNotificationsCount }}
+              </span>
+            </NuxtLink>
+          </li>
+          <li class="nav-item dropdown special-link">
+            <!-- NFT Launchpad -->
+            <a
+              class="nav-link dropdown-toggle"
+              data-bs-toggle="dropdown"
+              href="#"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false"
             >
-              {{ notificationsStore.getUnreadNotificationsCount }}
-            </span>
-          </NuxtLink>
-        </li>
-        <li class="nav-item dropdown special-link">
-          <!-- NFT Launchpad -->
-          <a
-            class="nav-link dropdown-toggle"
-            data-bs-toggle="dropdown"
-            href="#"
-            role="button"
-            aria-haspopup="true"
-            aria-expanded="false"
-          >
-            NFT Launchpad
-          </a>
-          <div class="dropdown-menu dropdown-menu-end">
-            <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
-            <NuxtLink class="dropdown-item" to="/nft/mynfts">My Nfts</NuxtLink>
-            <NuxtLink class="dropdown-item" to="/nft/create"
-              >Create a collection</NuxtLink
-            >
-            <NuxtLink class="dropdown-item" to="/nft/ManageMyCollections"
-              >Manage my Collections</NuxtLink
-            >
-          </div>
-        </li>
+              NFT Launchpad
+            </a>
+            <div class="dropdown-menu dropdown-menu-end">
+              <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
+              <NuxtLink class="dropdown-item" to="/nft/mynfts"
+                >My Nfts</NuxtLink
+              >
+              <NuxtLink class="dropdown-item" to="/nft/create">
+                Create a collection
+              </NuxtLink>
+              <NuxtLink class="dropdown-item" to="/nft/ManageMyCollections">
+                Manage my Collections
+              </NuxtLink>
+            </div>
+          </li>
 
-        <li class="nav-item">
-          <NuxtLink class="nav-link" to="/swap">
-            <span class="navbar-brand-text align-middle">Swap</span>
-          </NuxtLink>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="https://sns.scrolly.xyz" target="_blank">
-            <span class="navbar-brand-text align-middle">SNS</span>
-          </a>
-        </li>
-      </ul>
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/swap">
+              <span class="navbar-brand-text align-middle">Swap</span>
+            </NuxtLink>
+          </li>
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/quest">
+              <span class="navbar-brand-text align-middle">Quests</span>
+            </NuxtLink>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="https://sns.scrolly.xyz" target="_blank">
+              <span class="navbar-brand-text align-middle">SNS</span>
+            </a>
+          </li>
+        </ul>
+      </div>
 
-      <!--Account-->
+      <!-- Account -->
       <ul class="navbar-nav">
         <div class="d-flex align-items-center">
           <li v-if="!isActivated" class="nav-item">
@@ -73,39 +81,40 @@
               btnText="Connect wallet"
             />
           </li>
-          <div>
-            <li v-if="!isActivated" class="nav-item dropdown">
-              <a
-                class="nav-link dropdown-toggle"
-                data-bs-toggle="dropdown"
-                href="#"
-                role="button"
-                aria-haspopup="true"
-                aria-expanded="false"
+          <li v-if="!isActivated" class="nav-item dropdown">
+            <a
+              class="nav-link dropdown-toggle"
+              data-bs-toggle="dropdown"
+              href="#"
+              role="button"
+              aria-haspopup="true"
+              aria-expanded="false"
+            >
+              Theme:
+              {{ String(siteStore.getColorMode).charAt(0).toUpperCase() }}
+              {{ String(siteStore.getColorMode).slice(1) }}
+            </a>
+            <div class="dropdown-menu dropdown-menu-end">
+              <span
+                class="dropdown-item cursor-pointer"
+                @click="changeColorMode('scrolly')"
               >
-                Theme:
-                {{ String(siteStore.getColorMode).charAt(0).toUpperCase()
-                }}{{ String(siteStore.getColorMode).slice(1) }}
-              </a>
-              <div class="dropdown-menu dropdown-menu-end">
-                <span
-                  class="dropdown-item cursor-pointer"
-                  @click="changeColorMode('scrolly')"
-                  >Scrolly</span
-                >
-                <span
-                  class="dropdown-item cursor-pointer"
-                  @click="changeColorMode('dark')"
-                  >Dark</span
-                >
-                <span
-                  class="dropdown-item cursor-pointer"
-                  @click="changeColorMode('light')"
-                  >Light</span
-                >
-              </div>
-            </li>
-          </div>
+                Scrolly
+              </span>
+              <span
+                class="dropdown-item cursor-pointer"
+                @click="changeColorMode('dark')"
+              >
+                Dark
+              </span>
+              <span
+                class="dropdown-item cursor-pointer"
+                @click="changeColorMode('light')"
+              >
+                Light
+              </span>
+            </div>
+          </li>
           <!-- Mappy Points -->
           <div
             v-if="
@@ -154,11 +163,13 @@
                     aria-expanded="false"
                   >
                     <h6 class="m-0" v-if="userStore.getDefaultDomain">
-                      <i class="user-name">{{
-                        getTextWithoutBlankCharacters(
-                          userStore.getDefaultDomain,
-                        )
-                      }}</i>
+                      <i class="user-name">
+                        {{
+                          getTextWithoutBlankCharacters(
+                            userStore.getDefaultDomain,
+                          )
+                        }}
+                      </i>
                       <i
                         class="user-name bi bi-nut-fill"
                         style="margin-left: 5px"
@@ -171,42 +182,47 @@
                   </a>
                   <!-- Settings Dropdown -->
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuLink">
-                    <NuxtLink class="dropdown-item" to="/profile"
-                      >Profile</NuxtLink
-                    >
+                    <NuxtLink class="dropdown-item" to="/profile">
+                      Profile
+                    </NuxtLink>
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
                       data-bs-target="#chatSettingsModal"
-                      >Settings</span
                     >
+                      Settings
+                    </span>
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
                       data-bs-target="#changeUsernameModal"
-                      >Change username</span
                     >
+                      Change username
+                    </span>
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
                       data-bs-target="#findUserModal"
-                      >Find user</span
                     >
+                      Find user
+                    </span>
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
                       data-bs-target="#referralModal"
-                      >Share referral link</span
                     >
+                      Share referral link
+                    </span>
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
                       data-bs-target="#themeSelectionModal"
-                      >Theme</span
                     >
-                    <span class="dropdown-item" @click="disconnectWallet"
-                      >Disconnect</span
-                    >
+                      Theme
+                    </span>
+                    <span class="dropdown-item" @click="disconnectWallet">
+                      Disconnect
+                    </span>
                   </div>
                 </div>
 
@@ -237,9 +253,9 @@
                     >
                       Stake & earn weekly {{ $config.tokenSymbol }} rewards
                     </NuxtLink>
-                    <span class="dropdown-item" @click="addToMetaMask"
-                      >Add {{ $config.chatTokenSymbol }} to MetaMask</span
-                    >
+                    <span class="dropdown-item" @click="addToMetaMask">
+                      Add {{ $config.chatTokenSymbol }} to MetaMask
+                    </span>
                   </div>
 
                   <!-- sub-Activity Points -->
@@ -415,3 +431,23 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+.navbar-nav {
+  flex-direction: row;
+  align-items: center;
+}
+
+.nav-item {
+  margin-left: 1rem;
+}
+
+.navbar-collapse {
+  justify-content: space-between;
+}
+
+.connect-wallet-button {
+  display: flex;
+  align-items: center;
+}
+</style>
