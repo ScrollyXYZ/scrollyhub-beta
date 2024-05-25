@@ -90,36 +90,49 @@ export const useQuestStore = defineStore("questStore", {
   }),
   getters: {
     filteredCategories(state) {
-      if (state.selectedCategory === "latest") {
-        return this.getLatestQuests();
-      }
       if (state.selectedCategory === "all") {
         return state.questCategories;
       }
-      if (state.selectedCategory) {
-        return state.questCategories.filter(
-          (category) => category.category === state.selectedCategory,
+      if (state.selectedCategory === "latest") {
+        const allQuests = state.questCategories.flatMap(
+          (category) => category.quests,
         );
+        const latestQuests = allQuests.sort((a, b) => b.id - a.id).slice(0, 3);
+        return [
+          {
+            category: "Latest Quests",
+            quests: latestQuests,
+          },
+        ];
       }
-      return state.questCategories;
+      return state.questCategories.filter(
+        (category) => category.category === state.selectedCategory,
+      );
+    },
+    getCompletedQuests: (state) => (quests) => {
+      return quests.filter((quest) => quest.validated).length;
     },
   },
   actions: {
     async initializeQuests(userStore) {
-      await this.fetchActivityPoints(userStore);
-      await this.checkDomainOwnership(userStore);
-      await this.checkQuestConditions(userStore);
+      this.userStore = userStore;
+      await this.updateData();
     },
-    async fetchActivityPoints(userStore) {
-      const userAddress = userStore.getCurrentUserAddress;
+    async updateData() {
+      await this.fetchActivityPoints();
+      await this.checkDomainOwnership();
+      await this.checkQuestConditions();
+    },
+    async fetchActivityPoints() {
+      const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         this.activityPoints = await getActivityPoints(userAddress, signer);
       }
     },
-    async checkDomainOwnership(userStore) {
-      const userAddress = userStore.getCurrentUserAddress;
+    async checkDomainOwnership() {
+      const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
         const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -131,18 +144,17 @@ export const useQuestStore = defineStore("questStore", {
         const balance = await contract.balanceOf(userAddress);
 
         let points = 169 * Math.min(balance.toNumber(), 3);
-        this.questCategories.find(
+        const hubQuests = this.questCategories.find(
           (category) => category.category === "Hub Quests",
-        ).quests[0].points = points;
-        this.questCategories.find(
-          (category) => category.category === "Hub Quests",
-        ).quests[0].validated = balance.toNumber() > 0;
+        );
+        const quest = hubQuests.quests.find((q) => q.id === 1);
+        quest.points = points;
+        quest.validated = balance.toNumber() > 0;
       }
     },
-    async checkQuestConditions(userStore) {
-      const userAddress = userStore.getCurrentUserAddress;
+    async checkQuestConditions() {
+      const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
-        // example of smartcontract verification
         const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
@@ -166,46 +178,8 @@ export const useQuestStore = defineStore("questStore", {
         }
       }
     },
-    getCompletedQuests(quests) {
-      return quests.filter((quest) => quest.validated).length;
-    },
-    showQuestDetails(questId) {
-      for (const category of this.questCategories) {
-        const quest = category.quests.find((q) => q.id === questId);
-        if (quest) {
-          this.selectedQuest = quest;
-          this.questDetails = quest.description;
-          if (quest.id === 1) {
-            this.questDetails +=
-              "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
-          }
-          this.showModal = true;
-          break;
-        }
-      }
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedQuest = null;
-      this.questDetails = "";
-    },
-    hoverQuest(questId) {
-      this.hoveredQuest = questId;
-    },
     filterCategory(category) {
       this.selectedCategory = category;
-    },
-    getLatestQuests() {
-      const allQuests = this.questCategories.flatMap(
-        (category) => category.quests,
-      );
-      const latestQuests = allQuests.sort((a, b) => b.id - a.id).slice(0, 3);
-      return [
-        {
-          category: "Latest Quests",
-          quests: latestQuests,
-        },
-      ];
     },
   },
 });
