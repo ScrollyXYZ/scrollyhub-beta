@@ -19,36 +19,69 @@
         points by minting NFTs, creating collections, or participating in
         community activities.
       </p>
-      <div class="quest-path">
-        <div v-for="quest in quests" :key="quest.id" class="quest-container">
-          <div
-            class="quest"
-            :class="{
-              validated: quest.validated,
-              notValidated: !quest.validated && !quest.tbd,
-              tbd: quest.tbd,
-              flipped: hoveredQuest === quest.id,
-            }"
-            @mouseover="quest.tbd ? null : hoverQuest(quest.id)"
-            @mouseleave="hoverQuest(null)"
-            @click="quest.tbd ? null : showQuestDetails(quest.id)"
+
+      <div class="category-filter">
+        <label for="categorySelect">Select Category:</label>
+        <select id="categorySelect" v-model="selectedCategory">
+          <option
+            v-for="category in questCategories"
+            :key="category.category"
+            :value="category.category"
           >
-            <div class="quest-front">
-              <div class="quest-image-placeholder"></div>
-              <div class="quest-title">{{ quest.title }}</div>
-              <div
-                v-if="!quest.validated && !quest.tbd"
-                class="points-box-front"
-              >
-                <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                <span>{{ quest.points }} MP</span>
+            {{ category.category }}
+          </option>
+        </select>
+      </div>
+
+      <div
+        v-for="category in filteredCategories"
+        :key="category.category"
+        :id="category.category.replace(/\s+/g, '-')"
+        class="quest-category"
+      >
+        <h3>
+          {{ category.category }} ({{ getCompletedQuests(category.quests) }}/{{
+            category.quests.length
+          }}
+          completed)
+        </h3>
+        <div class="quest-path">
+          <div
+            v-for="quest in category.quests"
+            :key="quest.id"
+            class="quest-container"
+          >
+            <div
+              class="quest"
+              :class="{
+                validated: quest.validated,
+                notValidated: !quest.validated && !quest.tbd,
+                tbd: quest.tbd,
+                flipped: hoveredQuest === quest.id,
+              }"
+              @mouseover="quest.tbd ? null : hoverQuest(quest.id)"
+              @mouseleave="hoverQuest(null)"
+              @click="quest.tbd ? null : showQuestDetails(quest.id)"
+            >
+              <div class="quest-front">
+                <div class="quest-image">
+                  <img :src="quest.image" alt="Quest Image" />
+                </div>
+                <div class="quest-title">{{ quest.title }}</div>
+                <div
+                  v-if="!quest.validated && !quest.tbd"
+                  class="points-box-front"
+                >
+                  <img src="/img/mappy_icon.png" alt="Mappy Icon" />
+                  <span>{{ quest.points }} MP</span>
+                </div>
               </div>
-            </div>
-            <div class="quest-back">
-              <div class="quest-title">{{ quest.title }}</div>
-              <div class="points-box">
-                <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                <span>{{ quest.points }} MP</span>
+              <div class="quest-back">
+                <div class="quest-title">{{ quest.title }}</div>
+                <div class="points-box">
+                  <img src="/img/mappy_icon.png" alt="Mappy Icon" />
+                  <span>{{ quest.points }} MP</span>
+                </div>
               </div>
             </div>
           </div>
@@ -100,49 +133,95 @@ export default {
       selectedQuest: null,
       questDetails: "",
       hoveredQuest: null,
-      quests: [
+      selectedCategory: "",
+      questCategories: [
         {
-          id: "Bonus",
-          title: "Quest Bonus",
-          description: "Hold a Scrolly Journey",
-          points: 50,
-          validated: true,
-          tbd: false,
+          category: "Hub Quests",
+          quests: [
+            {
+              id: 1,
+              title: "Create your Scrolly Domains",
+              description: "Create your Scrolly Domains",
+              points: 0,
+              validated: false,
+              tbd: false,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            {
+              id: 2,
+              title: "Post Scrolly's Minter",
+              description: "Mint your first post on the hub",
+              points: 100,
+              validated: false,
+              tbd: false,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            {
+              id: 3,
+              title: "Scrolly's Journey Holder",
+              description:
+                "Own a Scrolly's Journey before the start of the Scrolly's Journey : Quests",
+              points: 100,
+              validated: false,
+              tbd: true,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            // add others quests there
+          ],
         },
         {
-          id: 1,
-          title: "Quest 1",
-          description: "Create your Scrolly Domains",
-          points: 0,
-          validated: false,
-          tbd: false,
+          category: "Social Quests",
+          quests: [
+            {
+              id: 4,
+              title: "Share on Social Media",
+              description: "Share your experience on social media",
+              points: 0,
+              validated: false,
+              tbd: false,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            // add others quests there
+          ],
         },
         {
-          id: 2,
-          title: "Quest 2",
-          description: "TBD",
-          points: 0,
-          validated: false,
-          tbd: true,
+          category: "Scrolly Community FTW",
+          quests: [
+            {
+              id: 7,
+              title: "Equilibre Memes Competitor",
+              description: "Share your experience on social media",
+              points: 50,
+              validated: false,
+              tbd: false,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            {
+              id: 6,
+              title: "Lottery Addict",
+              description: "Share your experience on social media",
+              points: 100,
+              validated: false,
+              tbd: false,
+              image: "https://sns.scrolly.xyz/assets/cover.png",
+            },
+            // add others quests there
+          ],
         },
-        {
-          id: 3,
-          title: "Quest 3",
-          description: "TBD",
-          points: 0,
-          validated: false,
-          tbd: true,
-        },
-        {
-          id: 4,
-          title: "Quest 4",
-          description: "TBD",
-          points: 0,
-          validated: false,
-          tbd: true,
-        },
+        // add others categories
       ],
+      userStore: null,
     };
+  },
+  computed: {
+    filteredCategories() {
+      if (this.selectedCategory) {
+        return this.questCategories.filter(
+          (category) => category.category === this.selectedCategory,
+        );
+      }
+      return this.questCategories;
+    },
   },
   async mounted() {
     this.userStore = useUserStore();
@@ -160,6 +239,7 @@ export default {
     async updateData() {
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
+      await this.checkQuestConditions();
     },
     async fetchActivityPoints() {
       const userAddress = this.userStore.getCurrentUserAddress;
@@ -182,19 +262,58 @@ export default {
         const balance = await contract.balanceOf(userAddress);
 
         let points = 169 * Math.min(balance.toNumber(), 3);
-        this.quests[1].points = points;
-        this.quests[1].validated = balance.toNumber() > 0;
+        this.questCategories.find(
+          (category) => category.category === "Hub Quests",
+        ).quests[0].points = points;
+        this.questCategories.find(
+          (category) => category.category === "Hub Quests",
+        ).quests[0].validated = balance.toNumber() > 0;
       }
     },
-    showQuestDetails(questId) {
-      const quest = this.quests.find((q) => q.id === questId);
-      this.selectedQuest = quest;
-      this.questDetails = quest.description;
-      if (quest.id === 1) {
-        this.questDetails +=
-          "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
+    async checkQuestConditions() {
+      const userAddress = this.userStore.getCurrentUserAddress;
+      if (userAddress) {
+        // example of smartcontract verification
+        const config = useRuntimeConfig();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          config.public.questVerifierAddress,
+          [
+            "function checkQuestCondition(uint256 questId, address user) view returns (bool)",
+          ],
+          provider,
+        );
+
+        for (const category of this.questCategories) {
+          for (const quest of category.quests) {
+            if (quest.tbd === false) {
+              const isValidated = await contract.checkQuestCondition(
+                quest.id,
+                userAddress,
+              );
+              quest.validated = isValidated;
+            }
+          }
+        }
       }
-      this.showModal = true;
+    },
+    getCompletedQuests(quests) {
+      return quests.filter((quest) => quest.validated).length;
+    },
+    showQuestDetails(questId) {
+      for (const category of this.questCategories) {
+        const quest = category.quests.find((q) => q.id === questId);
+        if (quest) {
+          this.selectedQuest = quest;
+          this.questDetails = quest.description;
+          if (quest.id === 1) {
+            this.questDetails +=
+              "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
+          }
+          this.showModal = true;
+          break;
+        }
+      }
     },
     closeModal() {
       this.showModal = false;
@@ -282,6 +401,19 @@ export default {
   font-size: 1.1em;
 }
 
+.category-filter {
+  margin-bottom: 20px;
+}
+
+.quest-category {
+  margin-top: 20px;
+}
+
+.quest-category h3 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
+}
+
 .quest-path {
   display: flex;
   justify-content: center;
@@ -332,11 +464,17 @@ export default {
   transform: rotateY(180deg);
 }
 
-.quest-image-placeholder {
+.quest-image {
   width: 60px;
   height: 60px;
-  background: rgba(255, 255, 255, 0.3);
+  margin-bottom: 10px;
+}
+
+.quest-image img {
+  width: 100%;
+  height: 100%;
   border-radius: 50%;
+  object-fit: cover;
 }
 
 .quest-title {

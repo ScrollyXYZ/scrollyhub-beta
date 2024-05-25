@@ -27,6 +27,19 @@
           >Back to Main Site</NuxtLink
         >
       </div>
+      <div class="category-links">
+        <h3>Categories</h3>
+        <ul>
+          <li v-for="category in questCategories" :key="category.category">
+            <NuxtLink
+              :to="`#${category.category.replace(/\s+/g, '-')}`"
+              class="link"
+            >
+              {{ category.category }}
+            </NuxtLink>
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 </template>
@@ -47,6 +60,23 @@ export default {
       return useUserStore();
     },
   },
+  data() {
+    return {
+      questCategories: [],
+    };
+  },
+  mounted() {
+    this.fetchQuestCategories();
+  },
+  methods: {
+    fetchQuestCategories() {
+      this.questCategories = [
+        { category: "Hub Quests" },
+        { category: "Social Quests" },
+        { category: "Scrolly Community FTW" },
+      ];
+    },
+  },
 };
 </script>
 <style scoped>
@@ -57,7 +87,7 @@ export default {
   padding: 10px;
   position: fixed;
   left: 30px;
-  top: 140px;
+  top: 10px;
 }
 
 .quest-sidebar-content {
@@ -138,5 +168,24 @@ export default {
 
 .link:hover {
   text-decoration: underline;
+}
+
+.category-links {
+  margin-top: 20px;
+}
+
+.category-links h3 {
+  text-align: center;
+  color: #333;
+}
+
+.category-links ul {
+  list-style: none;
+  padding: 0;
+  text-align: center;
+}
+
+.category-links li {
+  margin: 5px 0;
 }
 </style>
