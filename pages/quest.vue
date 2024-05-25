@@ -1,12 +1,5 @@
 <template>
   <div class="quest-page">
-    <QuestPageSidebar
-      :currentGrade="currentGrade"
-      :progress="progress"
-      :completedQuests="completedQuests"
-      :totalQuests="totalQuests"
-      :isMobile="isMobile"
-    />
     <div class="header-section">
       <div class="leaderboard-link">
         <span class="leaderboard-button disabled"> View Leaderboard </span>
@@ -14,7 +7,7 @@
       <div class="points-display animate__animated animate__fadeInDown">
         <div class="points-card">
           <h2>Your Mappy Points</h2>
-          <p>{{ activityPoints }}</p>
+          <p>{{ questStore.activityPoints }}</p>
         </div>
       </div>
     </div>
@@ -29,9 +22,9 @@
 
       <div class="category-filter">
         <label for="categorySelect">Select Category:</label>
-        <select id="categorySelect" v-model="selectedCategory">
+        <select id="categorySelect" v-model="questStore.selectedCategory">
           <option
-            v-for="category in questCategories"
+            v-for="category in questStore.questCategories"
             :key="category.category"
             :value="category.category"
           >
@@ -41,15 +34,15 @@
       </div>
 
       <div
-        v-for="category in filteredCategories"
+        v-for="category in questStore.filteredCategories"
         :key="category.category"
         :id="category.category.replace(/\s+/g, '-')"
         class="quest-category"
       >
         <h3>
-          {{ category.category }} ({{ getCompletedQuests(category.quests) }}/{{
-            category.quests.length
-          }}
+          {{ category.category }} ({{
+            questStore.getCompletedQuests(category.quests)
+          }}/{{ category.quests.length }}
           completed)
         </h3>
         <div class="quest-path">
@@ -64,11 +57,11 @@
                 validated: quest.validated,
                 notValidated: !quest.validated && !quest.tbd,
                 tbd: quest.tbd,
-                flipped: hoveredQuest === quest.id,
+                flipped: questStore.hoveredQuest === quest.id,
               }"
-              @mouseover="quest.tbd ? null : hoverQuest(quest.id)"
-              @mouseleave="hoverQuest(null)"
-              @click="quest.tbd ? null : showQuestDetails(quest.id)"
+              @mouseover="quest.tbd ? null : questStore.hoverQuest(quest.id)"
+              @mouseleave="questStore.hoverQuest(null)"
+              @click="quest.tbd ? null : questStore.showQuestDetails(quest.id)"
             >
               <div class="quest-front">
                 <div class="quest-image">
@@ -97,190 +90,61 @@
     </div>
 
     <!-- Quest Details Modal -->
-    <div v-if="showModal" class="modal-overlay" @click="closeModal">
+    <div
+      v-if="questStore.showModal"
+      class="modal-overlay"
+      @click="questStore.closeModal"
+    >
       <div class="modal-content animate__animated animate__zoomIn" @click.stop>
-        <h3>Quest: {{ selectedQuest.title }} Details</h3>
+        <h3>Quest: {{ questStore.selectedQuest.title }} Details</h3>
         <div class="modal-body">
           <p>
             <span
               :class="{
-                'validated-check': selectedQuest.validated,
-                'not-validated-check': !selectedQuest.validated,
+                'validated-check': questStore.selectedQuest.validated,
+                'not-validated-check': !questStore.selectedQuest.validated,
               }"
             ></span>
-            To do: {{ selectedQuest.validated ? "Validated" : "Not validated" }}
+            To do:
+            {{
+              questStore.selectedQuest.validated ? "Validated" : "Not validated"
+            }}
           </p>
-          <p>Max points: {{ selectedQuest.maxPoints }} MP</p>
-          <p>Description: {{ questDetails }}</p>
+          <p>Max points: {{ questStore.selectedQuest.maxPoints }} MP</p>
+          <p>Description: {{ questStore.questDetails }}</p>
           <NuxtLink
-            v-if="selectedQuest.id === 1"
+            v-if="questStore.selectedQuest.id === 1"
             to="https://sns.scrolly.xyz/#/"
             target="_blank"
           >
             Mint your domain
           </NuxtLink>
         </div>
-        <button @click="closeModal" class="modal-close-button">Close</button>
+        <button @click="questStore.closeModal" class="modal-close-button">
+          Close
+        </button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { ethers } from "ethers";
 import { useUserStore } from "~/store/user";
-import { getActivityPoints } from "~/utils/balanceUtils";
-import QuestPageSidebar from "~/components/sidebars/QuestPageSidebar.vue";
+import { useQuestStore } from "~/store/questStore";
 
 export default {
   name: "QuestPage",
-  components: {
-    QuestPageSidebar,
-  },
-  data() {
+  setup() {
+    const userStore = useUserStore();
+    const questStore = useQuestStore();
+
     return {
-      activityPoints: 0,
-      showModal: false,
-      selectedQuest: null,
-      questDetails: "",
-      hoveredQuest: null,
-      selectedCategory: "",
-      questCategories: [
-        {
-          category: "Hub Quests",
-          quests: [
-            {
-              id: 1,
-              title: "Create your Scrolly Domains",
-              description: "Create your Scrolly Domains",
-              points: 0,
-              validated: false,
-              tbd: false,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            {
-              id: 2,
-              title: "Post Scrolly's Minter",
-              description: "Mint your first post on the hub",
-              points: 100,
-              validated: false,
-              tbd: false,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            {
-              id: 3,
-              title: "Scrolly's Journey Holder",
-              description:
-                "Own a Scrolly's Journey before the start of the Scrolly's Journey : Quests",
-              points: 100,
-              validated: false,
-              tbd: true,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            // add others quests there
-          ],
-        },
-        {
-          category: "Social Quests",
-          quests: [
-            {
-              id: 4,
-              title: "Share on Social Media",
-              description: "Share your experience on social media",
-              points: 0,
-              validated: false,
-              tbd: false,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            // add others quests there
-          ],
-        },
-        {
-          category: "Scrolly Community FTW",
-          quests: [
-            {
-              id: 7,
-              title: "Equilibre Memes Competitor",
-              description: "Share your experience on social media",
-              points: 50,
-              validated: false,
-              tbd: false,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            {
-              id: 6,
-              title: "Lottery Addict",
-              description: "Share your experience on social media",
-              points: 100,
-              validated: false,
-              tbd: false,
-              image: "https://sns.scrolly.xyz/assets/cover.png",
-            },
-            // add others quests there
-          ],
-        },
-        // add others categories
-      ],
-      userStore: null,
+      userStore,
+      questStore,
     };
   },
-  computed: {
-    filteredCategories() {
-      if (this.selectedCategory) {
-        return this.questCategories.filter(
-          (category) => category.category === this.selectedCategory,
-        );
-      }
-      return this.questCategories;
-    },
-    completedQuests() {
-      return this.questCategories.reduce((total, category) => {
-        return total + this.getCompletedQuests(category.quests);
-      }, 0);
-    },
-    totalQuests() {
-      return this.questCategories.reduce((total, category) => {
-        return total + category.quests.length;
-      }, 0);
-    },
-    currentGrade() {
-      const grades = [
-        { name: "Scrolly Baby", points: 0 },
-        { name: "Scrolly Novice", points: 100 },
-        { name: "Scrolly Explorer", points: 200 },
-        // Ajoutez d'autres grades ici
-      ];
-      return (
-        grades
-          .slice()
-          .reverse()
-          .find((grade) => this.activityPoints >= grade.points) || grades[0]
-      );
-    },
-    progress() {
-      const nextGrade = this.nextGrade;
-      if (!nextGrade) return 100;
-      const prevPoints = this.currentGrade.points;
-      const nextPoints = nextGrade.points;
-      return (
-        ((this.activityPoints - prevPoints) / (nextPoints - prevPoints)) * 100
-      );
-    },
-    nextGrade() {
-      const grades = [
-        { name: "Scrolly Baby", points: 0 },
-        { name: "Scrolly Novice", points: 333 },
-        { name: "Scrolly Explorer", points: 777 },
-        { name: "Scrolly Mapper", points: 1337 },
-        { name: "Carto Maestro", points: 2442 },
-        { name: "Grand Cartographer of Scrolly", points: 4200 },
-      ];
-      return grades.find((grade) => this.activityPoints < grade.points);
-    },
-  },
   async mounted() {
-    this.userStore = useUserStore();
-    await this.updateData();
+    await this.questStore.initializeQuests(this.userStore);
     this.handleHashChange();
     window.addEventListener("hashchange", this.handleHashChange);
   },
@@ -290,7 +154,7 @@ export default {
   watch: {
     "userStore.getCurrentUserAddress": async function (newAddress, oldAddress) {
       if (newAddress !== oldAddress) {
-        await this.updateData();
+        await this.questStore.initializeQuests(this.userStore);
       }
     },
     "$route.hash": "handleHashChange",
@@ -299,100 +163,10 @@ export default {
     handleHashChange() {
       const hash = this.$route.hash.replace("#", "").replace(/-/g, " ");
       if (hash) {
-        this.selectedCategory = hash;
+        this.questStore.selectedCategory = hash;
+        this.questStore.filterCategory(hash);
       }
     },
-    async updateData() {
-      await this.fetchActivityPoints();
-      await this.checkDomainOwnership();
-      await this.checkQuestConditions();
-    },
-    async fetchActivityPoints() {
-      const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const signer = provider.getSigner();
-        this.activityPoints = await getActivityPoints(userAddress, signer);
-      }
-    },
-    async checkDomainOwnership() {
-      const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
-        const config = useRuntimeConfig();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          config.public.punkTldAddress,
-          ["function balanceOf(address owner) view returns (uint256)"],
-          provider,
-        );
-        const balance = await contract.balanceOf(userAddress);
-
-        let points = 169 * Math.min(balance.toNumber(), 3);
-        this.questCategories.find(
-          (category) => category.category === "Hub Quests",
-        ).quests[0].points = points;
-        this.questCategories.find(
-          (category) => category.category === "Hub Quests",
-        ).quests[0].validated = balance.toNumber() > 0;
-      }
-    },
-    async checkQuestConditions() {
-      const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
-        const config = useRuntimeConfig();
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          config.public.questVerifierAddress,
-          [
-            "function checkQuestCondition(uint256 questId, address user) view returns (bool)",
-          ],
-          provider,
-        );
-
-        for (const category of this.questCategories) {
-          for (const quest of category.quests) {
-            if (quest.tbd === false) {
-              const isValidated = await contract.checkQuestCondition(
-                quest.id,
-                userAddress,
-              );
-              quest.validated = isValidated;
-            }
-          }
-        }
-      }
-    },
-    getCompletedQuests(quests) {
-      return quests.filter((quest) => quest.validated).length;
-    },
-    showQuestDetails(questId) {
-      for (const category of this.questCategories) {
-        const quest = category.quests.find((q) => q.id === questId);
-        if (quest) {
-          this.selectedQuest = quest;
-          this.questDetails = quest.description;
-          if (quest.id === 1) {
-            this.questDetails +=
-              "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
-          }
-          this.showModal = true;
-          break;
-        }
-      }
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedQuest = null;
-      this.questDetails = "";
-    },
-    hoverQuest(questId) {
-      this.hoveredQuest = questId;
-    },
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      vm.updateData();
-    });
   },
 };
 </script>
