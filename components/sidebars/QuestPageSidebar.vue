@@ -43,6 +43,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { useUserStore } from "~/store/user";
 
@@ -79,6 +80,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .quest-page-sidebar {
   background: rgba(232, 232, 232, 0.7);
@@ -151,6 +153,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
+  color: black;
 }
 
 .links {

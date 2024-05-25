@@ -1,5 +1,12 @@
 <template>
   <div class="quest-page">
+    <QuestPageSidebar
+      :currentGrade="currentGrade"
+      :progress="progress"
+      :completedQuests="completedQuests"
+      :totalQuests="totalQuests"
+      :isMobile="isMobile"
+    />
     <div class="header-section">
       <div class="leaderboard-link">
         <span class="leaderboard-button disabled"> View Leaderboard </span>
@@ -123,9 +130,13 @@
 import { ethers } from "ethers";
 import { useUserStore } from "~/store/user";
 import { getActivityPoints } from "~/utils/balanceUtils";
+import QuestPageSidebar from "~/components/sidebars/QuestPageSidebar.vue";
 
 export default {
   name: "QuestPage",
+  components: {
+    QuestPageSidebar,
+  },
   data() {
     return {
       activityPoints: 0,
@@ -222,20 +233,75 @@ export default {
       }
       return this.questCategories;
     },
+    completedQuests() {
+      return this.questCategories.reduce((total, category) => {
+        return total + this.getCompletedQuests(category.quests);
+      }, 0);
+    },
+    totalQuests() {
+      return this.questCategories.reduce((total, category) => {
+        return total + category.quests.length;
+      }, 0);
+    },
+    currentGrade() {
+      const grades = [
+        { name: "Scrolly Baby", points: 0 },
+        { name: "Scrolly Novice", points: 100 },
+        { name: "Scrolly Explorer", points: 200 },
+        // Ajoutez d'autres grades ici
+      ];
+      return (
+        grades
+          .slice()
+          .reverse()
+          .find((grade) => this.activityPoints >= grade.points) || grades[0]
+      );
+    },
+    progress() {
+      const nextGrade = this.nextGrade;
+      if (!nextGrade) return 100;
+      const prevPoints = this.currentGrade.points;
+      const nextPoints = nextGrade.points;
+      return (
+        ((this.activityPoints - prevPoints) / (nextPoints - prevPoints)) * 100
+      );
+    },
+    nextGrade() {
+      const grades = [
+        { name: "Scrolly Baby", points: 0 },
+        { name: "Scrolly Novice", points: 333 },
+        { name: "Scrolly Explorer", points: 777 },
+        { name: "Scrolly Mapper", points: 1337 },
+        { name: "Carto Maestro", points: 2442 },
+        { name: "Grand Cartographer of Scrolly", points: 4200 },
+      ];
+      return grades.find((grade) => this.activityPoints < grade.points);
+    },
   },
   async mounted() {
     this.userStore = useUserStore();
     await this.updateData();
+    this.handleHashChange();
+    window.addEventListener("hashchange", this.handleHashChange);
+  },
+  beforeDestroy() {
+    window.removeEventListener("hashchange", this.handleHashChange);
   },
   watch: {
-    // Watch for changes in the user's address
     "userStore.getCurrentUserAddress": async function (newAddress, oldAddress) {
       if (newAddress !== oldAddress) {
         await this.updateData();
       }
     },
+    "$route.hash": "handleHashChange",
   },
   methods: {
+    handleHashChange() {
+      const hash = this.$route.hash.replace("#", "").replace(/-/g, " ");
+      if (hash) {
+        this.selectedCategory = hash;
+      }
+    },
     async updateData() {
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
@@ -273,7 +339,6 @@ export default {
     async checkQuestConditions() {
       const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
-        // example of smartcontract verification
         const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
