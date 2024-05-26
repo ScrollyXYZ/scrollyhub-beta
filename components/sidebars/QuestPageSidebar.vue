@@ -17,8 +17,14 @@
           </div>
         </div>
         <div class="quests-info">
-          <span>Quests</span>
-          <span>{{ completedQuests }} / {{ totalQuests }}</span>
+          <div class="quest-count">
+            <span class="quest-count-title">Quests</span>
+            <div class="quest-count-numbers">
+              <span class="quest-count-number">{{ completedQuests }}</span>
+              <span class="quest-count-separator"></span>
+              <span class="quest-count-number">{{ totalQuests }}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="links">
@@ -189,11 +195,45 @@ export default {
 }
 
 .quests-info {
-  text-align: right;
+  text-align: center;
   font-size: 1em;
   display: flex;
   flex-direction: column;
   align-items: center;
+  margin-top: 10px;
+}
+
+.quest-count {
+  background: #dcdcdc;
+  padding: 10px;
+  border-radius: 10px;
+  text-align: center;
+  width: 80px;
+}
+
+.quest-count-title {
+  font-size: 1.2em;
+  font-weight: bold;
+  display: block;
+}
+
+.quest-count-numbers {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.quest-count-number {
+  font-size: 1em;
+  font-weight: bold;
+  display: block;
+}
+
+.quest-count-separator {
+  height: 1px;
+  width: 100%;
+  background: black;
+  margin: 2px 0;
 }
 
 .links {
@@ -225,11 +265,18 @@ export default {
 .category-links ul {
   list-style: none;
   padding: 0;
-  text-align: center;
+  text-align: left;
 }
 
 .category-links li {
   margin: 5px 0;
   cursor: pointer;
+  font-size: 1.2em;
+  font-family: Arial, sans-serif;
+  padding-left: 15px;
+}
+
+.category-links li:hover {
+  text-decoration: underline;
 }
 </style>
