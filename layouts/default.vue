@@ -68,6 +68,101 @@
           </div>
           <div class="modal-body row">
             <!-- Wallet options here -->
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/metamask.png"
+                class="card-img-top card-img-wallet"
+                alt="MetaMask"
+              />
+              <small class="text-center mb-3 text-muted">MetaMask</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/rabby.png"
+                class="card-img-top card-img-wallet"
+                alt="Rabby"
+              />
+              <small class="text-center mb-3 text-muted">Rabby</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/bifrost.png"
+                class="card-img-top card-img-wallet"
+                alt="Bifrost"
+              />
+              <small class="text-center mb-3 text-muted">Bifrost</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/zerion.png"
+                class="card-img-top card-img-wallet"
+                alt="Zerion"
+              />
+              <small class="text-center mb-3 text-muted">Zerion</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectCoinbase"
+            >
+              <img
+                src="@/assets/img/wallets/coinbase.png"
+                class="card-img-top card-img-wallet"
+                alt="Coinbase"
+              />
+              <small class="text-center mb-3 text-muted">Coinbase</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/brave.png"
+                class="card-img-top card-img-wallet"
+                alt="Brave"
+              />
+              <small class="text-center mb-3 text-muted">Brave</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/trust.png"
+                class="card-img-top card-img-wallet"
+                alt="Trust Wallet"
+              />
+              <small class="text-center mb-3 text-muted">Trust Wallet</small>
+            </div>
+
+            <div
+              class="card col-6 cursor-pointer wallet-img-wrapper"
+              @click="connectMetaMask"
+            >
+              <img
+                src="@/assets/img/wallets/imtoken.png"
+                class="card-img-top card-img-wallet"
+                alt="imToken"
+              />
+              <small class="text-center mb-3 text-muted">imToken</small>
+            </div>
           </div>
         </div>
       </div>
