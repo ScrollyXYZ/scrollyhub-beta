@@ -27,21 +27,25 @@
           </div>
         </div>
       </div>
-      <div class="links">
-        <NuxtLink to="/quest" class="link">Scrolly Quest</NuxtLink>
-        <NuxtLink v-if="isMobile" to="/" class="link"
+      <div class="links" v-if="!isMobile">
+        <NuxtLink to="/quest" class="link" @click="handleLinkClick"
+          >Scrolly Quest</NuxtLink
+        >
+      </div>
+      <div class="links" v-if="isMobile">
+        <NuxtLink to="/" class="link" @click="handleLinkClick"
           >Back to Main Site</NuxtLink
         >
       </div>
-      <div class="category-links">
+      <div class="category-links" v-if="!isMobile">
         <h3>Categories</h3>
         <ul>
-          <li @click="filterCategory('all')">All</li>
-          <li @click="filterCategory('latest')">Latest</li>
+          <li @click="handleCategoryClick('all')">All</li>
+          <li @click="handleCategoryClick('latest')">Latest</li>
           <li
             v-for="category in questCategories"
             :key="category.category"
-            @click="filterCategory(category.category)"
+            @click="handleCategoryClick(category.category)"
           >
             {{ category.category }}
           </li>
@@ -54,17 +58,41 @@
 <script>
 import { useUserStore } from "~/store/user";
 import { useQuestStore } from "~/store/questStore";
+import { useSidebarStore } from "~/store/sidebars";
+import { useRouter } from "vue-router";
 
 export default {
   name: "QuestPageSidebar",
-  setup() {
+  props: ["isMobile"],
+  setup(props) {
     const userStore = useUserStore();
     const questStore = useQuestStore();
+    const sidebarStore = useSidebarStore();
+    const router = useRouter();
+
+    const closeLeftSidebar = () => {
+      if (props.isMobile) {
+        sidebarStore.setLeftSidebar(false);
+        sidebarStore.setMainContent(true);
+      }
+    };
+
+    const handleCategoryClick = (category) => {
+      questStore.filterCategory(category);
+      closeLeftSidebar();
+      router.push("/quest");
+    };
+
+    const handleLinkClick = () => {
+      closeLeftSidebar();
+    };
 
     return {
       userStore,
       questStore,
-      filterCategory: questStore.filterCategory,
+      sidebarStore,
+      handleCategoryClick,
+      handleLinkClick,
       questCategories: questStore.questCategories,
     };
   },
@@ -127,7 +155,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .quest-page-sidebar {
   background: rgba(232, 232, 232, 0.7);

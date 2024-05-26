@@ -1,33 +1,21 @@
-import { defineStore } from 'pinia'
+import { defineStore } from "pinia";
 
 export const useSidebarStore = defineStore({
-  id: 'sidebars',
-
-  state: () => {
-    return {
-      leftSidebar: false,
-      mainContent: true,
-      rightSidebar: false
-    }
-  },
-
-  getters: {
-    showLeftSidebar: state => state.leftSidebar,
-    showMainContent: state => state.mainContent,
-    showRightSidebar: state => state.rightSidebar,
-  },
-
+  id: "sidebars",
+  state: () => ({
+    showLeftSidebar: false,
+    showRightSidebar: false,
+    showMainContent: true,
+  }),
   actions: {
-    setLeftSidebar(status: boolean) {
-      this.leftSidebar = status;
+    setLeftSidebar(value: boolean) {
+      this.showLeftSidebar = value;
     },
-
-    setMainContent(status: boolean) {
-      this.mainContent = status;
+    setRightSidebar(value: boolean) {
+      this.showRightSidebar = value;
     },
-
-    setRightSidebar(status: boolean) {
-      this.rightSidebar = status;
-    }
-  }
-})
+    setMainContent(value: boolean) {
+      this.showMainContent = value;
+    },
+  },
+});

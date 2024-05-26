@@ -43,6 +43,7 @@ export const useQuestStore = defineStore("questStore", {
             tbd: true,
             image: "https://sns.scrolly.xyz/assets/cover.png",
           },
+          // add others quests there
         ],
       },
       {
@@ -57,6 +58,7 @@ export const useQuestStore = defineStore("questStore", {
             tbd: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
           },
+          // add others quests there
         ],
       },
       {
@@ -80,8 +82,10 @@ export const useQuestStore = defineStore("questStore", {
             tbd: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
           },
+          // add others quests there
         ],
       },
+      // add others categories
     ],
   }),
   getters: {
@@ -177,19 +181,12 @@ export const useQuestStore = defineStore("questStore", {
     filterCategory(category) {
       this.selectedCategory = category;
     },
-    hoverQuest(questId) {
-      this.hoveredQuest = questId;
-    },
     showQuestDetails(questId) {
       for (const category of this.questCategories) {
         const quest = category.quests.find((q) => q.id === questId);
         if (quest) {
           this.selectedQuest = quest;
           this.questDetails = quest.description;
-          if (quest.id === 1) {
-            this.questDetails +=
-              "\n\nMax points: 507 MP\n\nScrolly Domains allow you to interact with the hub's social features. It's your digital identity.";
-          }
           this.showModal = true;
           break;
         }
@@ -199,6 +196,9 @@ export const useQuestStore = defineStore("questStore", {
       this.showModal = false;
       this.selectedQuest = null;
       this.questDetails = "";
+    },
+    hoverQuest(questId) {
+      this.hoveredQuest = questId;
     },
   },
 });

@@ -3,7 +3,7 @@
     <div class="text-left">
       <div v-if="isMobile">
         <div class="text-center">
-          <NuxtLink to="/profile">
+          <NuxtLink to="/profile" @click.native="closeSidebar">
             <ProfileImage
               :key="userStore.getOrbisImage"
               @click="closeLeftSidebar"
@@ -57,6 +57,7 @@
         <NuxtLink
           to="/activity-points"
           class="btn btn-outline-primary btn-sm mt-2 mb-2"
+          @click.native="closeSidebar"
         >
           {{ getUserAp }} AP
         </NuxtLink>
@@ -212,6 +213,14 @@
           to="/activity-points"
         >
           <i class="bi bi-award"></i> Activity Points
+        </NuxtLink>
+        <NuxtLink
+          class="nav-link"
+          :class="$route.path.startsWith('/quest') ? 'active' : ''"
+          aria-current="page"
+          to="/quest"
+        >
+          <i class="bi bi-award"></i> Quests
         </NuxtLink>
       </li>
 
@@ -448,13 +457,6 @@ export default {
         this.lSidebar.hide();
         this.sidebarStore.setLeftSidebar(false);
         this.sidebarStore.setMainContent(true);
-      }
-    },
-    async fetchActivityPoints() {
-      if (this.$config.activityPointsAddress && this.address) {
-        this.toast.info("Refreshing activity points...", { timeout: 2000 });
-        const activityPoints = await this.getActivityPoints(this.address);
-        this.userStore.setCurrentUserActivityPoints(activityPoints);
       }
     },
   },

@@ -16,40 +16,14 @@
           :completed-quests="completedQuests"
           :total-quests="totalQuests"
           :is-mobile="isMobile"
-        >
-          <!-- Default sidebar content goes here if necessary -->
-          <div v-if="!isMobile" class="text-left">
-            <div
-              style="
-                display: flex;
-                align-items: center;
-                justify-content: flex-start;
-              "
-            >
-              <NuxtLink to="/profile" style="margin-right: 10px">
-                <ProfileImage
-                  :key="userStore.getOrbisImage"
-                  class="rounded-circle"
-                  :address="address"
-                  :domain="userStore.getDefaultDomain"
-                  :image="userStore.getOrbisImage"
-                  style="width: 33px; height: 33px"
-                />
-              </NuxtLink>
-              <NuxtLink
-                to="/profile"
-                style="text-decoration: none; color: inherit"
-              >
-                <h6 style="margin-bottom: 0"><strong>My Scrollie</strong></h6>
-              </NuxtLink>
-            </div>
-            <hr />
-          </div>
-        </component>
+          :l-sidebar="lSidebar"
+          @update:is-mobile="updateIsMobile"
+        />
       </div>
     </div>
   </div>
 </template>
+
 <script>
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
@@ -57,7 +31,6 @@ import { useNotificationsStore } from "~/store/notifications";
 import { useSidebarStore } from "~/store/sidebars";
 import { useUserStore } from "~/store/user";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
-import { getActivityPoints } from "~/utils/balanceUtils";
 
 import QuestPageSidebar from "./QuestPageSidebar.vue";
 import DefaultSidebarContent from "./DefaultSidebarContent.vue";
@@ -138,6 +111,9 @@ export default {
         this.sidebarStore.setLeftSidebar(false);
         this.sidebarStore.setMainContent(true);
       }
+    },
+    updateIsMobile(value) {
+      this.$emit("update:is-mobile", value);
     },
     async fetchActivityPoints() {
       if (this.$config.activityPointsAddress && this.address) {
