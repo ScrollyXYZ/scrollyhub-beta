@@ -166,27 +166,6 @@
                     <span
                       class="dropdown-item"
                       data-bs-toggle="modal"
-                      data-bs-target="#chatSettingsModal"
-                    >
-                      Settings
-                    </span>
-                    <span
-                      class="dropdown-item"
-                      data-bs-toggle="modal"
-                      data-bs-target="#changeUsernameModal"
-                    >
-                      Change username
-                    </span>
-                    <span
-                      class="dropdown-item"
-                      data-bs-toggle="modal"
-                      data-bs-target="#findUserModal"
-                    >
-                      Find user
-                    </span>
-                    <span
-                      class="dropdown-item"
-                      data-bs-toggle="modal"
                       data-bs-target="#referralModal"
                     >
                       Share referral link
@@ -197,6 +176,13 @@
                       data-bs-target="#themeSelectionModal"
                     >
                       Theme
+                    </span>
+                    <span
+                      class="dropdown-item"
+                      data-bs-toggle="modal"
+                      data-bs-target="#chatSettingsModal"
+                    >
+                      More settings
                     </span>
                     <span class="dropdown-item" @click="disconnectWallet">
                       Disconnect
