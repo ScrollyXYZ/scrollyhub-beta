@@ -401,9 +401,18 @@ export default {
 }
 
 .nav-item {
+  display: flex; 
+  justify-content: center; 
   margin-left: 2rem;
   margin-right: 2rem;
 }
+
+.nav-link {
+  display: flex; 
+  justify-content: center; 
+  text-align: center; 
+}
+
 .navbar-collapse {
   justify-content: space-between;
 }
