@@ -70,8 +70,7 @@
               aria-expanded="false"
             >
               Theme:
-              {{ String(siteStore.getColorMode).charAt(0).toUpperCase() }}
-              {{ String(siteStore.getColorMode).slice(1) }}
+              {{ `${String(siteStore.getColorMode).charAt(0).toUpperCase()}${String(siteStore.getColorMode).slice(1)}` }}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
               <span
@@ -410,7 +409,6 @@ export default {
 }
 
 .connect-wallet-button {
-  display: flex;
   align-items: center;
 }
 </style>
