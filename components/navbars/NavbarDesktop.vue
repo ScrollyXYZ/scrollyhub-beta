@@ -1,20 +1,20 @@
 <template>
   <nav class="navbar navbar-expand-lg navbar-bg-custom">
-    <div class="container-fluid mx-3">
+    <div class="container-fluid">
       <!-- Scrolly Logo Left -->
       <NuxtLink class="navbar-brand" to="/">
         <img
-          src="/img/favicon2.png"
+          src="/img/banner.png"
           alt="Chat logo"
-          height="120"
+          height="90"
           class="filtered-shadow"
         />
       </NuxtLink>
 
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse">
-        <ul class="navbar-nav mx-auto">
-          <li class="nav-item">
+        <ul class="navbar-nav mx-auto d-flex justify-content-center">
+          <li class="nav-item align-items-center justify-content-center">
             <NuxtLink class="nav-link" to="/">
               <span class="navbar-brand-text align-middle">Hub</span>
               <span
@@ -28,32 +28,11 @@
               </span>
             </NuxtLink>
           </li>
-          <li class="nav-item dropdown special-link">
-            <!-- NFT Launchpad -->
-            <a
-              class="nav-link dropdown-toggle"
-              data-bs-toggle="dropdown"
-              href="#"
-              role="button"
-              aria-haspopup="true"
-              aria-expanded="false"
-            >
-              NFT Launchpad
-            </a>
-            <div class="dropdown-menu dropdown-menu-end">
-              <NuxtLink class="dropdown-item" to="/nft">Latest NFTs</NuxtLink>
-              <NuxtLink class="dropdown-item" to="/nft/mynfts"
-                >My Nfts</NuxtLink
-              >
-              <NuxtLink class="dropdown-item" to="/nft/create">
-                Create a collection
-              </NuxtLink>
-              <NuxtLink class="dropdown-item" to="/nft/ManageMyCollections">
-                Manage my Collections
-              </NuxtLink>
-            </div>
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/nft">
+              <span class="navbar-brand-text align-middle">NFT Launchpad</span>
+            </NuxtLink>
           </li>
-
           <li class="nav-item">
             <NuxtLink class="nav-link" to="/swap">
               <span class="navbar-brand-text align-middle">Swap</span>
@@ -122,8 +101,7 @@
               $config.activityPointsAddress &&
               $config.showFeatures.activityPoints
             "
-            class="connect-wallet-button mt-3 user-and-settings-container d-flex align-items-start"
-            style="width: 350px"
+            class="connect-wallet-button user-and-settings-container d-flex align-items-start"
           >
             <div style="flex-grow: 0">
               <!-- Image Left -->
@@ -138,18 +116,8 @@
                   style="width: 60px; height: 60px"
                 />
               </NuxtLink>
-              <!-- Settings & Chain bar -->
-              <div>
-                <SwitchChainButton
-                  v-if="isActivated"
-                  :navbar="true"
-                  :dropdown="true"
-                  v-b-tooltip.hover
-                  :title="networkMessage"
-                />
-              </div>
             </div>
-            <!-- NAME / TOKENS / MAPPY POINTS -->
+            <!-- Settings & Chain bar -->
             <div style="flex-grow: 1; padding-left: 20px">
               <div class="d-flex flex-column align-items-start">
                 <!-- Username or Get your username -->
@@ -162,22 +130,32 @@
                     data-bs-toggle="dropdown"
                     aria-expanded="false"
                   >
-                    <h6 class="m-0" v-if="userStore.getDefaultDomain">
-                      <i class="user-name">
-                        {{
-                          getTextWithoutBlankCharacters(
-                            userStore.getDefaultDomain,
-                          )
-                        }}
-                      </i>
-                      <i
-                        class="user-name bi bi-nut-fill"
-                        style="margin-left: 5px"
-                      ></i>
-                    </h6>
-                    <h6 class="m-0" v-else>
-                      Get your Scrolly Domain
-                      <i class="bi bi-nut-fill" style="margin-left: 5px"></i>
+                    <h6 class="m-0 d-flex align-items-center">
+                      <span v-if="userStore.getDefaultDomain">
+                        <i class="user-name">
+                          {{
+                            getTextWithoutBlankCharacters(
+                              userStore.getDefaultDomain,
+                            )
+                          }}
+                        </i>
+                        <i
+                          class="user-name bi bi-nut-fill"
+                          style="margin-left: 5px"
+                        ></i>
+                      </span>
+                      <span v-else>
+                        Get your Scrolly Domain
+                        <i class="bi bi-nut-fill" style="margin-left: 5px"></i>
+                      </span>
+                      <SwitchChainButton
+                        v-if="isActivated"
+                        :navbar="true"
+                        :dropdown="true"
+                        v-b-tooltip.hover
+                        :title="networkMessage"
+                        style="margin-left: 10px"
+                      />
                     </h6>
                   </a>
                   <!-- Settings Dropdown -->
@@ -225,7 +203,6 @@
                     </span>
                   </div>
                 </div>
-
                 <!-- Tokens & Mappy Points div -->
                 <div class="d-flex justify-content-start mt-2">
                   <!-- sub-tokens-->
@@ -439,9 +416,9 @@ export default {
 }
 
 .nav-item {
-  margin-left: 1rem;
+  margin-left: 2rem;
+  margin-right: 2rem;
 }
-
 .navbar-collapse {
   justify-content: space-between;
 }

@@ -31,7 +31,7 @@
   --bs-light: #f5f5f6;
   --bs-dark: #0b0a12;
   --bs-orange: #fd7e14;
-  --bs-mode: hwb(0 89% 11%); <!-- // maincontainer //--!>
+  --bs-mode: hwb(0 89% 11%);
   --bs-white-rgb: 255, 255, 255;
   --bs-secondary-rgb: 133, 135, 138;
   --bs-success-rgb: 12, 188, 135;
