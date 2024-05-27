@@ -77,12 +77,18 @@
         </div>
         <div
           v-if="!userStore.getIsConnectedToOrbis && isCurrentUser"
-          class="d-flex justify-content-center align-items-center"
+          class="d-flex flex-column justify-content-center align-items-center"
           style="height: 200px"
         >
           <p class="text-center">
-            Connect to your account to access your profile
+            Please verify ownership to access your profile
           </p>
+          <button 
+            class="btn btn-primary" 
+            @click="connectToOrbis"
+          >
+            Verify account ownership
+          </button>
         </div>
         <div v-else class="row">
           <div class="col-md-3 mt-3 position-relative profile-image-column">
@@ -92,7 +98,7 @@
               @click="openFileUploadModal"
             >
               <img
-                :src="orbisImage || 'path/to/default/avatar.png'"
+                :src="orbisImage || '/img/user/anon.svg'"
                 alt="Profile Image"
                 class="img-fluid rounded-circle profile-image"
               />
@@ -102,7 +108,7 @@
             </div>
             <div v-else>
               <img
-                :src="orbisImage || 'path/to/default/avatar.png'"
+                :src="orbisImage || '/img/user/anon.svg'"
                 alt="Profile Image"
                 class="img-fluid rounded-circle profile-image"
               />
@@ -135,7 +141,7 @@
             <hr class="profile-separator" />
           </div>
         </div>
-        <div class="row mt-4">
+        <div class="row">
           <div class="col-md-9 offset-md-3 profile-categories-data">
             <div class="profile-category-item">
               <img
@@ -807,20 +813,25 @@ export default {
 }
 
 .profile-category-icon {
-  width: 30px;
-  height: 30px;
-  margin-right: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
 }
 
 .profile-category-text {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   width: 100%;
+  padding-right: 10px;
 }
 
 .profile-category-title {
-  font-size: 14px;
+
   font-weight: bold;
+}
+
+.profile-category-text p {
+  margin: 0; 
 }
 
 .profile-category-value {

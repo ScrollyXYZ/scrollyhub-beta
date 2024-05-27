@@ -31,7 +31,7 @@
   --bs-light: #f5f5f6;
   --bs-dark: #0b0a12;
   --bs-orange: #fd7e14;
-  --bs-mode: hwb(0 89% 11%); <!-- // maincontainer //--!>
+  --bs-mode: hwb(0 89% 11%);
   --bs-white-rgb: 255, 255, 255;
   --bs-secondary-rgb: 133, 135, 138;
   --bs-success-rgb: 12, 188, 135;
@@ -152,7 +152,7 @@
 }
 [data-bs-theme="scrolly"] .btn-primary {
   background-color: var(--bs-indigo);
-  border-radius: 50px;
+  border-radius: 30px;
   text-decoration: none;
   --bs-btn-bg: var(--bs-primary);
   --bs-btn-border-color: var(--bs-primary);
@@ -164,5 +164,5 @@
 }
 
 [data-bs-theme="scrolly"].btn-primary:hover {
-  background-color: var(--bs-purple); /* Darker purple on hover */
+  background-color: var(--bs-purple); 
 }
