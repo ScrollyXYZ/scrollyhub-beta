@@ -7,7 +7,7 @@
             <ProfileImage
               :key="userStore.getOrbisImage"
               @click="closeLeftSidebar"
-              class="img-fluid mt-3 rounded-circle w-30 sidebar-profile-image"
+              class="img-fluid mt-3 rounded-circle w-50 sidebar-profile-image"
               :address="address"
               :domain="userStore.getDefaultDomain"
               :image="userStore.getOrbisImage"
@@ -29,11 +29,11 @@
             :address="address"
             :domain="userStore.getDefaultDomain"
             :image="userStore.getOrbisImage"
-            style="width: 33px; height: 33px"
+            style="width: 50px; height: 50px"
           />
         </NuxtLink>
         <NuxtLink to="/profile" style="text-decoration: none; color: inherit">
-          <h6 style="margin-bottom: 0"><strong>My Scrollie</strong></h6>
+          <h6 style="margin-bottom: 0"><strong>{{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}</strong></h6>
         </NuxtLink>
       </div>
 

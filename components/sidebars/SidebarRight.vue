@@ -55,7 +55,7 @@
         <div class="card m-2 bg-light">
           <div class="sidebar-card-body">
             <img
-              src="~/public/img/scrollyimg.png"
+              src="/img/scrollyimg.png"
               class="sidebar-card-body-img"
             />
             <div class="speech-bubble">

@@ -1,56 +1,54 @@
 <template>
-  <div class="quest-page-sidebar">
-    <div class="quest-sidebar-content">
-      <div class="profile-section">
-        <img
-          :src="userStore.getOrbisImage || '/path/to/default/avatar.png'"
-          alt="Profile Image"
-          class="profile-image"
-        />
-        <div class="profile-details">
-          <div class="username">
-            {{ userStore.getDefaultDomain || "Guest" }}
-          </div>
-          <div class="grade-label">{{ currentGrade.name }}</div>
-          <div class="progress-bar">
-            <div class="progress" :style="{ width: progress + '%' }"></div>
-          </div>
+  <div class="quest-sidebar-content">
+    <div class="links" v-if="!isMobile">
+      <NuxtLink to="/quest" class="link" @click="handleLinkClick"
+        >Scrolly Quests</NuxtLink
+      >
+    </div>
+    <div class="profile-section">
+      <img
+        :src="userStore.getOrbisImage || '/img/user/anon.svg'"
+        alt="Profile Image"
+        class="profile-image"
+      />
+      <div class="profile-details">
+        <div class="username">
+          {{ userStore.getDefaultDomain || "Guest" }}
         </div>
-        <div class="quests-info">
-          <div class="quest-count">
-            <span class="quest-count-title">Quests</span>
-            <div class="quest-count-numbers">
-              <span class="quest-count-number">{{ completedQuests }}</span>
-              <span class="quest-count-separator"></span>
-              <span class="quest-count-number">{{ totalQuests }}</span>
-            </div>
-          </div>
+        <div class="grade-label">{{ currentGrade.name }}</div>
+        <div class="progress-bar">
+          <div class="progress" :style="{ width: progress + '%' }"></div>
         </div>
       </div>
-      <div class="links" v-if="!isMobile">
-        <NuxtLink to="/quest" class="link" @click="handleLinkClick"
-          >Scrolly Quest</NuxtLink
+      <div class="quests-info">
+        <div class="quest-count">
+          <span class="quest-count-title">Quests</span>
+          <div class="quest-count-numbers">
+            <span class="quest-count-number">{{ completedQuests }}</span>
+            <span class="quest-count-separator"></span>
+            <span class="quest-count-number">{{ totalQuests }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="links" v-if="isMobile">
+      <NuxtLink to="/" class="link" @click="handleLinkClick"
+        >Back to Main Site</NuxtLink
+      >
+    </div>
+    <div class="category-links" v-if="!isMobile">
+      <h3>Categories</h3>
+      <ul>
+        <li @click="handleCategoryClick('all')">All</li>
+        <li @click="handleCategoryClick('latest')">Latest</li>
+        <li
+          v-for="category in questCategories"
+          :key="category.category"
+          @click="handleCategoryClick(category.category)"
         >
-      </div>
-      <div class="links" v-if="isMobile">
-        <NuxtLink to="/" class="link" @click="handleLinkClick"
-          >Back to Main Site</NuxtLink
-        >
-      </div>
-      <div class="category-links" v-if="!isMobile">
-        <h3>Categories</h3>
-        <ul>
-          <li @click="handleCategoryClick('all')">All</li>
-          <li @click="handleCategoryClick('latest')">Latest</li>
-          <li
-            v-for="category in questCategories"
-            :key="category.category"
-            @click="handleCategoryClick(category.category)"
-          >
-            {{ category.category }}
-          </li>
-        </ul>
-      </div>
+          {{ category.category }}
+        </li>
+      </ul>
     </div>
   </div>
 </template>
@@ -158,16 +156,10 @@ export default {
 <style scoped>
 .quest-page-sidebar {
   background: rgba(232, 232, 232, 0.7);
-  width: 396px;
   border-radius: 15px;
   padding: 10px;
-  position: fixed;
   left: 30px;
   top: 10px;
-}
-
-.quest-sidebar-content {
-  padding: 10px;
 }
 
 .profile-section {
@@ -176,8 +168,8 @@ export default {
   align-items: center;
   justify-content: space-between;
   background: #ffffff;
-  padding: 10px;
-  border-radius: 8px;
+  padding: 5px;
+  border-radius: 20px;
 }
 
 .profile-image {
@@ -192,7 +184,7 @@ export default {
 }
 
 .username {
-  font-size: 1.2em;
+  font-size: 1.1em;
   font-weight: bold;
   color: black;
 }
@@ -203,7 +195,7 @@ export default {
   color: white;
   padding: 2px 8px;
   border-radius: 5px;
-  font-size: 0.9em;
+  font-size: 0.8em;
   margin-top: 5px;
 }
 
@@ -227,7 +219,6 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-top: 10px;
 }
 
 .quest-count {
@@ -235,11 +226,11 @@ export default {
   padding: 10px;
   border-radius: 10px;
   text-align: center;
-  width: 80px;
+  margin: 10px;
 }
 
 .quest-count-title {
-  font-size: 1.2em;
+  font-size: 1em;
   font-weight: bold;
   display: block;
 }
@@ -251,7 +242,7 @@ export default {
 }
 
 .quest-count-number {
-  font-size: 1em;
+  font-size: 0.9em;
   font-weight: bold;
   display: block;
 }
@@ -272,8 +263,9 @@ export default {
   display: block;
   color: #6a0dad;
   text-decoration: none;
-  margin: 5px 0;
+  margin-bottom: 20px;
   font-weight: bold;
+  font-size: 1.2em;
 }
 
 .link:hover {
