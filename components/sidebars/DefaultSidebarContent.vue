@@ -66,67 +66,116 @@
     </div>
 
     <ul class="nav nav-pills flex-column">
-      <ul class="list-group">
-        <NuxtLink
-          to="/"
-          class="list-group-item cursor-pointer hover-color bg-light border-0"
-          :class="$route.path === '/' ? 'active' : ''"
-          @click="closeLeftSidebar"
-        >
-          General discussion
-        </NuxtLink>
-      </ul>
+      <template v-if="!isNftRoute">
+        <ul class="list-group">
+          <NuxtLink
+            to="/"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            General discussion
+          </NuxtLink>
+        </ul>
 
-      <ul class="list-group">
-        <NuxtLink
-          to="/equilibre-memes"
-          class="list-group-item cursor-pointer hover-color bg-light border-0"
-          :class="$route.path.startsWith('/equilibre-memes') ? 'active' : ''"
-          @click="closeLeftSidebar"
-        >
-          Equilibre meme contest
-        </NuxtLink>
-      </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/equilibre-memes"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path.startsWith('/equilibre-memes') ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Equilibre meme contest
+          </NuxtLink>
+        </ul>
 
-      <!--
-      <ul class="list-group">
-        <NuxtLink to="/memes-contest" class="list-group-item cursor-pointer hover-color bg-light border-0" :class="$route.path.startsWith('/memes-contest') ? 'active' : ''" @click="closeLeftSidebar">
-          Memes contest
-        </NuxtLink>
-      </ul>
-      -->
+        <!--
+        <ul class="list-group">
+          <NuxtLink to="/memes-contest" class="list-group-item cursor-pointer hover-color bg-light border-0" :class="$route.path.startsWith('/memes-contest') ? 'active' : ''" @click="closeLeftSidebar">
+            Memes contest
+          </NuxtLink>
+        </ul>
+        -->
 
-      <ul class="list-group">
-        <NuxtLink
-          to="/memes-images"
-          class="list-group-item cursor-pointer hover-color bg-light border-0"
-          :class="$route.path.startsWith('/memes-images') ? 'active' : ''"
-          @click="closeLeftSidebar"
-        >
-          Share images & NFTs
-        </NuxtLink>
-      </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/memes-images"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path.startsWith('/memes-images') ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Share images & NFTs
+          </NuxtLink>
+        </ul>
 
-      <ul class="list-group">
-        <NuxtLink
-          to="/shill"
-          class="list-group-item cursor-pointer hover-color bg-light border-0"
-          :class="$route.path.startsWith('/shill') ? 'active' : ''"
-          @click="closeLeftSidebar"
-        >
-          Shill & discuss projects
-        </NuxtLink>
-      </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/shill"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path.startsWith('/shill') ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Shill & discuss projects
+          </NuxtLink>
+        </ul>
 
-      <hr />
+        <hr />
+      </template>
 
-      <!-- Home 
-      <li class="nav-item p-1" @click="closeLeftSidebar">
-        <NuxtLink class="nav-link" :class="$route.path === '/' ? 'active' : ''" aria-current="page" to="/">
-          <i class="bi bi-house"></i> Home
-        </NuxtLink>
-      </li>
-      -->
+      <template v-if="isNftRoute">
+        <ul class="list-group">
+          <NuxtLink
+            to="/nft/mynfts"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/nft/mynfts' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            My NFTs
+          </NuxtLink>
+        </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/nft"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/nft' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Latest Collections
+          </NuxtLink>
+        </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/nft/create"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/nft/create' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Create a collection
+          </NuxtLink>
+        </ul>
+        <ul class="list-group">
+          <NuxtLink
+            to="/nft/ManageMyCollections"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/nft/ManageMyCollections' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Manage My Collections
+          </NuxtLink>
+        </ul>
+        <ul class="list-group">
+          <NuxtLink
+            v-if="isMobile"
+            to="/"
+            class="list-group-item cursor-pointer hover-color bg-light border-0"
+            :class="$route.path === '/nft/mynfts' ? 'active' : ''"
+            @click="closeLeftSidebar"
+          >
+            Return to the Hub
+          </NuxtLink>
+        </ul>
+        <hr />
+      </template>
 
       <!-- NFT Launchpad -->
       <li
@@ -159,7 +208,11 @@
         </a>
       </li>
       <!-- Notifications -->
-      <li v-if="isActivated" class="nav-item p-1" @click="closeLeftSidebar">
+      <li
+        v-if="isActivated && !isNftRoute"
+        class="nav-item p-1"
+        @click="closeLeftSidebar"
+      >
         <NuxtLink
           class="nav-link"
           :class="$route.path.startsWith('/notifications') ? 'active' : ''"
@@ -251,6 +304,7 @@
       <!-- Search Posts -->
       <li class="nav-item p-1" @click="closeLeftSidebar">
         <NuxtLink
+          v-if="!isNftRoute"
           class="nav-link"
           :class="$route.path.startsWith('/search-posts') ? 'active' : ''"
           aria-current="page"
@@ -343,6 +397,7 @@
       <!-- Find User -->
       <li class="nav-item p-1" @click="closeLeftSidebar">
         <NuxtLink
+          v-if="!isNftRoute"
           class="nav-link"
           :class="$route.path.startsWith('/find-user') ? 'active' : ''"
           aria-current="page"
@@ -447,6 +502,9 @@ export default {
     },
     notificationsStore() {
       return useNotificationsStore();
+    },
+    isNftRoute() {
+      return this.$route.path.startsWith("/nft");
     },
   },
   methods: {
