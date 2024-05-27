@@ -1,5 +1,5 @@
 <template>
-  <div class="col-auto col-lg-3 px-0 mt-1">
+  <div class="col-auto col-lg-3 px-0 mt-1" v-if="!isNftRoute">
     <div
       id="sidebar2"
       class="collapse collapse-horizontal"
@@ -216,6 +216,7 @@ import KeysListWidget from "~/components/keys/KeysListWidget.vue";
 import ReferralWidget from "~/components/referrals/ReferralWidget.vue";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 import { useEthers } from "vue-dapp";
+import { useRoute } from "vue-router";
 
 export default {
   name: "SidebarRight",
@@ -234,6 +235,8 @@ export default {
     const userStore = useUserStore();
     const { address, isActivated } = useEthers();
     const isWalletConnected = computed(() => isConnected.value);
+    const route = useRoute();
+    const isNftRoute = computed(() => route.path.startsWith("/nft"));
 
     return {
       sidebarStore,
@@ -243,6 +246,7 @@ export default {
       disconnect,
       isWalletConnected,
       isActivated,
+      isNftRoute,
     };
   },
   methods: {
