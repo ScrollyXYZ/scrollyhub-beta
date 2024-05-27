@@ -53,23 +53,19 @@
               </div>
             </div>
           </div>
-
-          <!-- Register a domain name OR say Hello -->
-          <div class="card m-2 bg-light">
-            <div class="sidebar-card-body">
-              <img
-                src="~/public/img/scrollyimg.png"
-                class="sidebar-card-body-img"
-              />
-              <div class="speech-bubble">
-                <!-- Greeting for users who are connected and have a domain -->
-                <template v-if="isActivated && userStore.getDefaultDomain">
-                  Nice to see you again!
-                  {{
-                    getTextWithoutBlankCharacters(userStore.getDefaultDomain)
-                  }}
-                </template>
-
+        <!-- Register a domain name OR say Hello -->
+        <div class="card m-2 bg-light">
+          <div class="sidebar-card-body">
+            <img
+              src="/img/scrollyimg.png"
+              class="sidebar-card-body-img"
+            />
+            <div class="speech-bubble">
+              <!-- Greeting for users who are connected and have a domain -->
+              <template v-if="isActivated && userStore.getDefaultDomain">
+                Nice to see you again!
+                {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
+              </template>
                 <!-- Greeting for connected users who do not have a domain -->
                 <template
                   v-else-if="isActivated && !userStore.getDefaultDomain"

@@ -6,19 +6,24 @@
       :class="$config.sidebarLeftSticky ? 'sticky-lg-top' : ''"
     >
       <div
-        class="sidebar-nav list-group border-0 rounded-0 text-sm-start min-vh-100"
+        id="sidebar-nav"
+        class="list-group border-0 rounded-0 text-sm-start"
       >
-        <component
-          :is="currentSidebarComponent"
-          :user-store="userStore"
-          :current-grade="currentGrade"
-          :progress="progress"
-          :completed-quests="completedQuests"
-          :total-quests="totalQuests"
-          :is-mobile="isMobile"
-          :l-sidebar="lSidebar"
-          @update:is-mobile="updateIsMobile"
-        />
+        <div class="card m-2 bg-light"> 
+          <div class="card-body sidebar-card-body mt-4">
+            <component
+                :is="currentSidebarComponent"
+                :user-store="userStore"
+                :current-grade="currentGrade"
+                :progress="progress"
+                :completed-quests="completedQuests"
+                :total-quests="totalQuests"
+                :is-mobile="isMobile"
+                :l-sidebar="lSidebar"
+                @update:is-mobile="updateIsMobile"
+              />
+          </div>
+        </div>
       </div>
     </div>
   </div>
