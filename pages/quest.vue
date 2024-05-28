@@ -288,8 +288,6 @@ export default {
 .quest-front,
 .quest-back {
   position: absolute;
-  width: 100%;
-  height: 100%;
   backface-visibility: hidden;
   display: flex;
   flex-direction: column;
