@@ -473,7 +473,7 @@ a:hover {
   align-items: center;
   justify-content: center;
   gap: 10px;
-  margin-top: 10 px;
+  margin: 10px;
 }
 
 .activity-points-link {
@@ -703,7 +703,7 @@ a:hover {
 
 .speech-bubble {
   position: relative;
-  background: var(--bs-primary);
+  background: #00aabb;
   border-radius: 0.4em;
   padding: 10px;
   color: white;
@@ -714,22 +714,15 @@ a:hover {
 .speech-bubble::after {
   content: '';
   position: absolute;
-  bottom: 20px; /* Adjusts the vertical position of the tail */
-  left: -10px; /* Adjusts the horizontal position of the tail */
+  bottom: 20px; 
+  left: -10px; 
   transform: scaleY(-1);
   width: 0;
   height: 0;
   border: 10px solid transparent;
-  border-right-color: var(--bs-primary); /* Matches the background color of the speech bubble */
+  border-right-color: #00aabb; 
   border-left: 0;
   border-top: 0;
-}
-
-
-
-.button-container {
-  text-align: center;
-  margin-top: 10px;
 }
 
 .create-domain-button {
@@ -745,4 +738,9 @@ a:hover {
 .create-domain-button:hover {
   background-color: #008899;
   transform: scale(1.05);
+}
+
+.notification-color {
+  color: #fff !important;
+  background-color: #811c1c;
 }

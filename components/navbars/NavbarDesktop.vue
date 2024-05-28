@@ -407,11 +407,6 @@ export default {
   margin-right: 2rem;
 }
 
-.nav-link {
-  display: flex; 
-  justify-content: center; 
-  text-align: center; 
-}
 
 .navbar-collapse {
   justify-content: space-between;
