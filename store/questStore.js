@@ -11,9 +11,13 @@ export const useQuestStore = defineStore("questStore", {
     questDetails: "",
     hoveredQuest: null,
     selectedCategory: "all",
+    claimStatus: null,
+    eligibilityStatus: null,
+    showPopup: false,
+    popupMessage: "",
     questCategories: [
       {
-        category: "Hub Quests",
+        category: "Social Hub Quests",
         quests: [
           {
             id: 1,
@@ -22,7 +26,12 @@ export const useQuestStore = defineStore("questStore", {
             points: 0,
             validated: false,
             tbd: false,
+            ended: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
+            functions: {
+              checkBalance: "balanceOf",
+            },
           },
           {
             id: 2,
@@ -31,61 +40,96 @@ export const useQuestStore = defineStore("questStore", {
             points: 100,
             validated: false,
             tbd: false,
+            ended: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0xFC9b5992CEEB886C2ba7d0F785E2839802E27DC1",
+            functions: {
+              isEligible: "isEligible",
+              hasUserClaimed: "hasUserClaimed",
+              claim: "claim",
+            },
           },
           {
             id: 3,
-            title: "Scrolly's Journey Holder",
+            title: "Scrolly's Journey Owner",
             description:
-              "Own a Scrolly's Journey before the start of the Scrolly's Journey : Quests",
-            points: 100,
+              "Mint the Scrolly's Journey NFT Collection on the NFT Launchpad",
+            points: 200,
             validated: false,
-            tbd: true,
+            tbd: false,
+            ended: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0x0F06e87d431E90435677b83c056AED9d5e30761d",
+            functions: {
+              isEligible: "isEligible",
+              hasUserClaimed: "hasUserClaimed",
+              claim: "claim",
+            },
           },
-          // add others quests there
+          {
+            id: 4,
+            title: "Scrolly's Artist",
+            description:
+              "Mint the Scrolly's Journey NFT Collection on the NFT Launchpad",
+            points: 800,
+            validated: false,
+            tbd: false,
+            ended: false,
+            image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0x875d479920B8c9564501DAb57EA1325EeA6FD99D",
+            functions: {
+              isEligible: "isEligible",
+              hasUserClaimed: "hasUserClaimed",
+              claim: "claim",
+            },
+          },
+          // add other quests here
         ],
       },
       {
-        category: "Social Quests",
+        category: "Scrolly DeFi",
         quests: [
           {
-            id: 4,
-            title: "Share on Social Media",
+            id: 5,
+            title: "Coming soon",
             description: "Share your experience on social media",
             points: 0,
             validated: false,
-            tbd: false,
+            tbd: true,
+            ended: false,
             image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0xYourContractAddressForQuest5",
+            functions: {
+              isEligible: "isEligible",
+              hasUserClaimed: "hasUserClaimed",
+              claim: "claim",
+            },
           },
-          // add others quests there
+          // add other quests here
         ],
       },
       {
-        category: "Scrolly Community FTW",
+        category: "Community Rewards",
         quests: [
           {
-            id: 7,
-            title: "Equilibre Memes Competitor",
-            description: "Share your experience on social media",
+            id: 6,
+            title: "Equilibre Memes Contestoor",
+            description:
+              "Participate in the meme contest, share, and create as part of our community spirit. Regardless of winning, sharing and creating is what matters.",
             points: 50,
             validated: false,
             tbd: false,
+            ended: true, // Marked as ended
             image: "https://sns.scrolly.xyz/assets/cover.png",
+            contractAddress: "0x166E1FB48160D066C4724191463F4d3b298B3bbb",
+            functions: {
+              checkEligibility: "checkEligibility",
+            },
           },
-          {
-            id: 6,
-            title: "Lottery Addict",
-            description: "Share your experience on social media",
-            points: 100,
-            validated: false,
-            tbd: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
-          },
-          // add others quests there
+          // add other quests here
         ],
       },
-      // add others categories
+      // add other categories here
     ],
   }),
   getters: {
@@ -134,10 +178,9 @@ export const useQuestStore = defineStore("questStore", {
     async checkDomainOwnership() {
       const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
-        const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
-          config.public.punkTldAddress,
+          "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
           ["function balanceOf(address owner) view returns (uint256)"],
           provider,
         );
@@ -145,7 +188,7 @@ export const useQuestStore = defineStore("questStore", {
 
         let points = 169 * Math.min(balance.toNumber(), 3);
         const hubQuests = this.questCategories.find(
-          (category) => category.category === "Hub Quests",
+          (category) => category.category === "Social Hub Quests",
         );
         const quest = hubQuests.quests.find((q) => q.id === 1);
         quest.points = points;
@@ -155,39 +198,135 @@ export const useQuestStore = defineStore("questStore", {
     async checkQuestConditions() {
       const userAddress = this.userStore.getCurrentUserAddress;
       if (userAddress) {
-        const config = useRuntimeConfig();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const contract = new ethers.Contract(
-          config.public.questVerifierAddress,
-          [
-            "function checkQuestCondition(uint256 questId, address user) view returns (bool)",
-          ],
-          provider,
-        );
 
         for (const category of this.questCategories) {
           for (const quest of category.quests) {
-            if (quest.tbd === false) {
-              const isValidated = await contract.checkQuestCondition(
-                quest.id,
-                userAddress,
+            if (quest.id === 1) {
+              await this.checkDomainOwnership();
+            } else if (quest.id === 6) {
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
+                ],
+                provider,
               );
-              quest.validated = isValidated;
+              const eligible =
+                await contract[quest.functions.checkEligibility](userAddress);
+              quest.validated = eligible;
+            } else if (quest.functions) {
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
+                  `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
+                ],
+                provider,
+              );
+              const hasClaimed =
+                await contract[quest.functions.hasUserClaimed](userAddress);
+              quest.validated = hasClaimed;
+              if (!hasClaimed) {
+                quest.eligible =
+                  await contract[quest.functions.isEligible](userAddress);
+              } else {
+                quest.eligible = false;
+              }
             }
           }
         }
       }
     },
+    async checkEligibilityAndClaimStatus(contractAddress, functions) {
+      const userAddress = this.userStore.getCurrentUserAddress;
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        [
+          `function ${functions.isEligible}(address _user) external view returns (bool)`,
+          `function ${functions.hasUserClaimed}(address _user) external view returns (bool)`,
+          `function ${functions.claim}(address _user) external`,
+        ],
+        signer,
+      );
+
+      const hasClaimed = await contract[functions.hasUserClaimed](userAddress);
+      if (hasClaimed) {
+        this.claimStatus = true;
+        this.eligibilityStatus = false;
+      } else {
+        this.claimStatus = false;
+        this.eligibilityStatus =
+          await contract[functions.isEligible](userAddress);
+      }
+    },
+    async claimReward(contractAddress, functions, points) {
+      const userAddress = this.userStore.getCurrentUserAddress;
+      const provider = new ethers.providers.Web3Provider(window.ethereum);
+      const signer = provider.getSigner();
+      const contract = new ethers.Contract(
+        contractAddress,
+        [`function ${functions.claim}(address _user) external`],
+        signer,
+      );
+
+      try {
+        await contract[functions.claim](userAddress);
+        this.claimStatus = true;
+        this.showPopupMessage(
+          `Congratulations! You have successfully claimed ${points} Mappy Points!`,
+        );
+        setTimeout(async () => {
+          await this.updateData(); // Refresh quest status
+        }, 5000);
+      } catch (error) {
+        this.showPopupMessage(
+          "There was an issue processing your claim. Please try again later.",
+        );
+      }
+    },
+    showPopupMessage(message) {
+      this.popupMessage = message;
+      this.showPopup = true;
+      setTimeout(() => {
+        this.showPopup = false;
+      }, 5000);
+    },
     filterCategory(category) {
       this.selectedCategory = category;
     },
-    showQuestDetails(questId) {
+    async showQuestDetails(questId) {
       for (const category of this.questCategories) {
         const quest = category.quests.find((q) => q.id === questId);
         if (quest) {
           this.selectedQuest = quest;
           this.questDetails = quest.description;
           this.showModal = true;
+          if (quest.id === 1) {
+            await this.checkDomainOwnership();
+          } else if (quest.id === 6) {
+            const userAddress = this.userStore.getCurrentUserAddress;
+            const provider = new ethers.providers.Web3Provider(window.ethereum);
+            const contract = new ethers.Contract(
+              quest.contractAddress,
+              [
+                `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
+                `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
+              ],
+              provider,
+            );
+            this.claimStatus =
+              await contract[quest.functions.checkEligibility](userAddress);
+            quest.validated =
+              await contract[quest.functions.hasUserClaimed](userAddress);
+          } else {
+            await this.checkEligibilityAndClaimStatus(
+              quest.contractAddress,
+              quest.functions,
+            );
+          }
           break;
         }
       }

@@ -8,6 +8,38 @@
         <div class="points-card">
           <h2>Your Mappy Points</h2>
           <p>{{ questStore.activityPoints }}</p>
+          <button @click="toggleDetails" class="details-button">
+            {{ showDetails ? "▲" : "▼" }} Details
+          </button>
+          <transition name="fade">
+            <div v-if="showDetails" class="points-details">
+              <div class="details-section">
+                <p class="details-header">Points Breakdown</p>
+                <p class="details-item">
+                  <strong>{{ pointsFromValidatedQuests }}</strong> points from
+                  completed quests
+                </p>
+                <p class="details-item">
+                  <strong>{{ pointsFromUserActivities }}</strong> points from
+                  user activities on the hub
+                </p>
+              </div>
+              <div class="details-section">
+                <p class="details-header">Points by Category</p>
+                <div
+                  v-for="category in questStore.questCategories"
+                  :key="category.category"
+                  class="details-item"
+                >
+                  <p>
+                    <strong>{{ category.category }}:</strong>
+                    {{ calculateCategoryPoints(category.quests) }} /
+                    {{ calculateMaxCategoryPoints(category.quests) }} points
+                  </p>
+                </div>
+              </div>
+            </div>
+          </transition>
         </div>
       </div>
     </div>
@@ -20,67 +52,64 @@
         community activities.
       </p>
 
-      <div class="category-filter">
-        <label for="categorySelect">Select Category:</label>
-        <select id="categorySelect" v-model="questStore.selectedCategory">
-          <option
-            v-for="category in questStore.questCategories"
-            :key="category.category"
-            :value="category.category"
-          >
-            {{ category.category }}
-          </option>
-        </select>
+      <div class="view-toggle">
+        <button @click="setView('grid')" :class="{ active: view === 'grid' }">
+          Grid View
+        </button>
       </div>
 
-      <div
-        v-for="category in questStore.filteredCategories"
-        :key="category.category"
-        :id="category.category.replace(/\s+/g, '-')"
-        class="quest-category"
-      >
-        <h3>
-          {{ category.category }} ({{
-            questStore.getCompletedQuests(category.quests)
-          }}/{{ category.quests.length }}
-          completed)
-        </h3>
-        <div class="quest-path">
-          <div
-            v-for="quest in category.quests"
-            :key="quest.id"
-            class="quest-container"
-          >
+      <div v-if="view === 'grid'" class="grid-view">
+        <div
+          v-for="category in questStore.filteredCategories"
+          :key="category.category"
+          class="quest-category"
+        >
+          <h3 class="category-title">
+            {{ category.category }} ({{
+              questStore.getCompletedQuests(category.quests)
+            }}/{{ category.quests.length }} completed)
+          </h3>
+          <div class="quest-path">
             <div
-              class="quest"
-              :class="{
-                validated: quest.validated,
-                notValidated: !quest.validated && !quest.tbd,
-                tbd: quest.tbd,
-                flipped: questStore.hoveredQuest === quest.id,
-              }"
-              @mouseover="quest.tbd ? null : questStore.hoverQuest(quest.id)"
-              @mouseleave="questStore.hoverQuest(null)"
-              @click="quest.tbd ? null : questStore.showQuestDetails(quest.id)"
+              v-for="quest in category.quests"
+              :key="quest.id"
+              class="quest-container"
             >
-              <div class="quest-front">
-                <div class="quest-image">
-                  <img :src="quest.image" alt="Quest Image" />
+              <div
+                class="quest"
+                :class="{
+                  validated: quest.validated,
+                  notValidated: !quest.validated && !quest.tbd && !quest.ended,
+                  tbd: quest.tbd,
+                  ended: quest.ended,
+                  'validated-ended': quest.validated && quest.ended,
+                  flipped: questStore.hoveredQuest === quest.id,
+                }"
+                @mouseover="quest.tbd ? null : questStore.hoverQuest(quest.id)"
+                @mouseleave="questStore.hoverQuest(null)"
+                @click="
+                  quest.tbd ? null : questStore.showQuestDetails(quest.id)
+                "
+              >
+                <div class="quest-front">
+                  <div class="quest-image">
+                    <img :src="quest.image" alt="Quest Image" />
+                  </div>
+                  <div class="quest-title">{{ quest.title }}</div>
+                  <div
+                    v-if="!quest.validated && !quest.tbd && !quest.ended"
+                    class="points-box-front"
+                  >
+                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
+                    <span>{{ quest.points }} MP</span>
+                  </div>
                 </div>
-                <div class="quest-title">{{ quest.title }}</div>
-                <div
-                  v-if="!quest.validated && !quest.tbd"
-                  class="points-box-front"
-                >
-                  <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                  <span>{{ quest.points }} MP</span>
-                </div>
-              </div>
-              <div class="quest-back">
-                <div class="quest-title">{{ quest.title }}</div>
-                <div class="points-box">
-                  <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                  <span>{{ quest.points }} MP</span>
+                <div class="quest-back">
+                  <div class="quest-title">{{ quest.title }}</div>
+                  <div class="points-box">
+                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
+                    <span>{{ quest.points }} MP</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -101,17 +130,66 @@
           <p>
             <span
               :class="{
-                'validated-check': questStore.selectedQuest.validated,
-                'not-validated-check': !questStore.selectedQuest.validated,
+                'validated-check':
+                  questStore.selectedQuest.validated &&
+                  !questStore.selectedQuest.ended,
+                'not-validated-check':
+                  !questStore.selectedQuest.validated &&
+                  !questStore.selectedQuest.ended,
+                'ended-check':
+                  questStore.selectedQuest.ended &&
+                  !questStore.selectedQuest.validated,
+                'validated-ended-check':
+                  questStore.selectedQuest.validated &&
+                  questStore.selectedQuest.ended,
               }"
             ></span>
-            To do:
+            Status:
             {{
-              questStore.selectedQuest.validated ? "Validated" : "Not validated"
+              questStore.selectedQuest.validated &&
+              questStore.selectedQuest.ended
+                ? "Validated + Quest Ended"
+                : questStore.selectedQuest.validated
+                  ? "Validated"
+                  : questStore.selectedQuest.ended
+                    ? "Quest Ended"
+                    : "Not validated"
             }}
           </p>
-          <p>Max points: {{ questStore.selectedQuest.maxPoints }} MP</p>
+          <p
+            v-if="
+              questStore.selectedQuest.validated &&
+              questStore.selectedQuest.ended
+            "
+          >
+            Congratulations! You have successfully claimed
+            {{ questStore.selectedQuest.points }} Mappy Points and the quest has
+            ended!
+          </p>
+          <p v-else-if="questStore.selectedQuest.validated">
+            Congratulations! You have successfully claimed
+            {{ questStore.selectedQuest.points }} Mappy Points!
+          </p>
+          <p>Max points: {{ questStore.selectedQuest.points }} MP</p>
           <p>Description: {{ questStore.questDetails }}</p>
+          <div
+            v-if="
+              questStore.selectedQuest.contractAddress &&
+              !questStore.selectedQuest.validated &&
+              !questStore.selectedQuest.ended
+            "
+          >
+            <p v-if="questStore.claimStatus">
+              You have already claimed this reward.
+            </p>
+            <p v-else-if="questStore.eligibilityStatus">
+              You are eligible to claim your reward!
+              <button class="claim-button" @click="claimReward">
+                Claim Reward
+              </button>
+            </p>
+            <p v-else>You are not eligible to claim this reward yet.</p>
+          </div>
           <NuxtLink
             v-if="questStore.selectedQuest.id === 1"
             to="https://sns.scrolly.xyz/#/"
@@ -125,6 +203,10 @@
         </button>
       </div>
     </div>
+    <!-- Popup Notification -->
+    <div v-if="questStore.showPopup" class="popup-notification">
+      {{ questStore.popupMessage }}
+    </div>
   </div>
 </template>
 
@@ -134,6 +216,13 @@ import { useQuestStore } from "~/store/questStore";
 
 export default {
   name: "QuestPage",
+  data() {
+    return {
+      view: "grid", // Default to grid view
+      hoverQuest: null, // Store hovered quest ID for tooltip
+      showDetails: false, // Show or hide points details
+    };
+  },
   setup() {
     const userStore = useUserStore();
     const questStore = useQuestStore();
@@ -142,6 +231,21 @@ export default {
       userStore,
       questStore,
     };
+  },
+  computed: {
+    pointsFromValidatedQuests() {
+      return this.questStore.filteredCategories.reduce(
+        (acc, category) =>
+          acc +
+          category.quests
+            .filter((q) => q.validated)
+            .reduce((sum, quest) => sum + quest.points, 0),
+        0,
+      );
+    },
+    pointsFromUserActivities() {
+      return this.questStore.activityPoints - this.pointsFromValidatedQuests;
+    },
   },
   async mounted() {
     await this.questStore.initializeQuests(this.userStore);
@@ -167,6 +271,36 @@ export default {
         this.questStore.filterCategory(hash);
       }
     },
+    setView(view) {
+      this.view = view;
+    },
+    async showQuestDetails(quest) {
+      this.questStore.selectedQuest = quest;
+      this.questStore.showModal = true;
+      if (quest.id === 1) {
+        await this.questStore.checkDomainOwnership();
+      } else {
+        await this.questStore.checkEligibilityAndClaimStatus(
+          quest.contractAddress,
+          quest.functions,
+        );
+      }
+    },
+    async claimReward() {
+      const { contractAddress, functions, points } =
+        this.questStore.selectedQuest;
+      await this.questStore.claimReward(contractAddress, functions, points);
+      this.questStore.closeModal();
+    },
+    toggleDetails() {
+      this.showDetails = !this.showDetails;
+    },
+    calculateCategoryPoints(quests) {
+      return quests.reduce((sum, quest) => sum + quest.points, 0);
+    },
+    calculateMaxCategoryPoints(quests) {
+      return quests.reduce((sum, quest) => sum + quest.points, 0);
+    },
   },
 };
 </script>
@@ -175,10 +309,10 @@ export default {
 @import "animate.css";
 
 .quest-page {
-  background: linear-gradient(to right, #ff7e5f, #feb47b);
+  background: #f5f5f5;
   min-height: 100vh;
   padding: 20px;
-  color: #fff;
+  color: #333;
   text-align: center;
 }
 
@@ -194,10 +328,11 @@ export default {
 }
 
 .points-card {
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(255, 255, 255, 0.9);
   padding: 20px;
   border-radius: 10px;
   text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .points-card h2 {
@@ -209,6 +344,43 @@ export default {
   margin: 0;
   font-size: 2em;
   font-weight: bold;
+}
+
+.details-button {
+  margin-top: 10px;
+  background: none;
+  border: none;
+  color: #333;
+  font-size: 1em;
+  cursor: pointer;
+}
+
+.details-button:hover {
+  text-decoration: underline;
+}
+
+.points-details {
+  margin-top: 10px;
+  text-align: left;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 0.9em;
+}
+
+.details-section {
+  margin-bottom: 10px;
+}
+
+.details-header {
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.details-item {
+  margin: 5px 0;
 }
 
 .leaderboard-link {
@@ -240,15 +412,41 @@ export default {
   font-size: 1.1em;
 }
 
-.category-filter {
+.view-toggle {
+  display: flex;
+  justify-content: center;
   margin-bottom: 20px;
+}
+
+.view-toggle button {
+  padding: 10px 20px;
+  margin: 0 5px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.view-toggle button.active {
+  background-color: #333;
+  color: #fff;
+}
+
+.view-toggle button:not(.active) {
+  background-color: #ddd;
+  color: #333;
+}
+
+.grid-view {
+  display: flex;
+  flex-direction: column;
 }
 
 .quest-category {
   margin-top: 20px;
 }
 
-.quest-category h3 {
+.category-title {
   font-size: 1.5em;
   margin-bottom: 10px;
 }
@@ -363,23 +561,27 @@ export default {
   cursor: not-allowed;
 }
 
-.small-connector {
-  width: 30px;
-  height: 4px;
-  background: #fff;
-  margin: 0 10px;
+.quest.ended {
+  border: 2px solid #ff9800;
 }
 
-.status {
-  font-weight: bold;
+.quest.validated-ended {
+  border: 2px solid #4caf50;
+  background: linear-gradient(to right, #4caf50, #ff9800);
 }
 
-.status.validated {
-  color: #4caf50;
+.claim-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
 }
 
-.status.not-validated {
-  color: #f44336;
+.claim-button:hover {
+  background-color: #45a049;
 }
 
 .modal-overlay {
@@ -399,7 +601,7 @@ export default {
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-  color: #000;
+  color: #333;
   max-width: 400px;
   width: 80%;
 }
@@ -422,8 +624,18 @@ export default {
   color: red;
 }
 
+.ended-check::before {
+  content: "⌛";
+  color: #ff9800;
+}
+
+.validated-ended-check::before {
+  content: "✔️⌛";
+  color: green;
+}
+
 .modal-close-button {
-  background-color: #ff7e5f;
+  background-color: #333;
   color: #fff;
   border: none;
   padding: 10px 20px;
@@ -433,6 +645,39 @@ export default {
 }
 
 .modal-close-button:hover {
-  background-color: #feb47b;
+  background-color: #555;
+}
+
+.popup-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #333;
+  color: #fff;
+  padding: 15px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.popup-notification-enter-active,
+.popup-notification-leave-active {
+  transition: opacity 0.5s;
+}
+
+.popup-notification-enter,
+.popup-notification-leave-to {
+  opacity: 0;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
