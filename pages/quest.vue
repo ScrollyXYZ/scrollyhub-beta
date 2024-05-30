@@ -2,7 +2,7 @@
   <div class="quest-page">
     <div class="header-section">
       <div class="leaderboard-link">
-        <span class="leaderboard-button disabled"> View Leaderboard </span>
+        <NuxtLink to="/leaderboard">Leaderboard</NuxtLink>
       </div>
       <div class="points-display animate__animated animate__fadeInDown">
         <div class="points-card">

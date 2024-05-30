@@ -1,5 +1,5 @@
 <template>
-  <img :src="imgPath" />
+  <img :src="imgPath" class="profile-image" />
 </template>
 
 <script>
@@ -10,8 +10,8 @@ export default {
   data() {
     return {
       imgPath: null,
-      defaultImage: "/img/user/anon.svg"
-    }
+      defaultImage: "/img/user/anon.svg",
+    };
   },
 
   created() {
@@ -19,23 +19,31 @@ export default {
   },
 
   mounted() {
-    const storedImage = sessionStorage.getItem(String(this.address).toLowerCase()+"-img");
+    const storedImage = sessionStorage.getItem(
+      String(this.address).toLowerCase() + "-img",
+    );
 
     if (storedImage) {
       this.imgPath = storedImage;
     } else if (this.image) {
       this.imgPath = this.image;
-      sessionStorage.setItem(String(this.address).toLowerCase()+"-img", this.image);
+      sessionStorage.setItem(
+        String(this.address).toLowerCase() + "-img",
+        this.image,
+      );
     }
   },
 
   watch: {
-    image(oldValue, newValue) {
+    image(newValue) {
       if (newValue) {
         this.imgPath = newValue;
-        sessionStorage.setItem(String(this.address).toLowerCase()+"-img", this.image);
+        sessionStorage.setItem(
+          String(this.address).toLowerCase() + "-img",
+          newValue,
+        );
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
