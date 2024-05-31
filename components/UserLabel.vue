@@ -2,6 +2,7 @@
   <span class="user-label">
     <slot></slot>
     <span v-if="isAdmin" class="badge admin-badge">Admin</span>
+    <span v-if="userTitle" class="badge title-badge">{{ userTitle }}</span>
   </span>
 </template>
 
@@ -18,6 +19,11 @@ export default {
       default: "",
     },
   },
+  data() {
+    return {
+      userTitle: "",
+    };
+  },
   computed: {
     isAdmin() {
       const adminAddresses = [
@@ -29,15 +35,29 @@ export default {
         "scrolly.scrolly",
         // Add other admin domains here
       ];
-      console.log("Checking address:", this.address);
-      console.log("Checking domain:", this.domain);
-      console.log("Admin addresses:", adminAddresses);
-      console.log("Admin domains:", adminDomains);
       return (
         adminAddresses.includes(this.address.toLowerCase()) ||
         adminDomains.includes(this.domain.toLowerCase())
       );
     },
+  },
+  methods: {
+    async fetchUserTitle() {
+      try {
+        const response = await fetch(
+          `https://leaderboard-scrolly.vercel.app/rank/${this.address}`,
+        );
+        const data = await response.json();
+        if (data && data.title) {
+          this.userTitle = data.title;
+        }
+      } catch (error) {
+        console.error("Failed to fetch user title:", error);
+      }
+    },
+  },
+  mounted() {
+    this.fetchUserTitle();
   },
 };
 </script>
@@ -54,5 +74,11 @@ export default {
   padding: 0.2em 0.5em;
   background-color: red;
   color: white;
+}
+
+.title-badge {
+  font-size: 0.75em;
+  padding: 0.2em 0.8em;
+  color: black;
 }
 </style>
