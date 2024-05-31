@@ -315,6 +315,7 @@
               <change-collection-preview-modal
                 :cAddress="selectedNft.address"
                 :mdAddress="selectedNft.mdAddress"
+                storageType="ipfs"
                 @saveCollection="saveCollection"
               ></change-collection-preview-modal>
             </div>
@@ -329,6 +330,7 @@
                   <add-image-to-collection-modal
                     :cAddress="selectedNft.address"
                     :mdAddress="selectedNft.mdAddress"
+                    storageType="ipfs"
                     @saveCollection="saveCollection"
                   ></add-image-to-collection-modal>
                 </div>

@@ -274,6 +274,7 @@ import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import ConnectWalletButton from "~/components/ConnectWalletButton.vue";
+import Image from "~/components/Image.vue";
 import WaitingToast from "~/components/WaitingToast";
 import FileUploadModal from "~/components/storage/FileUploadModal.vue";
 import { useUserStore } from "~/store/user";
