@@ -83,10 +83,7 @@
           <p class="text-center">
             Please verify ownership to access your profile
           </p>
-          <button 
-            class="btn btn-primary" 
-            @click="connectToOrbis"
-          >
+          <button class="btn btn-primary" @click="connectToOrbis">
             Verify account ownership
           </button>
         </div>
@@ -275,6 +272,7 @@
         @processFileUrl="insertImage"
         title="Change profile image"
         infoText="Upload a new profile picture."
+        storageType="ipfs"
         :componentId="$.uid"
         :maxFileSize="$config.fileUploadSizeLimit"
       />
@@ -826,12 +824,11 @@ export default {
 }
 
 .profile-category-title {
-
   font-weight: bold;
 }
 
 .profile-category-text p {
-  margin: 0; 
+  margin: 0;
 }
 
 .profile-category-value {

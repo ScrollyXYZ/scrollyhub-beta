@@ -1,45 +1,65 @@
 <template>
   <!-- Modal -->
-  <div class="modal fade" :id="'fileUploadModal'+componentId" tabindex="-1" :aria-labelledby="'fileUploadModalLabel'+componentId" aria-hidden="true">
+  <div
+    class="modal fade"
+    :id="'fileUploadModal' + componentId"
+    tabindex="-1"
+    :aria-labelledby="'fileUploadModalLabel' + componentId"
+    aria-hidden="true"
+  >
     <div class="modal-dialog">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" :id="'fileUploadModalLabel'+componentId">{{ getTitle }}</h1>
-          <button :id="'closeFileUploadModal'+componentId" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <h1
+            class="modal-title fs-5"
+            :id="'fileUploadModalLabel' + componentId"
+          >
+            {{ getTitle }}
+          </h1>
+          <button
+            :id="'closeFileUploadModal' + componentId"
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          ></button>
         </div>
-  
-        <div class="modal-body mb-4">
 
+        <div class="modal-body mb-4">
           <!-- Tabs Navigation -->
           <ul class="nav nav-tabs nav-fill">
             <li class="nav-item">
-              <button 
+              <button
                 :disabled="!this.fileUploadEnabled"
-                class="nav-link" 
-                :class="currentTab === 'upload' ? 'active' : ''" 
-                @click="currentTab = 'upload'" 
-              >Upload</button>
+                class="nav-link"
+                :class="currentTab === 'upload' ? 'active' : ''"
+                @click="currentTab = 'upload'"
+              >
+                Upload
+              </button>
             </li>
             <li class="nav-item">
-              <button 
-                class="nav-link" 
-                :class="currentTab === 'paste' ? 'active' : ''" 
-                @click="currentTab = 'paste'" 
-              >Paste Link</button>
+              <button
+                class="nav-link"
+                :class="currentTab === 'paste' ? 'active' : ''"
+                @click="currentTab = 'paste'"
+              >
+                Paste Link
+              </button>
             </li>
           </ul>
           <!-- END Tabs Navigation -->
 
           <!-- Tabs Content -->
           <div class="tab-content mt-3">
-
             <!-- Upload Tab -->
             <div v-if="currentTab === 'upload'">
               <p v-if="infoText">{{ infoText }}</p>
-  
-              <FileUploadInput 
+
+              <FileUploadInput
                 btnCls="btn btn-primary"
-                :maxFileSize="maxFileSize" 
+                :maxFileSize="maxFileSize"
+                :storageType="storageType"
                 @processUploadedFileUrl="processUploadedFileUrl"
               />
             </div>
@@ -48,19 +68,22 @@
             <div v-if="currentTab === 'paste'">
               <p>Paste file link</p>
 
-              <input v-model="pastedLink" type="text" class="form-control mb-3" placeholder="Enter http link to file" />
+              <input
+                v-model="pastedLink"
+                type="text"
+                class="form-control mb-3"
+                placeholder="Enter http link to file"
+              />
 
-              <button 
-                class="btn btn-primary" 
+              <button
+                class="btn btn-primary"
                 @click="processUploadedFileUrl(pastedLink)"
                 :disabled="!pastedLink"
               >
                 Submit link
               </button>
             </div>
-
           </div>
-  
         </div>
       </div>
     </div>
@@ -68,20 +91,20 @@
 </template>
 
 <script>
-import { useSiteStore } from '~/store/site';
-import FileUploadInput from '~/components/storage/FileUploadInput.vue';
+import { useSiteStore } from "~/store/site";
+import FileUploadInput from "~/components/storage/FileUploadInput.vue";
 
 export default {
   name: "FileUploadModal",
-  props: ["title", "componentId", "infoText", "maxFileSize"],
+  props: ["title", "componentId", "infoText", "maxFileSize", "storageType"],
   emits: ["processFileUrl"],
   components: { FileUploadInput },
 
-  data()  {
+  data() {
     return {
       currentTab: "upload",
-      pastedLink: null
-    }
+      pastedLink: null,
+    };
   },
 
   mounted() {
@@ -103,16 +126,18 @@ export default {
   methods: {
     processUploadedFileUrl(fileUrl) {
       this.$emit("processFileUrl", fileUrl);
-      document.getElementById('closeFileUploadModal'+this.componentId).click();
-    }
+      document
+        .getElementById("closeFileUploadModal" + this.componentId)
+        .click();
+    },
   },
 
   setup() {
     const siteStore = useSiteStore();
 
     return {
-      siteStore
-    }
+      siteStore,
+    };
   },
 
   watch: {
@@ -122,7 +147,7 @@ export default {
       } else {
         this.currentTab = "upload";
       }
-    }
-  }
-}
+    },
+  },
+};
 </script>
