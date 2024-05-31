@@ -5,6 +5,7 @@
       <p>Upload additional image (and then click Submit below):</p>
       <FileUploadInput
         btnCls="btn btn-primary"
+        storageType="ipfs"
         :maxFileSize="$config.fileUploadSizeLimit"
         @processUploadedFileUrl="insertImageLink"
       />
@@ -13,9 +14,10 @@
     <p v-if="!$config.fileUploadEnabled">Paste image link here:</p>
     <input v-model="imageUrl" type="text" class="form-control" />
     <div v-if="imageUrl" class="mt-3">
-      <img
-        :src="imageUrl"
-        class="img-thumbnail img-fluid"
+      <Image
+        :url="imageUrl"
+        alt="Image"
+        cls="img-thumbnail img-fluid"
         style="max-width: 100px"
       />
       <br />
@@ -45,12 +47,13 @@
 import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
+import Image from "~/components/Image.vue";
 import FileUploadInput from "~/components/storage/FileUploadInput.vue";
 
 export default {
   name: "AddImageToCollectionModal",
   props: ["cAddress", "mdAddress"],
-  components: { FileUploadInput },
+  components: { FileUploadInput, Image },
   emits: ["saveCollection"],
 
   data() {

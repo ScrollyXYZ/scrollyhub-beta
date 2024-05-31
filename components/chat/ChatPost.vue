@@ -94,7 +94,11 @@
                 :to="'/nft/collection?id=' + collection.address"
                 class="text-decoration-none text-reset"
               >
-                <img :src="collection?.image" class="card-img-top" />
+                <Image
+                  :url="collection?.image"
+                  :alt="collection?.name"
+                  cls="card-img-top"
+                />
                 <div
                   class="card-body bg-body rounded-bottom-3 border-end border-bottom border-start"
                 >
@@ -329,6 +333,7 @@ import sanitizeHtml from "sanitize-html";
 import { useEthers, shortenAddress } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import { useUserStore } from "~/store/user";
+import Image from "~/components/Image.vue";
 import TokenTipModal from "~/components/TokenTipModal.vue";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
 import IggyPostMint from "~/components/minted-posts/IggyPostMint.vue";
@@ -364,7 +369,8 @@ export default {
     MintedPostImage,
     ProfileImage,
     TokenTipModal,
-    UserLabel, // Register the new component
+    Image,
+    UserLabel,
   },
 
   data() {

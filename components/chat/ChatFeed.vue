@@ -1,14 +1,19 @@
 <template>
   <div class="scroll-500">
-
     <!-- Post/Comment Input Box -->
     <div class="card mb-2 border" v-if="!hideCommentBox">
       <div class="card-body">
         <div class="form-group mt-2 mb-2">
-          <textarea 
-            v-model="postText" 
-            :disabled="!userStore.getIsConnectedToOrbis || !isSupportedChain || !hasDomainOrNotRequired" 
-            class="form-control" id="exampleTextarea" rows="5" 
+          <textarea
+            v-model="postText"
+            :disabled="
+              !userStore.getIsConnectedToOrbis ||
+              !isSupportedChain ||
+              !hasDomainOrNotRequired
+            "
+            class="form-control"
+            id="exampleTextarea"
+            rows="5"
             :placeholder="createPostPlaceholder"
           ></textarea>
         </div>
@@ -16,8 +21,14 @@
         <div class="d-flex justify-content-between">
           <div>
             <!-- GIF button -->
-            <TenorGifSearch 
-              v-if="$config.tenorApiKey != '' && isActivated && userStore.getIsConnectedToOrbis && isSupportedChain && hasDomainOrNotRequired"  
+            <TenorGifSearch
+              v-if="
+                $config.tenorApiKey != '' &&
+                isActivated &&
+                userStore.getIsConnectedToOrbis &&
+                isSupportedChain &&
+                hasDomainOrNotRequired
+              "
               @insertGif="insertImage"
             />
 
@@ -29,20 +40,28 @@
             -->
 
             <!-- Upload IMG button -->
-            <button 
-              v-if="isActivated && $config.fileUploadEnabled !== '' && userStore.getIsConnectedToOrbis && isSupportedChain && hasDomainOrNotRequired"
-              class="btn btn-outline-primary me-2 mt-2 btn-sm" 
-              data-bs-toggle="modal" :data-bs-target="'#fileUploadModal'+$.uid"
+            <button
+              v-if="
+                isActivated &&
+                $config.fileUploadEnabled !== '' &&
+                userStore.getIsConnectedToOrbis &&
+                isSupportedChain &&
+                hasDomainOrNotRequired
+              "
+              class="btn btn-outline-primary me-2 mt-2 btn-sm"
+              data-bs-toggle="modal"
+              :data-bs-target="'#fileUploadModal' + $.uid"
             >
               <i class="bi bi-file-earmark-image-fill"></i>
               IMG
             </button>
 
             <!-- Upload Image Modal -->
-            <FileUploadModal 
+            <FileUploadModal
               v-if="userStore.getIsConnectedToOrbis"
               @processFileUrl="insertImage"
               title="Upload image"
+              storageType="imagekit"
               infoText="Upload an image."
               :componentId="$.uid"
               :maxFileSize="$config.fileUploadSizeLimit"
@@ -50,92 +69,132 @@
             <!-- END Upload Image Modal -->
 
             <!-- Emoji Picker -->
-            <EmojiPicker  
-              v-if="isActivated && userStore.getIsConnectedToOrbis && isSupportedChain && hasDomainOrNotRequired"
+            <EmojiPicker
+              v-if="
+                isActivated &&
+                userStore.getIsConnectedToOrbis &&
+                isSupportedChain &&
+                hasDomainOrNotRequired
+              "
               @updateEmoji="insertEmoji"
             />
           </div>
-          
+
           <div>
             <!-- Create Post button -->
-            <button 
-              v-if="isActivated && userStore.getIsConnectedToOrbis && isSupportedChain && hasDomainOrNotRequired" 
-              :disabled="!postText || waitingCreatePost" 
-              class="btn btn-primary me-2 mt-2" 
+            <button
+              v-if="
+                isActivated &&
+                userStore.getIsConnectedToOrbis &&
+                isSupportedChain &&
+                hasDomainOrNotRequired
+              "
+              :disabled="!postText || waitingCreatePost"
+              class="btn btn-primary me-2 mt-2"
               @click="createPost"
-            >Submit</button>
+            >
+              Submit
+            </button>
 
             <!-- Sign Into Chat button -->
-            <button 
-              v-if="isActivated && !userStore.getIsConnectedToOrbis && isSupportedChain && hasDomainOrNotRequired" 
-              class="btn btn-primary" @click="connectToOrbis"
-            >Sign into chat</button>
+            <button
+              v-if="
+                isActivated &&
+                !userStore.getIsConnectedToOrbis &&
+                isSupportedChain &&
+                hasDomainOrNotRequired
+              "
+              class="btn btn-primary"
+              @click="connectToOrbis"
+            >
+              Sign into chat
+            </button>
 
             <!-- Get Username button -->
-            <button 
-              v-if="isActivated && isSupportedChain && !hasDomainOrNotRequired" 
+            <button
+              v-if="isActivated && isSupportedChain && !hasDomainOrNotRequired"
               class="btn btn-primary disabled"
-            >Get yourself a {{ $config.tldName }} name to post <i class="bi bi-arrow-right"></i></button>
-            
+            >
+              Get yourself a {{ $config.tldName }} name to post
+              <i class="bi bi-arrow-right"></i>
+            </button>
+
             <!-- Connect Wallet button -->
-            <ConnectWalletButton v-if="!isActivated" class="btn btn-primary" btnText="Connect wallet" />
+            <ConnectWalletButton
+              v-if="!isActivated"
+              class="btn btn-primary"
+              btnText="Connect wallet"
+            />
 
             <!-- Switch Chain button -->
-            <SwitchChainButton v-if="isActivated && !isSupportedChain" :navbar="false" :dropdown="false" />
+            <SwitchChainButton
+              v-if="isActivated && !isSupportedChain"
+              :navbar="false"
+              :dropdown="false"
+            />
           </div>
-        
         </div>
 
         <div class="d-flex mt-2 row">
-          <img 
-            v-for="(imgLink, index) in getAllImagesFromText(postText)" 
-            :src="imgLink" 
+          <img
+            v-for="(imgLink, index) in getAllImagesFromText(postText)"
+            :src="imgLink"
             :key="index"
-            class="img-fluid img-thumbnail m-1 col-2" 
+            class="img-fluid img-thumbnail m-1 col-2"
           />
         </div>
       </div>
     </div>
 
     <div v-if="orbisPosts">
-      <ChatPost 
-        @insertReply="insertReply" 
-        @removePost="removePost" 
-        v-for="post in orbisPosts" 
+      <ChatPost
+        @insertReply="insertReply"
+        @removePost="removePost"
+        v-for="post in orbisPosts"
         :key="post.stream_id"
-        :showQuotedPost="showQuotedPost" 
+        :showQuotedPost="showQuotedPost"
         :post="post"
-        :orbisContext="getOrbisContext" />
+        :orbisContext="getOrbisContext"
+      />
     </div>
 
-    <div class="d-flex justify-content-center mt-5 mb-4" v-if="orbisPosts.length === 0 && !waitingLoadPosts">
+    <div
+      class="d-flex justify-content-center mt-5 mb-4"
+      v-if="orbisPosts.length === 0 && !waitingLoadPosts"
+    >
       <p>No posts yet. Be the first to post!</p>
     </div>
 
     <div class="d-flex justify-content-center mb-3" v-if="waitingLoadPosts">
-      <span class="spinner-border spinner-border-lg" role="status" aria-hidden="true"></span>
+      <span
+        class="spinner-border spinner-border-lg"
+        role="status"
+        aria-hidden="true"
+      ></span>
     </div>
-    
+
     <div class="d-grid gap-2 col-6 mx-auto mb-5" v-if="showLoadMore">
-      <button class="btn btn-primary" type="button" @click="getOrbisPosts">Load more posts</button>
+      <button class="btn btn-primary" type="button" @click="getOrbisPosts">
+        Load more posts
+      </button>
     </div>
   </div>
 </template>
 
 <script>
-import { useEthers } from 'vue-dapp';
+import { useEthers } from "vue-dapp";
 import ChatPost from "~/components/chat/ChatPost.vue";
 import { useToast } from "vue-toastification/dist/index.mjs";
-import { useSiteStore } from '~/store/site';
-import { useUserStore } from '~/store/user';
+import { useSiteStore } from "~/store/site";
+import { useUserStore } from "~/store/user";
 import ConnectWalletButton from "~/components/ConnectWalletButton.vue";
 import SwitchChainButton from "~/components/SwitchChainButton.vue";
 import TenorGifSearch from "~/components/tenor/TenorGifSearch.vue";
 import TenorStickerSearch from "~/components/tenor/TenorStickerSearch.vue";
 import FileUploadModal from "~/components/storage/FileUploadModal.vue";
 import { getAllImagesFromText } from "~/utils/textUtils";
-import EmojiPicker from '~/components/EmojiPicker.vue'
-import 'emoji-mart-vue-fast/css/emoji-mart.css'
+import EmojiPicker from "~/components/EmojiPicker.vue";
+import "emoji-mart-vue-fast/css/emoji-mart.css";
 
 export default {
   name: "ChatFeed",
@@ -146,7 +205,7 @@ export default {
     "master", // master stream ID, if there's a master post, we'll show it at the top
     "masterPost", // master post object (if it exists)
     "orbisContext",
-    "showQuotedPost" // if true, we'll show the quoted posts (for any post that has a quote)
+    "showQuotedPost", // if true, we'll show the quoted posts (for any post that has a quote)
   ],
 
   components: {
@@ -156,7 +215,7 @@ export default {
     SwitchChainButton,
     TenorGifSearch,
     TenorStickerSearch,
-    EmojiPicker
+    EmojiPicker,
   },
 
   data() {
@@ -164,11 +223,11 @@ export default {
       orbisPosts: [],
       pageCounter: 0,
       postText: null,
-      reply_to: null, 
+      reply_to: null,
       showLoadMore: true,
       waitingCreatePost: false,
-      waitingLoadPosts: false
-    }
+      waitingLoadPosts: false,
+    };
   },
 
   created() {
@@ -180,13 +239,13 @@ export default {
     createPostPlaceholder() {
       if (this.userStore.getIsConnectedToOrbis) {
         if (this.id) {
-          return "Post your reply"
+          return "Post your reply";
         }
-        return "What's happening?"
+        return "What's happening?";
       } else if (!this.isActivated) {
-        return "What's happening? (Please connect wallet and then sign into chat to post messages.)"
+        return "What's happening? (Please connect wallet and then sign into chat to post messages.)";
       } else {
-        return "What's happening? (Please sign into chat to post messages.)"
+        return "What's happening? (Please sign into chat to post messages.)";
       }
     },
 
@@ -216,12 +275,12 @@ export default {
 
     showOnlyMasterPosts() {
       // check if user chose to only show master posts on the main feed in local storage
-      if (this.siteStore.getShowOnlyMasterPosts === 'true') {
+      if (this.siteStore.getShowOnlyMasterPosts === "true") {
         return true;
       } else {
         return false;
       }
-    }
+    },
   },
 
   methods: {
@@ -245,12 +304,12 @@ export default {
 
     async connectToOrbis() {
       let res = await this.$orbis.connect_v2({
-        provider: this.signer.provider.provider, 
-        lit: false
+        provider: this.signer.provider.provider,
+        lit: false,
       });
 
       /** Check if connection is successful or not */
-      if(res.status == 200) {
+      if (res.status == 200) {
         this.userStore.setIsConnectedToOrbis(true);
 
         if (this.$orbis.session) {
@@ -259,7 +318,7 @@ export default {
         }
       } else {
         console.log("Error connecting to Ceramic: ", res);
-        this.toast(res.result, {type: "error"});
+        this.toast(res.result, { type: "error" });
       }
     },
 
@@ -280,22 +339,21 @@ export default {
         options = {
           master: masterId, // the main post in the thread
           reply_to: this.id, // important: reply_to needs to be filled out even if the reply is directly to the master post
-          body: this.postText, 
-          context: this.getOrbisContext
-        }
-
+          body: this.postText,
+          context: this.getOrbisContext,
+        };
       } else {
         options = {
-          body: this.postText, 
-          context: this.getOrbisContext
-        }
+          body: this.postText,
+          context: this.getOrbisContext,
+        };
       }
 
       // post on Orbis & Ceramic
       let res = await this.$orbis.createPost(options);
 
       /** Check if posting is successful or not */
-      if(res.status == 200) {
+      if (res.status == 200) {
         // post on current feed
         this.orbisPosts.unshift({
           stream_id: res.doc,
@@ -303,24 +361,24 @@ export default {
           timestamp: Math.floor(Date.now() / 1000),
           creator_details: {
             metadata: {
-              address: this.address
+              address: this.address,
             },
             profile: {
-              pfp: this.userStore.getOrbisImage
-            }
+              pfp: this.userStore.getOrbisImage,
+            },
           },
           master: this.id,
           reply_to: this.id,
           content: {
-            body: this.postText
-          }
+            body: this.postText,
+          },
         });
 
         this.postText = null;
         this.waitingCreatePost = false;
       } else {
         console.log("Error posting via Orbis to Ceramic: ", res);
-        this.toast(res.result, {type: "error"});
+        this.toast(res.result, { type: "error" });
         this.waitingCreatePost = false;
       }
     },
@@ -338,15 +396,15 @@ export default {
         options = {
           master: this.id, // master is the post ID
           context: this.getOrbisContext, // context is the group ID
-          only_master: false // only get master posts (not replies), or all posts
-        }
+          only_master: false, // only get master posts (not replies), or all posts
+        };
       } else {
         // Main feed
         options = {
           //algorithm: "recommendations", // recommendations, all-posts, all-posts-non-filtered
           context: this.getOrbisContext, // context is the group ID
-          only_master: this.showOnlyMasterPosts // only get master posts (not replies), or all posts
-        }
+          only_master: this.showOnlyMasterPosts, // only get master posts (not replies), or all posts
+        };
       }
 
       if (this.byDid) {
@@ -358,11 +416,13 @@ export default {
         options,
         this.pageCounter,
         this.$config.getPostsLimit,
-        ascending
+        ascending,
       );
 
       if (error) {
-        this.toast("Error fetching posts from the Orbis/Ceramic node.", {type: "error"});
+        this.toast("Error fetching posts from the Orbis/Ceramic node.", {
+          type: "error",
+        });
         console.log(error);
         //this.toast(error, {type: "error"});
       }
@@ -384,6 +444,22 @@ export default {
     },
 
     async insertImage(imageUrl) {
+      if (imageUrl.startsWith("ipfs://")) {
+        imageUrl = imageUrl.replace("ipfs://", this.$config.ipfsGateway);
+      }
+
+      if (
+        imageUrl.endsWith(".JPG") ||
+        imageUrl.endsWith(".PNG") ||
+        imageUrl.endsWith(".JPEG") ||
+        imageUrl.endsWith(".GIF")
+      ) {
+        imageUrl = imageUrl
+          .replace(".JPG", ".jpg")
+          .replace(".PNG", ".png")
+          .replace(".JPEG", ".jpeg")
+          .replace(".GIF", ".gif");
+      }
       // add image url to postText
       if (!this.postText) {
         this.postText = imageUrl + " ";
@@ -392,7 +468,13 @@ export default {
       }
     },
 
-    async insertReply(streamId, replyToId, replyText, repliedText, repliedAddress) {
+    async insertReply(
+      streamId,
+      replyToId,
+      replyText,
+      repliedText,
+      repliedAddress,
+    ) {
       // callback hook for ChatPost component
       // listens for reply event and inserts reply into feed
       this.orbisPosts.unshift({
@@ -401,25 +483,25 @@ export default {
         timestamp: Math.floor(Date.now() / 1000),
         creator_details: {
           metadata: {
-            address: this.address
+            address: this.address,
           },
           profile: {
-            pfp: this.userStore.getOrbisImage
-          }
+            pfp: this.userStore.getOrbisImage,
+          },
         },
         master: this.id,
         reply_to: replyToId, // the post/stream ID of the post being replied to
         content: {
-          body: replyText // the text of the reply
+          body: replyText, // the text of the reply
         },
         reply_to_details: {
-          body: repliedText // the text of the post being replied to
+          body: repliedText, // the text of the post being replied to
         },
         reply_to_creator_details: {
           metadata: {
-            address: repliedAddress // the author address of the post being replied to
-          }
-        }
+            address: repliedAddress, // the author address of the post being replied to
+          },
+        },
       });
     },
 
@@ -427,7 +509,7 @@ export default {
       // callback hook for ChatPost component
       // listens for delete event and removes post from feed
       this.orbisPosts = this.orbisPosts.filter((p) => p.stream_id !== streamId);
-    }
+    },
   },
 
   setup() {
@@ -436,7 +518,15 @@ export default {
     const siteStore = useSiteStore();
     const userStore = useUserStore();
 
-    return { address, chainId, isActivated, signer, toast, siteStore, userStore }
-  }
-}
+    return {
+      address,
+      chainId,
+      isActivated,
+      signer,
+      toast,
+      siteStore,
+      userStore,
+    };
+  },
+};
 </script>

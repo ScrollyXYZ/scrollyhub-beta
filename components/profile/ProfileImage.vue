@@ -1,5 +1,5 @@
 <template>
-  <img :src="imgPath" class="profile-image" />
+  <img :src="parseImageLink" class="profile-image" />
 </template>
 
 <script>
@@ -33,7 +33,15 @@ export default {
       );
     }
   },
-
+  computed: {
+    parseImageLink() {
+      let parsedImage = this.imgPath;
+      if (parsedImage && parsedImage.includes("ipfs://")) {
+        parsedImage = parsedImage.replace("ipfs://", this.$config.ipfsGateway);
+      }
+      return parsedImage;
+    },
+  },
   watch: {
     image(newValue) {
       if (newValue) {
