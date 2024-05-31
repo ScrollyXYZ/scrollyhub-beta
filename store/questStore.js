@@ -27,7 +27,7 @@ export const useQuestStore = defineStore("questStore", {
             validated: false,
             tbd: false,
             ended: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyDomains.png",
             contractAddress: "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
             functions: {
               checkBalance: "balanceOf",
@@ -41,7 +41,7 @@ export const useQuestStore = defineStore("questStore", {
             validated: false,
             tbd: false,
             ended: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyPostMinter.png",
             contractAddress: "0xFC9b5992CEEB886C2ba7d0F785E2839802E27DC1",
             functions: {
               isEligible: "isEligible",
@@ -58,7 +58,7 @@ export const useQuestStore = defineStore("questStore", {
             validated: false,
             tbd: false,
             ended: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyJourneyOwner.png",
             contractAddress: "0x0F06e87d431E90435677b83c056AED9d5e30761d",
             functions: {
               isEligible: "isEligible",
@@ -75,7 +75,7 @@ export const useQuestStore = defineStore("questStore", {
             validated: false,
             tbd: false,
             ended: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyArtist.png",
             contractAddress: "0x875d479920B8c9564501DAb57EA1325EeA6FD99D",
             functions: {
               isEligible: "isEligible",
@@ -91,13 +91,30 @@ export const useQuestStore = defineStore("questStore", {
         quests: [
           {
             id: 5,
-            title: "Coming soon",
-            description: "Share your experience on social media",
-            points: 0,
+            title: "Scrolly Staker on Zprotocol",
+            description: "Stake at least $10 on ETH-Scrolly pair on Zprotocol.",
+            points: 200,
             validated: false,
             tbd: true,
             ended: false,
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyDeFi.png",
+            contractAddress: "0xYourContractAddressForQuest5",
+            functions: {
+              isEligible: "isEligible",
+              hasUserClaimed: "hasUserClaimed",
+              claim: "claim",
+            },
+          },
+          {
+            id: 7,
+            title: "Scrolly Yield Farmer",
+            description:
+              "Farm on Zprotocol for 7 consecutive days. You will be eligible for extra $ZP rewards too",
+            points: 400,
+            validated: false,
+            tbd: true,
+            ended: false,
+            image: "http://scrolly.xyz/img/quests/ScrollyYield.png",
             contractAddress: "0xYourContractAddressForQuest5",
             functions: {
               isEligible: "isEligible",
@@ -120,7 +137,7 @@ export const useQuestStore = defineStore("questStore", {
             validated: false,
             tbd: false,
             ended: true, // Marked as ended
-            image: "https://sns.scrolly.xyz/assets/cover.png",
+            image: "http://scrolly.xyz/img/quests/ScrollyMemeConstest.png",
             contractAddress: "0x166E1FB48160D066C4724191463F4d3b298B3bbb",
             functions: {
               checkEligibility: "checkEligibility",
