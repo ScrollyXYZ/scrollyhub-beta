@@ -1,3 +1,4 @@
+
 [data-bs-theme="dark"] {
   --bs-light: #2a2c31;
   --bs-gray-200: #464950;
@@ -49,6 +50,22 @@
   --bs-bgnavbar: #000000ea;
 }
 
+[data-bs-theme="dark"] p {
+  color: var(--bs-light-text);
+}
+
+[data-bs-theme="dark"] h1 {
+  color: var(--bs-gray-200);
+}
+
+[data-bs-theme="dark"] h2 {
+  color: var(--bs-white);
+}
+
+[data-bs-theme="dark"] h5 {
+  color: var(--bs-black);
+}
+
 [data-bs-theme="dark"] .bg-light {
   background-color: var(--bs-light) !important;
 }
@@ -58,12 +75,16 @@
 }
 
 [data-bs-theme="dark"] .navbar {
-  --bs-navbar-color: var(
-    --bs-gray-900
-  ); /* Adjusted for clear visibility on light navbar */
+  /* --bs-navbar-color: var(--bs-gray-200); Adjusted for clear visibility on light navbar */
   --bs-navbar-hover-color: var(--bs-primary);
   --bs-navbar-disabled-color: var(--bs-gray-400);
   --bs-navbar-active-color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .navbar-brand-text {
+  color: #ffffff;
+  font-family: "GlitterySnowfall", Arial, sans-serif;
+  font-size: 1.9rem;
 }
 
 [data-bs-theme="dark"] .navbar-dark {
@@ -103,7 +124,12 @@
   filter: invert(1) grayscale(100%) brightness(300%);
 }
 
+
 [data-bs-theme="dark"] .form-check-input:checked {
   background-color: var(--bs-primary);
   border-color: var(--bs-primary);
+}
+
+[data-bs-theme="dark"] .quest-page {
+  background: var(--bs-mode);
 }

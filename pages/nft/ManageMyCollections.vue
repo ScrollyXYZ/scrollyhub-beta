@@ -57,7 +57,7 @@
             </div>
           </div>
           <div class="col-md-6">
-            <h5>{{ nft.name }}</h5>
+            {{ nft.name }}
             <p>Minted NFTs: {{ nft.totalSupply }}</p>
             <p v-if="nft.isBonding">
               <span class="badge bg-primary">Bonding</span>

@@ -66,19 +66,24 @@ export default {
 .user-label {
   display: inline-flex;
   align-items: center;
-  gap: 5px;
+  gap: 8px;
 }
 
 .admin-badge {
   font-size: 0.75em;
   padding: 0.2em 0.5em;
-  background-color: red;
+  background-color: #e74c3c;
   color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .title-badge {
   font-size: 0.75em;
   padding: 0.2em 0.8em;
-  color: black;
+  background-color: var(--bs-primary);
+  color: white;
+  border-radius: 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>

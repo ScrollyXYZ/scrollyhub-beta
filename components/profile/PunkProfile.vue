@@ -731,7 +731,7 @@ export default {
 
 <style scoped>
 .profile-card {
-  background-color: rgba(255, 255, 255, 0.7);
+  opacity: 0.9;
   border-radius: 15px;
   padding: 20px;
 }
@@ -748,8 +748,6 @@ export default {
 }
 
 .profile-image {
-  width: 150px;
-  height: 150px;
   border: none;
 }
 

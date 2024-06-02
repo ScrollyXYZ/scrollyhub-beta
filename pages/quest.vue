@@ -6,7 +6,7 @@
       </div>
       <div class="points-display animate__animated animate__fadeInDown">
         <div class="points-card">
-          <h2>Your Mappy Points</h2>
+          <h2 class ="mappy-point">Your Mappy Points</h2>
           <p>{{ questStore.activityPoints }}</p>
           <button @click="toggleDetails" class="details-button">
             {{ showDetails ? "▲" : "▼" }} Details
@@ -125,7 +125,7 @@
       @click="questStore.closeModal"
     >
       <div class="modal-content animate__animated animate__zoomIn" @click.stop>
-        <h3>Quest: {{ questStore.selectedQuest.title }} Details</h3>
+        <h5>Quest: {{ questStore.selectedQuest.title }} Details</h5>
         <div class="modal-body">
           <p>
             <span
@@ -309,10 +309,8 @@ export default {
 @import "animate.css";
 
 .quest-page {
-  background: #f5f5f5;
   min-height: 100vh;
   padding: 20px;
-  color: #333;
   text-align: center;
 }
 
@@ -342,7 +340,7 @@ export default {
 
 .points-card p {
   margin: 0;
-  font-size: 2em;
+  font-size: 1em;
   font-weight: bold;
 }
 
@@ -677,5 +675,9 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.mappy-point{
+  color: var(--bs-black)
 }
 </style>

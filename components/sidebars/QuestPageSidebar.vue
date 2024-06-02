@@ -15,7 +15,7 @@
         <div class="username">
           {{ userStore.getDefaultDomain || "Guest" }}
         </div>
-        <div class="grade-label">{{ currentGrade.name }}</div>
+
         <div class="progress-bar">
           <div class="progress" :style="{ width: progress + '%' }"></div>
         </div>
@@ -262,7 +262,7 @@ export default {
 
 .link {
   display: block;
-  color: #6a0dad;
+  color: var(--bs-indigo);
   text-decoration: none;
   margin-bottom: 20px;
   font-weight: bold;
@@ -279,7 +279,6 @@ export default {
 
 .category-links h3 {
   text-align: center;
-  color: #333;
 }
 
 .category-links ul {

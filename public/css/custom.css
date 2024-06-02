@@ -334,7 +334,7 @@ a:hover {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.5;
-  color: var(--bs-gray-900);
+  /* color: var(--bs-gray-900); */
   background-color: var(--bs-body-bg);
   background-clip: padding-box;
   border: 1px solid var(--bs-gray-300);
@@ -444,7 +444,7 @@ a:hover {
   background-color: transparent;
 }
 .navbar-brand-text {
-  color: var(--bs-primary);
+  color: var(--bs-white);
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 2rem;
   margin-right: 0px;
@@ -550,9 +550,7 @@ a:hover {
 }
 
 .profile-image {
-  width: 50px; /* Specify the width */
-  height: 50px; /* Ensure the height matches the width for a circle */
-  object-fit: cover; /* Ensures the image covers the area without distortion */
+  object-fit: cover; 
 }
 
 .user-name {
@@ -703,7 +701,7 @@ a:hover {
 
 .speech-bubble {
   position: relative;
-  background: #00aabb;
+  background: var(--bs-primary);
   border-radius: 0.4em;
   padding: 10px;
   color: white;
@@ -720,7 +718,7 @@ a:hover {
   width: 0;
   height: 0;
   border: 10px solid transparent;
-  border-right-color: #00aabb; 
+  border-right-color: var(--bs-primary);
   border-left: 0;
   border-top: 0;
 }
