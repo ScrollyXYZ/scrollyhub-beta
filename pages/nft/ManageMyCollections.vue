@@ -44,11 +44,7 @@
           class="row mb-4 align-items-center position-relative"
         >
           <div class="col-md-3 text-center position-relative">
-            <img
-              :src="nft.image"
-              class="img-fluid img-thumbnail rounded nft-image"
-              :alt="nft.name"
-            />
+            <Image :url="nft?.image" :alt="nft?.name" cls="card-img-top" />
             <div class="overlay">
               <i
                 class="bi bi-eye eye-icon"
@@ -355,6 +351,7 @@ import ChangeCollectionPreviewModal from "~/components/nft/collection/ChangeColl
 import AddImageToCollectionModal from "~/components/nft/collection/AddImageToCollectionModal.vue";
 import RemoveImageFromCollectionModal from "~/components/nft/collection/RemoveImageFromCollectionModal.vue";
 import ChangeNftTypeModal from "~/components/nft/collection/ChangeNftTypeModal.vue";
+import Image from "~/components/Image.vue";
 
 export default {
   name: "MyCreatedNfts",
@@ -364,6 +361,7 @@ export default {
     AddImageToCollectionModal,
     RemoveImageFromCollectionModal,
     ChangeNftTypeModal,
+    Image,
   },
   props: ["hideBackButton"],
   data() {
