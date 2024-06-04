@@ -94,20 +94,20 @@
               class="profile-image-container"
               @click="openFileUploadModal"
             >
-              <img
-                :src="orbisImage || '/img/user/anon.svg'"
-                alt="Profile Image"
-                class="img-fluid rounded-circle profile-image"
+              <ProfileImage
+                :address="uAddress"
+                :domain="domain"
+                :image="orbisImage"
               />
               <div v-if="isCurrentUser" class="edit-overlay">
                 <i class="bi bi-camera-fill edit-icon"></i>
               </div>
             </div>
             <div v-else>
-              <img
-                :src="orbisImage || '/img/user/anon.svg'"
-                alt="Profile Image"
-                class="img-fluid rounded-circle profile-image"
+              <ProfileImage
+                :address="uAddress"
+                :domain="domain"
+                :image="orbisImage"
               />
             </div>
           </div>
@@ -748,7 +748,10 @@ export default {
 }
 
 .profile-image {
-  border: none;
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .profile-image-container:hover .edit-overlay {
@@ -879,10 +882,13 @@ export default {
   .profile-image-column {
     text-align: center;
   }
-
   .profile-categories-data {
     margin-left: 0;
     width: 100%;
   }
+}
+
+.dropdown-menu {
+  z-index: 1050;
 }
 </style>

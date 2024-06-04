@@ -20,10 +20,10 @@
           class="card border mb-3 h-100 d-flex flex-column position-relative"
         >
           <div class="image-container rounded">
-            <img
-              :src="nft.image"
-              class="card-img-top rounded"
+            <Image
+              :url="nft.image"
               :alt="nft.name"
+              cls="card-img-top rounded"
               @error="onImageError(nft)"
               @load="onImageLoad(nft)"
             />
@@ -35,8 +35,9 @@
             <small
               v-if="nft.isBonding"
               class="badge bg-primary text-white align-self-start"
-              >bonding</small
             >
+              bonding
+            </small>
           </div>
         </div>
       </NuxtLink>
@@ -47,10 +48,14 @@
 <script>
 import { ethers } from "ethers";
 import { fetchCollection, storeCollection } from "~/utils/storageUtils";
+import Image from "~/components/Image.vue";
 
 export default {
   name: "UserCollections",
   props: ["address"],
+  components: {
+    Image,
+  },
   data() {
     return {
       nfts: [],
@@ -63,50 +68,54 @@ export default {
   },
   methods: {
     async fetchUserNfts() {
-      this.waitingData = true;
-      const provider = this.$getFallbackProvider(this.$config.supportedChainId);
+      try {
+        this.waitingData = true;
+        const provider = this.$getFallbackProvider(
+          this.$config.supportedChainId,
+        );
 
-      const launchpadInterface = new ethers.utils.Interface([
-        "function getNftContracts(uint256 fromIndex, uint256 toIndex) external view returns(address[] memory)",
-        "function getNftContractsArrayLength() external view returns(uint256)",
-      ]);
-
-      const launchpadContract = new ethers.Contract(
-        this.$config.nftLaunchpadBondingAddress,
-        launchpadInterface,
-        provider,
-      );
-
-      const allNftsArrayLength =
-        await launchpadContract.getNftContractsArrayLength();
-      const allNfts = await launchpadContract.getNftContracts(
-        0,
-        allNftsArrayLength - 1,
-      );
-      const ownedNfts = [];
-
-      for (const nftAddress of allNfts) {
-        const nftInterface = new ethers.utils.Interface([
-          "function balanceOf(address owner) external view returns (uint256)",
+        const launchpadInterface = new ethers.utils.Interface([
+          "function getNftContracts(uint256 fromIndex, uint256 toIndex) external view returns(address[] memory)",
+          "function getNftContractsArrayLength() external view returns(uint256)",
         ]);
 
-        const nftContract = new ethers.Contract(
-          nftAddress,
-          nftInterface,
+        const launchpadContract = new ethers.Contract(
+          this.$config.nftLaunchpadBondingAddress,
+          launchpadInterface,
           provider,
         );
-        const balance = await nftContract.balanceOf(this.address);
 
-        if (balance > 0) {
-          ownedNfts.push(nftAddress);
+        const allNftsArrayLength =
+          await launchpadContract.getNftContractsArrayLength();
+        const allNfts = await launchpadContract.getNftContracts(
+          0,
+          allNftsArrayLength - 1,
+        );
+        const ownedNfts = [];
+
+        for (const nftAddress of allNfts) {
+          const nftInterface = new ethers.utils.Interface([
+            "function balanceOf(address owner) external view returns (uint256)",
+          ]);
+
+          const nftContract = new ethers.Contract(
+            nftAddress,
+            nftInterface,
+            provider,
+          );
+          const balance = await nftContract.balanceOf(this.address);
+
+          if (balance > 0) {
+            ownedNfts.push(nftAddress);
+          }
         }
+
+        await this.parseNftsArray(ownedNfts, this.nfts, provider);
+        this.waitingData = false;
+      } catch (error) {
+        console.error("Error fetching NFTs:", error);
+        this.waitingData = false;
       }
-
-      await this.parseNftsArray(ownedNfts, this.nfts, provider);
-      this.waitingData = false;
-
-      // Retry loading images for NFTs that failed to load initially
-      this.retryFailedImages();
     },
     async parseNftsArray(inputArray, outputArray, provider) {
       const nftInterface = new ethers.utils.Interface([
@@ -138,20 +147,8 @@ export default {
             continue; // Skip NFTs with incomplete data
           }
 
-          if (cImage.includes(".ipfs.sphn.link/")) {
-            const linkParts = cImage.split(".ipfs.sphn.link/");
-            const cid = linkParts[0].replace("https://", "");
-            const newImageLink =
-              this.$config.ipfsGateway + cid + "/" + linkParts[1];
-            collection.image = newImageLink;
-            cImage = newImageLink;
-          }
-
-          if (!cImage) {
-            continue; // Skip NFTs without valid image
-          }
-
           collection.name = cName;
+          collection.image = cImage;
           storeCollection(window, inputArray[i], collection);
 
           outputArray.push({
