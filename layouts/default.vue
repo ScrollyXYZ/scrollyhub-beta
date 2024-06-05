@@ -67,7 +67,6 @@
             </button>
           </div>
           <div class="modal-body row">
-            <!-- Wallet options here -->
             <div
               class="card col-6 cursor-pointer wallet-img-wrapper"
               @click="connectMetaMask"
@@ -170,11 +169,16 @@
     <!-- END Connect Wallet modal -->
 
     <ChatSettingsModal />
+
     <ChangeUsernameModal />
+
     <FindUserModal />
+
     <ReferralModal />
+
     <VerifyAccountOwnership />
   </div>
+
   <!-- Do not delete: ugly hack to make "global" work with Vite -->
   <component :is="'script'"> var global = global || window; </component>
 </template>
@@ -213,8 +217,6 @@ export default {
       referrer: null,
       rSidebar: null,
       width: null,
-      sidebarHiddenOnNFT: false,
-      initialLoad: true,
     };
   },
 
@@ -251,6 +253,7 @@ export default {
       this.rSidebar.hide();
     } else {
       this.lSidebar.show();
+      //this.rSidebar.show();
       this.sidebarStore.setLeftSidebar(true);
       this.sidebarStore.setRightSidebar(true);
     }
@@ -279,13 +282,10 @@ export default {
     if (this.referrer) {
       this.parseReferrer();
     }
-
-    this.checkCurrentRoute();
-    this.initialLoad = false;
   },
 
   unmounted() {
-    window.removeEventListener("resize", this.onWidthChange);
+    window.removeEventListener("resize", onWidthChange);
   },
 
   computed: {
@@ -466,22 +466,6 @@ export default {
 
     onWidthChange() {
       this.width = window.innerWidth;
-      if (this.isMobile && this.isNftRoute()) {
-        this.closeRightSidebar();
-      } else if (
-        !this.isMobile &&
-        !this.sidebarHiddenOnNFT &&
-        !this.isNftRoute()
-      ) {
-        this.openRightSidebar();
-      } else if (
-        !this.isMobile &&
-        this.sidebarHiddenOnNFT &&
-        this.isNftRoute() &&
-        !this.initialLoad
-      ) {
-        this.closeRightSidebar();
-      }
     },
 
     async orbisLogout() {
@@ -523,30 +507,6 @@ export default {
         // store into local storage as referrer
         storeReferrer(window, this.referrer);
       }
-    },
-
-    checkCurrentRoute() {
-      if (this.isNftRoute()) {
-        this.closeRightSidebar();
-        this.sidebarHiddenOnNFT = true;
-      } else {
-        this.openRightSidebar();
-        this.sidebarHiddenOnNFT = false;
-      }
-    },
-
-    closeRightSidebar() {
-      this.sidebarStore.setRightSidebar(false);
-      this.rSidebar.hide();
-    },
-
-    openRightSidebar() {
-      this.sidebarStore.setRightSidebar(true);
-      this.rSidebar.show();
-    },
-
-    isNftRoute() {
-      return this.$route.path.startsWith("/nft");
     },
   },
 
@@ -642,11 +602,7 @@ export default {
     width(newVal, oldVal) {
       if (newVal > this.breakpoint) {
         this.lSidebar.show();
-        if (!this.sidebarHiddenOnNFT || this.isNftRoute()) {
-          this.rSidebar.hide();
-        } else {
-          this.rSidebar.show();
-        }
+        this.rSidebar.show();
         this.sidebarStore.setLeftSidebar(true);
         this.sidebarStore.setMainContent(true);
         this.sidebarStore.setRightSidebar(true);
@@ -657,10 +613,6 @@ export default {
         this.sidebarStore.setMainContent(true);
         this.sidebarStore.setRightSidebar(false);
       }
-    },
-
-    $route(newVal, oldVal) {
-      this.checkCurrentRoute();
     },
   },
 };
