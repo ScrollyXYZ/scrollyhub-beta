@@ -180,13 +180,11 @@ import ERC20ABI from "~/assets/abi/Erc20Abi.json";
 import { useToast } from "vue-toastification";
 import votingInfoData from "~/assets/votingInfo.json";
 import { useRouter } from "vue-router";
-
 const RPC_URL = "https://scroll.drpc.org";
 const VOTING_CONTRACT_ADDRESS = "0x31f77C3b3b643bc8aF4779b0D0a3a87cF747B089";
 const TOKEN_CONTRACT_ADDRESS = "0xb65aD8d81d1E4Cb2975352338805AF6e39BA8Be8";
 const ACTIVITY_POINTS_CONTRACT_ADDRESS =
   "0x9904CE72Cd7427F59bBe53bc69211081159fcf0a";
-
 export default {
   props: ["proposalId"],
   data() {
@@ -245,24 +243,20 @@ export default {
           provider,
         );
         const proposalId = parseInt(this.proposalId);
-
         console.log("Fetching proposal details...");
         const [description, endTime, numResponses, votes] =
           await contract.getProposalDetails(proposalId);
-
         console.log("Proposal details fetched", {
           description,
           endTime,
           numResponses,
           votes,
         });
-
         const votesBN = votes.map((vote) => ethers.BigNumber.from(vote));
         const totalVotes = votesBN.reduce(
           (acc, val) => acc.add(val),
           ethers.BigNumber.from(0),
         );
-
         this.proposal = {
           id: proposalId,
           description,
@@ -272,7 +266,6 @@ export default {
         };
         this.totalVotes = totalVotes;
         this.isVoteEnded = Date.now() / 1000 > endTime;
-
         console.log("Total votes calculated", totalVotes.toString());
       } catch (error) {
         console.error("Error fetching proposal details:", error);
@@ -360,7 +353,6 @@ export default {
     },
     async castVote(proposalId, responseIndex) {
       const toast = useToast();
-
       try {
         if (!window.ethereum) {
           alert(
@@ -368,42 +360,34 @@ export default {
           );
           return;
         }
-
         console.log("Requesting MetaMask account access...");
         await window.ethereum.request({ method: "eth_requestAccounts" });
         console.log("MetaMask account access granted.");
-
         const { address } = useEthers();
         console.log("User address:", address.value);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
-
         if (!signer) {
           console.error(
             "Signer not found. Please ensure MetaMask is connected and authorized.",
           );
           return;
         }
-
         console.log("Signer found. Proceeding with the transaction...");
         const votingContract = new ethers.Contract(
           VOTING_CONTRACT_ADDRESS,
           VotingTokenABI,
           signer,
         );
-
         console.log(
           "Voting for proposalId:",
           proposalId,
           "responseIndex:",
           responseIndex,
         );
-
         this.isLoading = true;
-
         const tx = await votingContract.vote(proposalId, responseIndex);
         console.log("Transaction sent:", tx);
-
         const toastWait = toast(
           {
             component: WaitingToast,
@@ -422,13 +406,10 @@ export default {
                 .focus(),
           },
         );
-
         const receipt = await tx.wait();
         console.log("Transaction receipt:", receipt);
-
         if (receipt.status === 1) {
           toast.dismiss(toastWait);
-
           toast("Vote successful!", {
             type: "success",
             onClick: () =>
@@ -439,14 +420,12 @@ export default {
                 )
                 .focus(),
           });
-
           this.hasVoted = true;
           this.userVoteChoice = responseIndex + 1;
           this.showVoteConfirmation = true;
           setTimeout(() => {
             this.showVoteConfirmation = false;
           }, 3000);
-
           await this.fetchProposalDetails();
         } else {
           toast.dismiss(toastWait);
@@ -464,7 +443,6 @@ export default {
         }
       } catch (e) {
         console.error("Error voting:", e);
-
         try {
           let extractMessage = e.message.split("reason=")[1];
           extractMessage = extractMessage.split(", method=")[0];
@@ -473,9 +451,7 @@ export default {
             "execution reverted:",
             "Error:",
           );
-
           console.log(extractMessage);
-
           toast(extractMessage, { type: "error" });
         } catch (e) {
           toast("Transaction failed.", { type: "error" });

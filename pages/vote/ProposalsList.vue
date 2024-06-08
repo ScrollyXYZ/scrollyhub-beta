@@ -43,10 +43,8 @@
 import { ethers } from "ethers";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import proposalsData from "~/assets/votingInfo.json";
-
 const RPC_URL = "https://scroll.drpc.org";
 const VOTING_CONTRACT_ADDRESS = "0x31f77C3b3b643bc8aF4779b0D0a3a87cF747B089";
-
 export default {
   data() {
     return {
@@ -69,7 +67,6 @@ export default {
         VotingTokenABI,
         provider,
       );
-
       const proposalPromises = proposalsData.map(async (proposal) => {
         const [description, endTime] = await contract.getProposalDetails(
           proposal.id,
@@ -80,7 +77,6 @@ export default {
           endTime: parseInt(endTime.toString(), 10),
         };
       });
-
       this.proposals = await Promise.all(proposalPromises);
     },
     isProposalEnded(endTime) {
@@ -90,7 +86,6 @@ export default {
       const now = Date.now() / 1000;
       const timeDiff = endTime - now;
       if (timeDiff <= 0) return "0h 0m 0s";
-
       const hours = Math.floor(timeDiff / 3600);
       const minutes = Math.floor((timeDiff % 3600) / 60);
       const seconds = Math.floor(timeDiff % 60);
