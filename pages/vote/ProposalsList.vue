@@ -10,7 +10,7 @@
           class="proposal-item"
         >
           <div class="proposal-card">
-            <nuxt-link
+            <NuxtLink
               :to="{ path: '/vote', query: { id: proposal.id } }"
               class="proposal-link"
             >
@@ -29,7 +29,7 @@
                   Time Remaining: {{ getTimeRemaining(proposal.endTime) }}
                 </p>
               </div>
-            </nuxt-link>
+            </NuxtLink>
           </div>
         </li>
       </ul>
@@ -54,39 +54,33 @@ export default {
       intervalId: null,
     };
   },
-  async mounted() {
-    await this.loadProposals();
+  async asyncData() {
+    const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+    const contract = new ethers.Contract(
+      VOTING_CONTRACT_ADDRESS,
+      VotingTokenABI,
+      provider,
+    );
+    const proposalPromises = proposalsData.map(async (proposal) => {
+      const [description, endTime] = await contract.getProposalDetails(
+        proposal.id,
+      );
+      return {
+        id: proposal.id,
+        title: proposal.title,
+        endTime: parseInt(endTime.toString(), 10),
+      };
+    });
+    const proposals = await Promise.all(proposalPromises);
+    return { proposals };
+  },
+  mounted() {
     this.intervalId = setInterval(this.updateRemainingTimes, 1000);
   },
   beforeDestroy() {
     clearInterval(this.intervalId);
   },
   methods: {
-    async loadProposals() {
-      try {
-        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-        const contract = new ethers.Contract(
-          VOTING_CONTRACT_ADDRESS,
-          VotingTokenABI,
-          provider,
-        );
-        const proposalPromises = proposalsData.map(async (proposal) => {
-          const [description, endTime] = await contract.getProposalDetails(
-            proposal.id,
-          );
-          return {
-            id: proposal.id,
-            title: proposal.title,
-            endTime: parseInt(endTime.toString(), 10),
-          };
-        });
-        this.proposals = await Promise.all(proposalPromises);
-      } catch (error) {
-        console.error("Error loading proposals:", error);
-      } finally {
-        this.loading = false;
-      }
-    },
     isProposalEnded(endTime) {
       return Date.now() / 1000 > endTime;
     },
