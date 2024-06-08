@@ -1,7 +1,8 @@
 <template>
   <div class="proposals-container">
     <h1>Proposals List</h1>
-    <div v-if="proposals.length">
+    <div v-if="loading">Loading proposals...</div>
+    <div v-else-if="proposals.length">
       <ul class="proposals-list">
         <li
           v-for="proposal in proposals"
@@ -33,10 +34,7 @@
         </li>
       </ul>
     </div>
-    <div v-else>
-      <p v-if="loading">Loading proposals...</p>
-      <p v-else>No proposals found.</p>
-    </div>
+    <div v-else>No proposals found.</div>
   </div>
 </template>
 
