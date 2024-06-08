@@ -45,6 +45,7 @@ import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import proposalsData from "~/assets/votingInfo.json";
 const RPC_URL = "https://scroll.drpc.org";
 const VOTING_CONTRACT_ADDRESS = "0x31f77C3b3b643bc8aF4779b0D0a3a87cF747B089";
+
 export default {
   data() {
     return {

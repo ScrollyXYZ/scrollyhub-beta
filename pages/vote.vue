@@ -1,11 +1,40 @@
 <template>
   <div>
-    <VotingComponent v-if="$route.query.id" :proposalId="$route.query.id" />
-    <ChatFeed
-      v-if="$route.query.id"
-      class="mt-3 scroll-500"
-      :orbisContext="'vote:' + $route.query.id"
-    />
+    <Head>
+      <Title>Vote | {{ $config.projectMetadataTitle }}</Title>
+      <Meta
+        property="og:title"
+        :content="'Vote | ' + $config.projectMetadataTitle"
+      />
+      <Meta
+        name="description"
+        :content="'Participate in the vote on ' + $config.projectName + '!'"
+      />
+      <Meta
+        property="og:image"
+        :content="$config.projectUrl + $config.previewImagePostNft"
+      />
+      <Meta
+        property="og:description"
+        :content="'Participate in the vote on ' + $config.projectName + '!'"
+      />
+      <Meta
+        name="twitter:image"
+        :content="$config.projectUrl + $config.previewImagePostNft"
+      />
+      <Meta
+        name="twitter:description"
+        :content="'Participate in the vote on ' + $config.projectName + '!'"
+      />
+    </Head>
+
+    <div v-if="$route.query.id">
+      <VotingComponent :proposalId="$route.query.id" />
+      <ChatFeed
+        class="mt-3 scroll-500"
+        :orbisContext="'vote:' + $route.query.id"
+      />
+    </div>
     <ProposalsList v-else />
   </div>
 </template>
