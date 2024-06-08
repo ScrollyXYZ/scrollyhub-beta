@@ -1,0 +1,51 @@
+[
+  {
+    "id": 1,
+    "title": "Introducing LottoPGF: Empowering Public Goods Funding with Scrolly!",
+    "description": "We're excited to announce a partnership with LottoPGF, a project revolutionizing public goods funding through decentralized lotteries.",
+    "overview": {
+      "title": "Overview",
+      "content": "LottoPGF uses Ethereum's blockchain to create transparent and verifiable lotteries. Players can choose which public goods to support, ensuring fair resource allocation. For this first lottery, we are giving you the choice between 4 non-profit organizations. 90% of the cost of a lottery ticket will be donated to the chosen organization, and the remaining 10% will increase the jackpot."
+    },
+    "details": {
+      "title": "Details",
+      "content": "Traditional lotteries often lack transparency and control. LottoPGF adheres to Ethereum’s principles, offering a trustworthy and community-focused alternative."
+    },
+    "steps": {
+      "title": "How It Works",
+      "steps": [
+        "Players join decentralized lotteries.",
+        "Proceeds support public goods chosen by the community.",
+        "The protocol ensures transparent distribution and verifiable odds."
+      ]
+    },
+    "options": [
+      {
+        "name": "Palestinian Red Crescent Society",
+        "description": "Offers emergency medical services and humanitarian aid in Palestine.",
+        "url": "https://www.palestinercs.org/en"
+      },
+      {
+        "name": "The Water Project",
+        "description": "Provides clean water solutions in sub-Saharan Africa.",
+        "url": "https://thewaterproject.org/"
+      },
+      {
+        "name": "UNICEF",
+        "description": "Supports children's rights and well-being globally.",
+        "url": "https://www.unicef.org/"
+      },
+      {
+        "name": "Doctors Without Borders",
+        "description": "Delivers essential medical care worldwide.",
+        "url": "https://www.doctorswithoutborders.org/"
+      }
+    ],
+    "footer": {
+      "snapshot": "Snapshot: 06/06/2024 8:00AM UTC+2",
+      "eligibility": "Every Scrolly holder at the date of the snapshot is eligible to vote. Join us in supporting transparent, fair funding for public goods.",
+      "disclaimer": "Disclaimer: If crypto donations are not possible, the Scrolly team will handle the donation in $/€, ensuring full transparency.",
+      "moreDetails": "https://mirror.xyz/lottopgf.eth/e7ubDHXWyAoTOsldwNXsLSYGFFxtr4Mmui_QK7mNpMg"
+    }
+  }
+]
