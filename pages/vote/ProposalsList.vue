@@ -1,5 +1,33 @@
 <template>
   <div class="proposals-container">
+    <Head>
+      <Title>Proposals List | {{ $config.projectMetadataTitle }}</Title>
+      <Meta
+        property="og:title"
+        :content="'Proposals List | ' + $config.projectMetadataTitle"
+      />
+      <Meta
+        name="description"
+        :content="'Browse the proposals on ' + $config.projectName + '!'"
+      />
+      <Meta
+        property="og:image"
+        :content="$config.projectUrl + $config.previewImagePostNft"
+      />
+      <Meta
+        property="og:description"
+        :content="'Browse the proposals on ' + $config.projectName + '!'"
+      />
+      <Meta
+        name="twitter:image"
+        :content="$config.projectUrl + $config.previewImagePostNft"
+      />
+      <Meta
+        name="twitter:description"
+        :content="'Browse the proposals on ' + $config.projectName + '!'"
+      />
+    </Head>
+
     <h1>Proposals List</h1>
     <div v-if="proposals.length">
       <ul class="proposals-list">
