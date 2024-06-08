@@ -1,33 +1,5 @@
 <template>
   <div class="proposals-container">
-    <Head>
-      <Title>Proposals List | {{ $config.projectMetadataTitle }}</Title>
-      <Meta
-        property="og:title"
-        :content="'Proposals List | ' + $config.projectMetadataTitle"
-      />
-      <Meta
-        name="description"
-        :content="'Browse the proposals on ' + $config.projectName + '!'"
-      />
-      <Meta
-        property="og:image"
-        :content="$config.projectUrl + $config.previewImagePostNft"
-      />
-      <Meta
-        property="og:description"
-        :content="'Browse the proposals on ' + $config.projectName + '!'"
-      />
-      <Meta
-        name="twitter:image"
-        :content="$config.projectUrl + $config.previewImagePostNft"
-      />
-      <Meta
-        name="twitter:description"
-        :content="'Browse the proposals on ' + $config.projectName + '!'"
-      />
-    </Head>
-
     <h1>Proposals List</h1>
     <div v-if="proposals.length">
       <ul class="proposals-list">
@@ -62,7 +34,8 @@
       </ul>
     </div>
     <div v-else>
-      <p>Loading proposals...</p>
+      <p v-if="loading">Loading proposals...</p>
+      <p v-else>No proposals found.</p>
     </div>
   </div>
 </template>
@@ -71,6 +44,7 @@
 import { ethers } from "ethers";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import proposalsData from "~/assets/votingInfo.json";
+
 const RPC_URL = "https://scroll.drpc.org";
 const VOTING_CONTRACT_ADDRESS = "0x31f77C3b3b643bc8aF4779b0D0a3a87cF747B089";
 
@@ -78,6 +52,7 @@ export default {
   data() {
     return {
       proposals: [],
+      loading: true,
       intervalId: null,
     };
   },
@@ -90,23 +65,29 @@ export default {
   },
   methods: {
     async loadProposals() {
-      const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-      const contract = new ethers.Contract(
-        VOTING_CONTRACT_ADDRESS,
-        VotingTokenABI,
-        provider,
-      );
-      const proposalPromises = proposalsData.map(async (proposal) => {
-        const [description, endTime] = await contract.getProposalDetails(
-          proposal.id,
+      try {
+        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+        const contract = new ethers.Contract(
+          VOTING_CONTRACT_ADDRESS,
+          VotingTokenABI,
+          provider,
         );
-        return {
-          id: proposal.id,
-          title: proposal.title,
-          endTime: parseInt(endTime.toString(), 10),
-        };
-      });
-      this.proposals = await Promise.all(proposalPromises);
+        const proposalPromises = proposalsData.map(async (proposal) => {
+          const [description, endTime] = await contract.getProposalDetails(
+            proposal.id,
+          );
+          return {
+            id: proposal.id,
+            title: proposal.title,
+            endTime: parseInt(endTime.toString(), 10),
+          };
+        });
+        this.proposals = await Promise.all(proposalPromises);
+      } catch (error) {
+        console.error("Error loading proposals:", error);
+      } finally {
+        this.loading = false;
+      }
     },
     isProposalEnded(endTime) {
       return Date.now() / 1000 > endTime;

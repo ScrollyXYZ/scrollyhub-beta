@@ -48,6 +48,11 @@
               <span class="navbar-brand-text align-middle">SNS</span>
             </a>
           </li>
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/vote/ProposalsList">
+              <span class="navbar-brand-text align-middle">Vote</span>
+            </NuxtLink>
+          </li>
         </ul>
       </div>
 
@@ -70,7 +75,9 @@
               aria-expanded="false"
             >
               Theme:
-              {{ `${String(siteStore.getColorMode).charAt(0).toUpperCase()}${String(siteStore.getColorMode).slice(1)}` }}
+              {{
+                `${String(siteStore.getColorMode).charAt(0).toUpperCase()}${String(siteStore.getColorMode).slice(1)}`
+              }}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
               <span
@@ -401,12 +408,11 @@ export default {
 }
 
 .nav-item {
-  display: flex; 
-  justify-content: center; 
+  display: flex;
+  justify-content: center;
   margin-left: 2rem;
   margin-right: 2rem;
 }
-
 
 .navbar-collapse {
   justify-content: space-between;
