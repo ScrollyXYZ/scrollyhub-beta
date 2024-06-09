@@ -208,7 +208,8 @@ import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import ERC20ABI from "~/assets/abi/Erc20Abi.json";
-import { useToast } from "vue-toastification";
+import Toastification from "vue-toastification";
+const { useToast } = Toastification;
 import votingInfoData from "~/assets/votingInfo.json";
 import { useRouter, useRoute } from "vue-router";
 
