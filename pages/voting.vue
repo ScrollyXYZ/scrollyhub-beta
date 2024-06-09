@@ -208,11 +208,9 @@ import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import ERC20ABI from "~/assets/abi/Erc20Abi.json";
-import Toastification from "vue-toastification";
+import { useToast } from "vue-toastification";
 import votingInfoData from "~/assets/votingInfo.json";
 import { useRouter, useRoute } from "vue-router";
-
-const { useToast } = Toastification;
 
 const RPC_URL = "https://scroll.drpc.org";
 const VOTING_CONTRACT_ADDRESS = "0x31f77C3b3b643bc8aF4779b0D0a3a87cF747B089";
@@ -245,7 +243,7 @@ export default {
     clearInterval(this.timer);
   },
   methods: {
-    loadProposal() {
+    async loadProposal() {
       const route = useRoute();
       const proposalId = parseInt(route.query.id);
       this.proposalId = proposalId;
@@ -261,10 +259,10 @@ export default {
           (option) => (option.showFullDescription = false),
         );
       }
-      this.fetchProposalDetails();
-      this.checkEligibility();
-      this.checkHasVoted();
-      this.fetchMultiplier();
+      await this.fetchProposalDetails();
+      await this.checkEligibility();
+      await this.checkHasVoted();
+      await this.fetchMultiplier();
       this.updateTimeRemaining();
       this.timer = setInterval(this.updateTimeRemaining, 1000);
       this.loading = false;
@@ -327,8 +325,8 @@ export default {
         );
         const hasVoted = await contract.hasVoted(
           address.value,
-          this.proposal.id,
-        );
+          this.proposalId,
+        ); // Utilisation de this.proposalId
         this.hasVoted = hasVoted;
       } catch (error) {
         console.error("Error checking if user has voted:", error);
