@@ -237,7 +237,7 @@ export default {
     };
   },
   async mounted() {
-    this.loadProposal();
+    await this.loadProposal();
   },
   beforeDestroy() {
     clearInterval(this.timer);
@@ -326,7 +326,7 @@ export default {
         const hasVoted = await contract.hasVoted(
           address.value,
           this.proposalId,
-        ); // Utilisation de this.proposalId
+        );
         this.hasVoted = hasVoted;
       } catch (error) {
         console.error("Error checking if user has voted:", error);
@@ -341,7 +341,7 @@ export default {
           ERC20ABI,
           provider,
         );
-        const multiplier = await apContract.getMultiplier(address.value);
+        const multiplier = await apContract.multiplier(address.value);
         this.multiplier = parseInt(multiplier.toString(), 10);
       } catch (error) {
         console.error("Error fetching multiplier:", error);
