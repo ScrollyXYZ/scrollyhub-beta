@@ -49,7 +49,7 @@
             </a>
           </li>
           <li class="nav-item">
-            <NuxtLink class="nav-link" to="/vote/ProposalsList">
+            <NuxtLink class="nav-link" to="/elector">
               <span class="navbar-brand-text align-middle">Vote</span>
             </NuxtLink>
           </li>
