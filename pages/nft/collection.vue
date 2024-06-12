@@ -931,6 +931,5 @@ export default {
   border: 1px solid #ddd;
   border-top: 0;
   border-radius: 0 0 15px 15px;
-  background-color: #f9f9f9;
 }
 </style>
