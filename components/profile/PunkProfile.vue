@@ -730,11 +730,6 @@ export default {
 </script>
 
 <style scoped>
-.profile-card {
-  opacity: 0.9;
-  border-radius: 15px;
-  padding: 20px;
-}
 
 .profile-image-column {
   text-align: center;
@@ -885,9 +880,5 @@ export default {
     margin-left: 0;
     width: 100%;
   }
-}
-
-.dropdown-menu {
-  z-index: 1050;
 }
 </style>

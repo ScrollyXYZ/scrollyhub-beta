@@ -118,9 +118,9 @@
         <div class="modal-dialog modal-lg">
           <div class="modal-content">
             <div class="modal-header">
-              <h5 class="modal-title" id="settingsModalLabel">
+              <h3 class="modal-title" id="settingsModalLabel">
                 Manage NFT: {{ selectedNft.name }}
-              </h5>
+              </h3>
               <button
                 type="button"
                 class="btn-close"
@@ -594,6 +594,5 @@ export default {
   border: 1px solid #ddd;
   border-top: 0;
   border-radius: 0 0 15px 15px;
-  background-color: #f9f9f9;
 }
 </style>

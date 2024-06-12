@@ -62,9 +62,9 @@
   color: var(--bs-white);
 }
 
-[data-bs-theme="dark"] h5 {
+/* [data-bs-theme="dark"] h5 {
   color: var(--bs-black);
-}
+} */
 
 [data-bs-theme="dark"] .bg-light {
   background-color: var(--bs-light) !important;
@@ -137,6 +137,20 @@
 
 [data-bs-theme="dark"] .profile-section {
   background-color: var(--bs-mode) !important;
+}
+
+[data-bs-theme="dark"] .modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  color: var(--bs-modal-color);
+  pointer-events: auto;
+  background-color: var(--bs-mode);
+  background-clip: padding-box;
+  border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
+  border-radius: var(--bs-modal-border-radius);
+  outline: 0;
 }
 
 [data-bs-theme="dark"] .highlight[data-v-11163183] {
