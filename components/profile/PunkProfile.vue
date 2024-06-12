@@ -797,7 +797,6 @@ export default {
 }
 
 .profile-categories-data {
-  background-color: rgba(255, 255, 255, 0.9);
   border-radius: 10px;
   margin-top: 20px;
   padding: 10px;

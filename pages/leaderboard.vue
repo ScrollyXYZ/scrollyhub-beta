@@ -2,7 +2,7 @@
   <div class="leaderboard-container">
     <div class="header-section">
       <div class="header">
-        <h1>Leaderboard</h1>
+        <h3>Leaderboard</h3>
         <a @click="showModal = true" class="refresh-link"
           >Clear Cache and Refresh</a
         >
@@ -362,7 +362,7 @@ export default {
 .header-section {
   padding: 20px;
   margin-bottom: 20px;
-  background-color: #f9f9f9;
+  background-color: var(--bs-mode);
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -384,7 +384,6 @@ export default {
   margin-top: 10px;
   font-size: 1em;
   text-align: center;
-  color: #333333;
 }
 
 .user-rank {
@@ -446,7 +445,7 @@ export default {
   align-items: center;
   padding: 8px 16px;
   margin: 8px 0;
-  background-color: #ffffff;
+  background-color: var(--bs-mode);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;

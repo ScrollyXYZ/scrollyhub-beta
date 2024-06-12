@@ -187,7 +187,6 @@ export default {
 .username {
   font-size: 1.1em;
   font-weight: bold;
-  color: black;
 }
 
 .grade-label {
