@@ -33,7 +33,11 @@
           />
         </NuxtLink>
         <NuxtLink to="/profile" style="text-decoration: none; color: inherit">
-          <h6 style="margin-bottom: 0"><strong>{{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}</strong></h6>
+          <h6 style="margin-bottom: 0">
+            <strong>{{
+              getTextWithoutBlankCharacters(userStore.getDefaultDomain)
+            }}</strong>
+          </h6>
         </NuxtLink>
       </div>
 
@@ -363,7 +367,21 @@
           <i class="bi bi-key"></i> Friend Keys
         </NuxtLink>
       </li>
-
+      <!-- Badge -->
+      <li
+        class="nav-item p-1"
+        @click="closeLeftSidebar"
+        v-if="$config.badge.isLive"
+      >
+        <NuxtLink
+          class="nav-link"
+          :class="$route.path.startsWith('/badge') ? 'active' : ''"
+          aria-current="page"
+          to="/badge"
+        >
+          <i class="bi bi-patch-check"></i> Get Scroll Badge
+        </NuxtLink>
+      </li>
       <!-- Airdrop -->
       <li
         class="nav-item p-1"
