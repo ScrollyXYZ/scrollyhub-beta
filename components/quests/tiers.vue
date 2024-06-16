@@ -1,6 +1,5 @@
 <template>
   <div class="badge-tiers">
-    <h2>Badge Tiers</h2>
     <div class="tier-cards">
       <div class="tier-card" v-for="tier in badgeTiers" :key="tier.id">
         <img :src="tier.image" :alt="`Tier ${tier.level} Badge`" />
@@ -34,6 +33,12 @@ export default {
   padding: 20px;
 }
 
+.badge-tiers h2 {
+  font-size: 1.8em;
+  margin-bottom: 20px;
+  color: #333;
+}
+
 .tier-cards {
   display: flex;
   justify-content: center;
@@ -41,11 +46,17 @@ export default {
 }
 
 .tier-card {
-  background: none;
-  padding: 10px;
-  margin: 10px;
-  width: 100px;
   text-align: center;
+  padding: 20px;
+  margin: 10px;
+  background-color: #f8f9fa;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s;
+}
+
+.tier-card:hover {
+  transform: scale(1.05);
 }
 
 .tier-card img {
@@ -57,7 +68,7 @@ export default {
 }
 
 .tier-card p {
-  font-size: 1em;
-  color: var(--text-color);
+  font-size: 1.2em;
+  color: #666;
 }
 </style>

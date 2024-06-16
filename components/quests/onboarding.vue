@@ -215,7 +215,7 @@ export default {
   padding: 12px 25px;
   border: none;
   border-radius: 25px;
-  background-color: var(--secondary-color);
+  background-color: blue;
   color: white;
   font-size: 1.2em;
   cursor: pointer;
@@ -227,6 +227,7 @@ export default {
 .claim-button:hover {
   background-color: var(--primary-color);
   transform: scale(1.05);
+  color: black;
 }
 
 /* Custom styles */
