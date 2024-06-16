@@ -1,10 +1,5 @@
 <template>
   <div class="quest-sidebar-content">
-    <div class="links" v-if="!isMobile">
-      <NuxtLink to="/quest" class="link" @click="handleLinkClick"
-        >Scrolly Quests</NuxtLink
-      >
-    </div>
     <div class="profile-section">
       <img
         :src="userStore.getOrbisImage || '/img/user/anon.svg'"
@@ -31,13 +26,8 @@
         </div>
       </div>
     </div>
-    <div class="links" v-if="isMobile">
-      <NuxtLink to="/" class="link" @click="handleLinkClick"
-        >Back to Main Site</NuxtLink
-      >
-    </div>
-    <div class="category-links" v-if="!isMobile">
-      <h3>Categories</h3>
+    <div class="category-links">
+      <h3>Scrolly Quests</h3>
       <ul>
         <li @click="handleCategoryClick('all')">All</li>
         <li @click="handleCategoryClick('latest')">Latest</li>
@@ -50,6 +40,18 @@
         </li>
       </ul>
     </div>
+    <NuxtLink to="/scrollybadge" class="h3" @click="closeLeftSidebar"
+      >Badge Infos</NuxtLink
+    >
+    <br />
+    <NuxtLink to="/leaderboard" class="h3" @click="closeLeftSidebar"
+      >Leaderboard</NuxtLink
+    >
+    <div class="h3" v-if="isMobile">
+      <NuxtLink to="/profile" class="h3" @click="closeLeftSidebar"
+        >Back to Main Site</NuxtLink
+      >
+    </div>
   </div>
 </template>
 
@@ -61,7 +63,7 @@ import { useRouter } from "vue-router";
 
 export default {
   name: "QuestPageSidebar",
-  props: ["isMobile"],
+  props: ["isMobile", "lSidebar"],
   setup(props) {
     const userStore = useUserStore();
     const questStore = useQuestStore();
@@ -70,6 +72,7 @@ export default {
 
     const closeLeftSidebar = () => {
       if (props.isMobile) {
+        props.lSidebar.hide();
         sidebarStore.setLeftSidebar(false);
         sidebarStore.setMainContent(true);
       }
@@ -91,6 +94,7 @@ export default {
       sidebarStore,
       handleCategoryClick,
       handleLinkClick,
+      closeLeftSidebar,
       questCategories: questStore.questCategories,
     };
   },
@@ -137,11 +141,13 @@ export default {
       );
     },
     completedQuests() {
+      if (!this.questStore.questCategories) return 0;
       return this.questStore.questCategories.reduce((total, category) => {
         return total + this.questStore.getCompletedQuests(category.quests);
       }, 0);
     },
     totalQuests() {
+      if (!this.questStore.questCategories) return 0;
       return this.questStore.questCategories.reduce((total, category) => {
         return total + category.quests.length;
       }, 0);
@@ -153,6 +159,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .quest-page-sidebar {
   background: rgba(232, 232, 232, 0.7);

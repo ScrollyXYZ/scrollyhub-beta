@@ -47,7 +47,11 @@ export default {
   props: ["lSidebar", "isMobile"],
   computed: {
     currentSidebarComponent() {
-      if (this.$route.name === "quest" || this.$route.name === "leaderboard") {
+      if (
+        this.$route.name === "quest" ||
+        this.$route.name === "leaderboard" ||
+        this.$route.name === "scrollybadge"
+      ) {
         return "QuestPageSidebar";
       } else {
         return "DefaultSidebarContent";
@@ -65,11 +69,11 @@ export default {
     currentGrade() {
       const tiers = [
         { name: "Scrolly Baby", points: 1 },
-        { name: "Scrolly Novice", points: 333 },
-        { name: "Scrolly Explorer", points: 777 },
-        { name: "Scrolly Mapper", points: 1337 },
-        { name: "Carto Maestro", points: 2442 },
-        { name: "Grand Cartographer of Scrolly", points: 4200 },
+        { name: "Scrolly Novice", points: 667 },
+        { name: "Scrolly Explorer", points: 1221 },
+        { name: "Scrolly Mapper", points: 2442 },
+        { name: "Carto Maestro", points: 4200 },
+        { name: "Grand Cartographer of Scrolly", points: 6000 },
       ];
       return (
         tiers.reverse().find((tier) => this.getUserAp >= tier.points) ||
