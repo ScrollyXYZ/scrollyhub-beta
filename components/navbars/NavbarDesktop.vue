@@ -39,7 +39,7 @@
             </NuxtLink>
           </li>
           <li class="nav-item">
-            <NuxtLink class="nav-link" to="/quest">
+            <NuxtLink class="nav-link" to="/scrollybadge">
               <span class="navbar-brand-text align-middle">Quests</span>
             </NuxtLink>
           </li>
