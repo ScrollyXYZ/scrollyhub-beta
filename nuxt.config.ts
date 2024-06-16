@@ -1,35 +1,23 @@
 import { NodeGlobalsPolyfillPlugin } from "@esbuild-plugins/node-globals-polyfill";
 import { NodeModulesPolyfillPlugin } from "@esbuild-plugins/node-modules-polyfill";
 
-// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   app: {
     head: {
       meta: [
-        {
-          name: "viewport",
-          content: "width=device-width, initial-scale=1",
-        },
-        {
-          charset: "utf-8",
-        },
+        { name: "viewport", content: "width=device-width, initial-scale=1" },
+        { charset: "utf-8" },
       ],
       link: [
         {
-          // Bootstrap
           rel: "stylesheet",
-          href: "	https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
+          href: "https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css",
         },
         {
-          // Bootstrap icons
           rel: "stylesheet",
           href: "https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css",
         },
-        {
-          // Custom
-          rel: "stylesheet",
-          href: "/css/custom.css",
-        },
+        { rel: "stylesheet", href: "/css/custom.css" },
       ],
       script: [
         {
@@ -174,22 +162,26 @@ export default defineNuxtConfig({
   },
   vite: {
     build: {
-      target: ["es2020"], // fix big integer literals error
+      target: ["es2020"],
     },
     optimizeDeps: {
       esbuildOptions: {
         define: {
-          global: "globalThis", // fix nuxt3 global
+          global: "globalThis",
         },
         plugins: [
           NodeGlobalsPolyfillPlugin({
-            process: true, // fix nuxt3 process
+            process: true,
             buffer: true,
           }),
           NodeModulesPolyfillPlugin(),
         ],
-        target: "es2020", // fix big integer literals error
+        target: "es2020",
       },
     },
   },
+  build: {
+    transpile: ["swiper"],
+  },
+  plugins: ["~/plugins/swiper.client.js"],
 });

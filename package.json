@@ -26,6 +26,7 @@
     "metascraper-title": "^5.36.0",
     "pinia": "^2.0.28",
     "sanitize-html": "^2.7.2",
+    "swiper": "^11.1.4",
     "vue-dapp": "^0.6.2",
     "vue-toastification": "^2.0.0-rc.5"
   },
