@@ -8,6 +8,7 @@
     "preview": "nuxt preview"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-free": "^6.5.2",
     "@openzeppelin/merkle-tree": "^1.0.5",
     "@orbisclub/orbis-sdk": "^0.4.70",
     "@pinia/nuxt": "^0.4.6",

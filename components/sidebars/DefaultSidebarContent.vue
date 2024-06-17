@@ -78,7 +78,7 @@
             :class="$route.path === '/' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            General discussion
+            <i class="bi bi-chat-left-text"></i> General discussion
           </NuxtLink>
         </ul>
 
@@ -89,14 +89,14 @@
             :class="$route.path.startsWith('/equilibre-memes') ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Equilibre meme contest
+            <i class="bi bi-emoji-smile"></i> Equilibre meme contest
           </NuxtLink>
         </ul>
 
         <!--
         <ul class="list-group">
           <NuxtLink to="/memes-contest" class="list-group-item cursor-pointer hover-color bg-light border-0" :class="$route.path.startsWith('/memes-contest') ? 'active' : ''" @click="closeLeftSidebar">
-            Memes contest
+            <i class="bi bi-image"></i> Memes contest
           </NuxtLink>
         </ul>
         -->
@@ -108,7 +108,7 @@
             :class="$route.path.startsWith('/memes-images') ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Share images & NFTs
+            <i class="bi bi-image"></i> Share images & NFTs
           </NuxtLink>
         </ul>
 
@@ -119,7 +119,7 @@
             :class="$route.path.startsWith('/shill') ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Shill & discuss projects
+            <i class="bi bi-megaphone"></i> Shill & discuss projects
           </NuxtLink>
         </ul>
 
@@ -134,7 +134,7 @@
             :class="$route.path === '/nft/mynfts' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            My NFTs
+            <i class="bi bi-person"></i> My NFTs
           </NuxtLink>
         </ul>
         <ul class="list-group">
@@ -144,7 +144,7 @@
             :class="$route.path === '/nft' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Latest Collections
+            <i class="bi bi-collection"></i> Latest Collections
           </NuxtLink>
         </ul>
         <ul class="list-group">
@@ -154,7 +154,7 @@
             :class="$route.path === '/nft/create' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Create a collection
+            <i class="bi bi-pencil"></i> Create a collection
           </NuxtLink>
         </ul>
         <ul class="list-group">
@@ -164,7 +164,7 @@
             :class="$route.path === '/nft/ManageMyCollections' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Manage My Collections
+            <i class="bi bi-gear"></i> Manage My Collections
           </NuxtLink>
         </ul>
         <ul class="list-group">
@@ -175,7 +175,7 @@
             :class="$route.path === '/nft/mynfts' ? 'active' : ''"
             @click="closeLeftSidebar"
           >
-            Return to the Hub
+            <i class="bi bi-arrow-left"></i> Return to the Hub
           </NuxtLink>
         </ul>
         <hr />
@@ -488,6 +488,7 @@
     </ul>
   </div>
 </template>
+
 <script>
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";

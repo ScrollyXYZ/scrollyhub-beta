@@ -1,16 +1,17 @@
 <template>
-  <div class="quest-sidebar-content">
+  <div class="default-sidebar-content quest-sidebar-content">
     <div class="profile-section">
-      <img
-        :src="userStore.getOrbisImage || '/img/user/anon.svg'"
-        alt="Profile Image"
+      <ProfileImage
+        :key="userStore.getOrbisImage"
         class="profile-image"
+        :address="address"
+        :domain="userStore.getDefaultDomain || 'Guest'"
+        :image="userStore.getOrbisImage"
       />
       <div class="profile-details">
         <div class="username">
           {{ userStore.getDefaultDomain || "Guest" }}
         </div>
-
         <div class="progress-bar">
           <div class="progress" :style="{ width: progress + '%' }"></div>
         </div>
@@ -28,29 +29,62 @@
     </div>
     <div class="category-links">
       <h3>Scrolly Quests</h3>
-      <ul>
-        <li @click="handleCategoryClick('all')">All</li>
-        <li @click="handleCategoryClick('latest')">Latest</li>
+      <ul class="list-group">
+        <li
+          class="list-group-item cursor-pointer hover-color bg-light border-0"
+          :class="$route.path === '/quest' ? 'active' : ''"
+          @click="handleCategoryClick('all')"
+        >
+          <i class="fas fa-list"></i> All
+        </li>
+        <li
+          class="list-group-item cursor-pointer hover-color bg-light border-0"
+          :class="$route.path === '/quest/latest' ? 'active' : ''"
+          @click="handleCategoryClick('latest')"
+        >
+          <i class="fas fa-clock"></i> Latest
+        </li>
         <li
           v-for="category in questCategories"
           :key="category.category"
+          class="list-group-item cursor-pointer hover-color bg-light border-0"
+          :class="$route.path === `/quest/${category.category}` ? 'active' : ''"
           @click="handleCategoryClick(category.category)"
         >
+          <i class="fas" :class="category.iconClass"></i>
           {{ category.category }}
         </li>
       </ul>
     </div>
-    <NuxtLink to="/scrollybadge" class="h3" @click="closeLeftSidebar"
-      >Badge Infos</NuxtLink
+    <hr class="separator" />
+    <NuxtLink
+      to="/scrollybadge"
+      class="list-group-item cursor-pointer hover-color bg-light border-0"
+      :class="$route.path === '/scrollybadge' ? 'active' : ''"
+      @click="closeLeftSidebar"
     >
-    <br />
-    <NuxtLink to="/leaderboard" class="h3" @click="closeLeftSidebar"
-      >Leaderboard</NuxtLink
+      <i class="fas fa-info-circle"></i> Badge Infos
+    </NuxtLink>
+    <NuxtLink
+      to="/leaderboard"
+      class="list-group-item cursor-pointer hover-color bg-light border-0"
+      :class="$route.path === '/leaderboard' ? 'active' : ''"
+      @click="closeLeftSidebar"
     >
-    <div class="h3" v-if="isMobile">
-      <NuxtLink to="/profile" class="h3" @click="closeLeftSidebar"
-        >Back to Main Site</NuxtLink
+      <i class="fas fa-trophy"></i> Leaderboard
+    </NuxtLink>
+    <div
+      v-if="isMobile"
+      class="list-group-item cursor-pointer hover-color bg-light border-0"
+    >
+      <NuxtLink
+        to="/profile"
+        class="list-group-item cursor-pointer hover-color bg-light border-0"
+        :class="$route.path === '/profile' ? 'active' : ''"
+        @click="closeLeftSidebar"
       >
+        <i class="fas fa-arrow-left"></i> Back to Main Site
+      </NuxtLink>
     </div>
   </div>
 </template>
@@ -60,9 +94,14 @@ import { useUserStore } from "~/store/user";
 import { useQuestStore } from "~/store/questStore";
 import { useSidebarStore } from "~/store/sidebars";
 import { useRouter } from "vue-router";
+import ProfileImage from "~/components/profile/ProfileImage.vue";
+import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
   name: "QuestPageSidebar",
+  components: {
+    ProfileImage,
+  },
   props: ["isMobile", "lSidebar"],
   setup(props) {
     const userStore = useUserStore();
@@ -84,18 +123,32 @@ export default {
       router.push("/quest");
     };
 
-    const handleLinkClick = () => {
-      closeLeftSidebar();
+    const mapCategoryToIcon = (category) => {
+      switch (category) {
+        case "Social Hub Quests":
+          return "fa-users";
+        case "Scrolly DeFi":
+          return "fa-coins";
+        case "Community Rewards":
+          return "fa-gift";
+        default:
+          return "fa-question-circle";
+      }
     };
+
+    const questCategories = questStore.questCategories.map((category) => ({
+      ...category,
+      iconClass: mapCategoryToIcon(category.category),
+    }));
 
     return {
       userStore,
       questStore,
       sidebarStore,
       handleCategoryClick,
-      handleLinkClick,
       closeLeftSidebar,
-      questCategories: questStore.questCategories,
+      questCategories,
+      getTextWithoutBlankCharacters,
     };
   },
   computed: {
@@ -161,14 +214,6 @@ export default {
 </script>
 
 <style scoped>
-.quest-page-sidebar {
-  background: rgba(232, 232, 232, 0.7);
-  border-radius: 15px;
-  padding: 10px;
-  left: 30px;
-  top: 10px;
-}
-
 .profile-section {
   display: flex;
   flex-direction: row;
@@ -194,16 +239,6 @@ export default {
 .username {
   font-size: 1.1em;
   font-weight: bold;
-}
-
-.grade-label {
-  display: inline-block;
-  background-color: #6a0dad;
-  color: white;
-  padding: 2px 8px;
-  border-radius: 5px;
-  font-size: 0.8em;
-  margin-top: 5px;
 }
 
 .progress-bar {
@@ -261,47 +296,10 @@ export default {
   margin: 2px 0;
 }
 
-.links {
-  margin-top: 10px;
-  text-align: center;
-}
-
-.link {
-  display: block;
-  color: var(--bs-indigo);
-  text-decoration: none;
-  margin-bottom: 20px;
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-.link:hover {
-  text-decoration: underline;
-}
-
-.category-links {
-  margin-top: 20px;
-}
-
-.category-links h3 {
-  text-align: center;
-}
-
-.category-links ul {
-  list-style: none;
-  padding: 0;
-  text-align: left;
-}
-
-.category-links li {
-  margin: 5px 0;
-  cursor: pointer;
-  font-size: 1.2em;
-  font-family: Arial, sans-serif;
-  padding-left: 15px;
-}
-
-.category-links li:hover {
-  text-decoration: underline;
+.separator {
+  border: 0;
+  height: 1px;
+  background: grey;
+  margin: 10px 0;
 }
 </style>
