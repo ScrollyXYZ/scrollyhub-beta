@@ -9,23 +9,6 @@
           represent Scrolly's commitment to community engagement.
         </p>
       </div>
-      <svg
-        class="header-wave"
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1440 320"
-      >
-        <defs>
-          <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" style="stop-color: #6a11cb; stop-opacity: 1" />
-            <stop offset="100%" style="stop-color: #2575fc; stop-opacity: 1" />
-          </linearGradient>
-        </defs>
-        <path
-          fill="url(#grad1)"
-          fill-opacity="1"
-          d="M0,224L48,213.3C96,203,192,181,288,186.7C384,192,480,224,576,213.3C672,203,768,149,864,122.7C960,96,1056,96,1152,101.3C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
-        ></path>
-      </svg>
     </header>
 
     <main class="main-content">
@@ -63,7 +46,6 @@ export default {
   --background-color: #f5f5f5;
   --text-color: #333;
   --border-color: #ddd;
-  --wave-color: #c3cfe2;
 }
 
 body {
@@ -78,14 +60,13 @@ body {
   flex-direction: column;
   align-items: center;
   min-height: 100vh;
-  padding: 40px;
+  padding: 20px 40px;
 }
 
 .header-section {
   width: 100%;
-  background-color: var(--wave-color);
   text-align: center;
-  padding: 60px 20px;
+  padding: 40px 20px;
   margin-bottom: 40px;
   position: relative;
   overflow: hidden;
@@ -97,29 +78,26 @@ body {
   max-width: 800px;
   margin: 0 auto;
   animation: fadeIn 2s;
-}
-
-.header-wave {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  z-index: 0;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .header-section h1 {
-  font-size: 3em;
+  font-size: 3.5em;
   color: var(--primary-color);
   font-weight: bold;
   margin: 0;
   padding: 0;
+  animation: fadeInDown 2s;
 }
 
 .header-section p {
-  font-size: 1.2em;
+  font-size: 1.5em;
   color: var(--text-color);
   margin: 20px 0 0;
+  animation: fadeInUp 2s;
 }
 
 .main-content {
@@ -152,11 +130,11 @@ body {
 
 @media (max-width: 768px) {
   .header-section h1 {
-    font-size: 2.2em;
+    font-size: 2.5em;
   }
 
   .header-section p {
-    font-size: 1em;
+    font-size: 1.2em;
   }
 
   .box {
@@ -172,6 +150,28 @@ body {
   }
   to {
     opacity: 1;
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 </style>

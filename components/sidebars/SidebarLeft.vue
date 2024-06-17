@@ -50,6 +50,7 @@ export default {
       if (
         this.$route.name === "quest" ||
         this.$route.name === "leaderboard" ||
+        this.$route.name === "badge" ||
         this.$route.name === "scrollybadge"
       ) {
         return "QuestPageSidebar";
