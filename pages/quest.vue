@@ -2,7 +2,7 @@
   <div class="quest-page">
     <div class="header-section">
       <div class="leaderboard-link">
-        <NuxtLink to="/leaderboard">Leaderboard</NuxtLink>
+        <NuxtLink to="/leaderboard"></NuxtLink>
       </div>
       <div class="points-display animate__animated animate__fadeInDown">
         <div class="points-card">
@@ -594,7 +594,7 @@ export default {
 }
 
 .modal-content {
-  background: #fff;
+  background: var(--bs-mode);
   padding: 20px;
   border-radius: 10px;
   text-align: center;

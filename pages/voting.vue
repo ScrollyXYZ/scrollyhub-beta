@@ -512,7 +512,6 @@ h1 {
 }
 .option-card {
   padding: 15px;
-  background: #ffffff;
   border: 1px solid #dee2e6;
   border-radius: 5px;
 }
@@ -557,7 +556,7 @@ h1 {
 }
 .footer-info {
   margin-top: 30px;
-  background-color: #f8f9fa;
+  background-color: #e9ecef;
   padding: 10px;
   border-radius: 5px;
   text-align: center;

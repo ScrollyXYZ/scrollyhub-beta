@@ -498,7 +498,6 @@ export default {
 }
 
 .modal-content {
-  background: white;
   padding: 20px;
   border-radius: 10px;
   width: 80%;

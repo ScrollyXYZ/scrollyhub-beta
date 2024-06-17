@@ -106,7 +106,7 @@ export default {
 <style scoped>
 .vi-proposals-container {
   padding: 20px;
-  background-color: var(--bs-body-bg);
+  background-color: var(--bs-mode);
   border-radius: var(--bs-border-radius);
   box-shadow: var(--bs-box-shadow);
   font-family: var(--bs-body-font-family);
@@ -118,7 +118,8 @@ h1 {
   text-align: center;
   margin-bottom: 20px;
 }
-.vi-proposals-list {
+.vi-pr
+osals-list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -128,7 +129,7 @@ h1 {
 }
 .vi-proposal-card {
   padding: 20px;
-  background: var(--bs-white);
+  background: var(--bs-light);
   border-radius: var(--bs-border-radius);
   box-shadow: var(--bs-box-shadow-sm);
   transition:
