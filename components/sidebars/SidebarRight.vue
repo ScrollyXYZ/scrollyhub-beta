@@ -1,6 +1,12 @@
 <template>
   <div
-    :class="['col-auto', isNftRoute ? 'col-lg-1' : 'col-lg-3', 'px-0', 'mt-1']"
+    v-if="!isNftRoute || isMobile"
+    :class="[
+      'col-auto',
+      isNftRoute && isMobile ? 'col-lg-1' : 'col-lg-3',
+      'px-0',
+      'mt-1',
+    ]"
   >
     <div
       id="sidebar2"
@@ -11,7 +17,7 @@
         id="sidebar-nav"
         class="list-group border-0 rounded-0 text-sm-start min-vh-100"
       >
-        <template v-if="!isNftRoute">
+        <template v-if="!isNftRoute || isMobile">
           <div class="card m-2 bg-light" v-if="isMobile">
             <div class="card-body sidebar-card-body mt-4">
               <div class="d-grid gap-2">
@@ -115,7 +121,7 @@
                 scrolling="no"
                 frameborder="no"
                 allow="autoplay"
-                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1812713007&color=%23ff5500&auto_play=true&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
+                src="https://w.soundcloud.com/player/?url=https%3A//api.soundcloud.com/playlists/1812713007&color=%23ff5500&auto_play=false&hide_related=false&show_comments=true&show_user=true&show_reposts=false&show_teaser=true&visual=true"
               ></iframe>
               <div
                 style="
