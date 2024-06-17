@@ -590,7 +590,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1090;
+  z-index: 1900;
 }
 
 .modal-content {
