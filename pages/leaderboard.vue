@@ -481,7 +481,7 @@ export default {
 }
 
 .highlight {
-  background-color: #e6f7ff !important;
+  background-color: #1e3b49 !important;
 }
 
 .modal-overlay {
