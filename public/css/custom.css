@@ -455,7 +455,7 @@ a:hover {
 }
 
 .navbar-mobile {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.451);
 }
 
 .navbar-toggler {
@@ -550,7 +550,7 @@ a:hover {
 }
 
 .profile-image {
-  object-fit: cover; 
+  object-fit: cover;
 }
 
 .user-name {
@@ -561,7 +561,7 @@ a:hover {
 .user-name:hover {
   font-weight: bold;
   margin-top: 0rem;
-  color: rgb(77, 0, 57) ;
+  color: rgb(77, 0, 57);
 }
 .user-name a {
   color: inherit;
@@ -694,7 +694,7 @@ a:hover {
 }
 
 .sidebar-card-body-img {
-  width: 100px; 
+  width: 100px;
   height: auto;
   margin: 10px;
 }
@@ -706,14 +706,14 @@ a:hover {
   padding: 10px;
   color: white;
   text-align: center;
-  margin: 10px; 
+  margin: 10px;
 }
 
 .speech-bubble::after {
-  content: '';
+  content: "";
   position: absolute;
-  bottom: 20px; 
-  left: -10px; 
+  bottom: 20px;
+  left: -10px;
   transform: scaleY(-1);
   width: 0;
   height: 0;
@@ -730,7 +730,9 @@ a:hover {
   padding: 10px 20px;
   text-decoration: none;
   border-radius: 5px;
-  transition: background-color 0.3s, transform 0.3s;
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
 }
 
 .create-domain-button:hover {
