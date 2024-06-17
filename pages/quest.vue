@@ -6,7 +6,7 @@
       </div>
       <div class="points-display animate__animated animate__fadeInDown">
         <div class="points-card">
-          <h2 class ="mappy-point">Your Mappy Points</h2>
+          <h2 class="mappy-point">Your Mappy Points</h2>
           <p>{{ questStore.activityPoints }}</p>
           <button @click="toggleDetails" class="details-button">
             {{ showDetails ? "▲" : "▼" }} Details
@@ -590,6 +590,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1090;
 }
 
 .modal-content {
@@ -677,7 +678,7 @@ export default {
   opacity: 0;
 }
 
-.mappy-point{
-  color: var(--bs-black)
+.mappy-point {
+  color: var(--bs-black);
 }
 </style>
