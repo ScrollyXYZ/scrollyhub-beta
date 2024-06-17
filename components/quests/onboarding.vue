@@ -8,116 +8,19 @@
       grab-cursor="true"
       class="main-swiper"
     >
-      <SwiperSlide>
+      <SwiperSlide v-for="(slide, index) in slides" :key="index">
         <div class="slide-content">
-          <h2>Step 1: Create Your Scrolly Domain</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Wallet Icon"
-          />
-          <p>
-            Join the hub and share with more than 1,000 scrollies around the
-            world.
-          </p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step1')"
-          >
-            Learn More
-          </button>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        <div class="slide-content">
-          <h2>Step 2: Create Your Scrolly Profile</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Activities Icon"
-          />
-          <p>Add your picture and get onboard with social features.</p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step2')"
-          >
-            Learn More
-          </button>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        <div class="slide-content">
-          <h2>Step 3: Participate in Contests & Quests</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Progress Icon"
-          />
-          <p>Track your progress and earn Mappy Points as rewards.</p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step3')"
-          >
-            Learn More
-          </button>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        <div class="slide-content">
-          <h2>Step 4: Earn More Mappy Points</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Progress Icon"
-          />
-          <p>
-            Earn passive Mappy Points rewards with your on-chain activities on
-            the hub.
-          </p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step4')"
-          >
-            Learn More
-          </button>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        <div class="slide-content">
-          <h2>Step 5: Refer Your Friends</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Progress Icon"
-          />
-          <p>
-            Earn Mappy Points and ETH for your friends' activities on the hub.
-          </p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step5')"
-          >
-            Learn More
-          </button>
-        </div>
-      </SwiperSlide>
-      <SwiperSlide>
-        <div class="slide-content">
-          <h2>Step 6: Enjoy Your Rewards</h2>
-          <img
-            src="https://www.dutchfarmint.com/wp-content/uploads/2016/06/720x480.png"
-            alt="Progress Icon"
-          />
-          <p>
-            Keep engaging and enjoying the benefits of being part of the Scrolly
-            community.
-          </p>
-          <button
-            class="slide-button"
-            @click="navigateToLink('https://example.com/step6')"
-          >
-            Learn More
-          </button>
+          <img :src="slide.img" :alt="slide.alt" class="slide-image" />
+          <div class="overlay">
+            <h2 class="slide-title">{{ slide.title }}</h2>
+            <p>{{ slide.description }}</p>
+            <button class="slide-button" @click="navigateToLink(slide.link)">
+              {{ slide.buttonText }}
+            </button>
+          </div>
         </div>
       </SwiperSlide>
     </Swiper>
-
-    <button class="claim-button" @click="navigateToClaim">Claim Badge</button>
   </div>
 </template>
 
@@ -130,15 +33,67 @@ import { Navigation, Pagination } from "swiper/modules";
 export default {
   name: "GetStartedCarousel",
   setup() {
+    const slides = ref([
+      {
+        title: "Step 1: Create Your Scrolly Domain",
+        img: "http://scrolly.xyz/onboarding/1.png",
+        alt: "Wallet Icon",
+        description:
+          "Join the hub and share with more than 1,000 scrollies around the world.",
+        buttonText: "Get your Scrolly Domain",
+        link: "https://sns.scrolly.xyz/#/",
+      },
+      {
+        title: "Step 2: Participate in Contests & Quests",
+        img: "http://scrolly.xyz/onboarding/2.png",
+        alt: "Activities Icon",
+        description: "Track your progress and earn Mappy Points as rewards.",
+        buttonText: "I want to be an adventurer",
+        link: "/quest",
+      },
+      {
+        title: "Step 3: Get MOAR Mappy Points with your on-chain activities",
+        img: "http://scrolly.xyz/onboarding/3.png",
+        alt: "Progress Icon",
+        description: "Track your progress and earn Mappy Points as rewards.",
+        buttonText: "Learn More",
+        link: "/activity-points",
+      },
+      {
+        title: "Step 4: Refer Your Friends",
+        img: "http://scrolly.xyz/onboarding/4.png",
+        alt: "Progress Icon",
+        description:
+          "Earn passive Mappy Points rewards with your on-chain activities on the hub.",
+        buttonText: "Get my Link",
+        link: "/profile",
+      },
+      {
+        title: "Step 5: Evolve your Badge",
+        img: "http://scrolly.xyz/onboarding/4.png",
+        alt: "Progress Icon",
+        description: "Your badge evolved with your Mappy Points.",
+        buttonText: "Mint my Scrolly Badge",
+        link: "/badge",
+      },
+      {
+        title: "Step 6: Enjoy Your Rewards",
+        img: "http://scrolly.xyz/onboarding/4.png",
+        alt: "Progress Icon",
+        description:
+          "Keep engaging and enjoying the benefits of being part of the Scrolly community.",
+        buttonText: "Claim your Scrolly Badge",
+        link: "/badge",
+      },
+    ]);
+
     return {
       Navigation,
       Pagination,
+      slides,
     };
   },
   methods: {
-    navigateToClaim() {
-      this.$router.push("/badge");
-    },
     navigateToLink(url) {
       window.open(url, "_blank");
     },
@@ -158,37 +113,46 @@ export default {
 
 .main-swiper {
   margin-bottom: 20px;
-  width: 70%; /* Réduit la largeur du composant */
+  width: 100%;
   margin: 0 auto;
 }
 
 .slide-content {
+  position: relative;
   text-align: center;
-  padding: 20px;
   border-radius: 10px;
-  background-color: #f8f9fa;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 }
 
-.slide-content h2 {
-  font-size: 1.8em;
-  margin-bottom: 10px;
-  color: #333;
-}
-
-.slide-content p {
-  font-size: 1.2em;
-  color: #666;
-  margin-bottom: 15px;
-}
-
-.slide-content img {
+.slide-image {
   width: 100%;
   height: auto;
-  max-width: 100%;
+  display: block;
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.5);
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.overlay h2 {
+  font-size: 1.8em;
+  margin-bottom: 10px;
+  color: white;
+}
+
+.overlay p {
+  font-size: 1.2em;
   margin-bottom: 15px;
-  border-radius: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  color: white;
 }
 
 .slide-button {
@@ -202,32 +166,11 @@ export default {
   transition:
     background-color 0.3s,
     transform 0.3s;
-  margin-bottom: 20px;
 }
 
 .slide-button:hover {
   background-color: #0056b3;
   transform: scale(1.05);
-}
-
-.claim-button {
-  margin-top: 20px;
-  padding: 12px 25px;
-  border: none;
-  border-radius: 25px;
-  background-color: blue;
-  color: white;
-  font-size: 1.2em;
-  cursor: pointer;
-  transition:
-    background-color 0.3s,
-    transform 0.3s;
-}
-
-.claim-button:hover {
-  background-color: var(--primary-color);
-  transform: scale(1.05);
-  color: black;
 }
 
 /* Custom styles */
