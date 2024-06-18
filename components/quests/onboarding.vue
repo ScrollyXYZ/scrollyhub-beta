@@ -14,9 +14,21 @@
           <div class="overlay">
             <h2 class="slide-title">{{ slide.title }}</h2>
             <p>{{ slide.description }}</p>
-            <NuxtLink :to="slide.link" class="slide-button">
-              {{ slide.buttonText }}
-            </NuxtLink>
+            <template v-if="isExternalLink(slide.link)">
+              <a
+                :href="slide.link"
+                class="slide-button"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {{ slide.buttonText }}
+              </a>
+            </template>
+            <template v-else>
+              <NuxtLink :to="slide.link" class="slide-button">
+                {{ slide.buttonText }}
+              </NuxtLink>
+            </template>
           </div>
         </div>
       </SwiperSlide>
@@ -87,10 +99,15 @@ export default {
       },
     ]);
 
+    const isExternalLink = (link) => {
+      return link.startsWith("http");
+    };
+
     return {
       Navigation,
       Pagination,
       slides,
+      isExternalLink,
     };
   },
   components: {
