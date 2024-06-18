@@ -14,9 +14,9 @@
           <div class="overlay">
             <h2 class="slide-title">{{ slide.title }}</h2>
             <p>{{ slide.description }}</p>
-            <button class="slide-button" @click="navigateToLink(slide.link)">
+            <NuxtLink :to="slide.link" class="slide-button">
               {{ slide.buttonText }}
-            </button>
+            </NuxtLink>
           </div>
         </div>
       </SwiperSlide>
@@ -93,11 +93,6 @@ export default {
       slides,
     };
   },
-  methods: {
-    navigateToLink(url) {
-      window.open(url, "_blank");
-    },
-  },
   components: {
     Swiper,
     SwiperSlide,
@@ -166,6 +161,7 @@ export default {
   transition:
     background-color 0.3s,
     transform 0.3s;
+  text-decoration: none;
 }
 
 .slide-button:hover {
