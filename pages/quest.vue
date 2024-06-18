@@ -590,7 +590,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1900;
+  z-index: 2000;
 }
 
 .modal-content {
@@ -601,6 +601,7 @@ export default {
   color: #333;
   max-width: 400px;
   width: 80%;
+  z-index: 2001;
 }
 
 .modal-content h3 {

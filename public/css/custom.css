@@ -370,9 +370,9 @@ a:hover {
   text-decoration: none;
 }
 
-/* .list-group-item.active {
+.list-group-item.active {
   color: var(--bs-primary);
-} */
+}
 
 .main-containter {
   flex: 0 0 auto;
