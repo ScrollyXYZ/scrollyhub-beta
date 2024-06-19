@@ -642,14 +642,14 @@ export default {
 
 .popup-notification {
   position: fixed;
-  top: 20px;
+  top: 50px;
   right: 20px;
   background: #333;
   color: #fff;
   padding: 15px;
   border-radius: 5px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
+  z-index: 3000;
   transition: opacity 0.3s ease-in-out;
 }
 
