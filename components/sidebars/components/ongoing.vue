@@ -1,7 +1,7 @@
 <template>
   <div class="get-started-carousel">
     <Swiper
-      :modules="[Navigation, Pagination]"
+      :modules="[Navigation]"
       :slides-per-view="1"
       navigation
       grab-cursor="true"
@@ -52,7 +52,7 @@
 import { ref } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
-import { Navigation, Pagination } from "swiper/modules";
+import { Navigation } from "swiper/modules";
 import ReferralModal from "~/components/referrals/ReferralModal.vue";
 
 export default {
@@ -65,55 +65,36 @@ export default {
   setup() {
     const slides = ref([
       {
-        title: "Step 1: Create Your Scrolly Domain",
-        img: "http://scrolly.xyz/onboarding/1.png",
+        title: "",
+        img: "http://scrolly.xyz/online/contest1.png",
         alt: "Wallet Icon",
-        description:
-          "Join the hub and share with more than 1,000 scrollies around the world.",
-        buttonText: "Get your Scrolly Domain",
-        link: "https://sns.scrolly.xyz/#/",
+        description: "",
+        buttonText: "Participate",
+        link: "/equilibre-memes",
       },
       {
-        title: "Step 2: Participate in Contests & Quests",
+        title: "",
         img: "http://scrolly.xyz/onboarding/2.png",
         alt: "Activities Icon",
-        description: "Track your progress and earn Mappy Points as rewards.",
-        buttonText: "I want to be an adventurer",
+        description: "",
+        buttonText: "Explore",
         link: "/quest",
       },
       {
-        title: "Step 3: Get MOAR Mappy Points with your on-chain activities",
-        img: "http://scrolly.xyz/onboarding/3.png",
+        title: "",
+        img: "http://scrolly.xyz/online/vote1.png",
         alt: "Progress Icon",
-        description: "Track your progress and earn Mappy Points as rewards.",
-        buttonText: "Learn More",
-        link: "/activity-points",
+        description: "",
+        buttonText: "Vote",
+        link: "/voting?id=1",
       },
       {
-        title: "Step 4: Refer Your Friends",
-        img: "http://scrolly.xyz/onboarding/4.png",
+        title: "",
+        img: "http://scrolly.xyz/online/refer.png",
         alt: "Progress Icon",
-        description:
-          "Earn passive Mappy Points rewards with your on-chain activities on the hub.",
+        description: "",
         buttonText: "Get my Link",
         link: "#referralModal",
-      },
-      {
-        title: "Step 5: Evolve your Badge",
-        img: "http://scrolly.xyz/onboarding/4.png",
-        alt: "Progress Icon",
-        description: "Your badge evolved with your Mappy Points.",
-        buttonText: "Mint my Scrolly Badge",
-        link: "/badge",
-      },
-      {
-        title: "Step 6: Enjoy Your Rewards",
-        img: "http://scrolly.xyz/onboarding/4.png",
-        alt: "Progress Icon",
-        description:
-          "Keep engaging and enjoying the benefits of being part of the Scrolly community.",
-        buttonText: "Claim your Scrolly Badge",
-        link: "/badge",
       },
     ]);
 
@@ -123,7 +104,6 @@ export default {
 
     return {
       Navigation,
-      Pagination,
       slides,
       isExternalLink,
     };
@@ -162,7 +142,6 @@ export default {
   left: 0;
   width: 100%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.5);
   color: white;
   display: flex;
   flex-direction: column;

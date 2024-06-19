@@ -61,53 +61,33 @@
           </div>
           <!-- Register a domain name OR say Hello -->
           <div class="card m-2 bg-light">
-            <div class="sidebar-card-body">
-              <img src="/img/scrollyimg.png" class="sidebar-card-body-img" />
-              <div class="speech-bubble">
-                <!-- Greeting for users who are connected and have a domain -->
-                <template v-if="isActivated && userStore.getDefaultDomain">
-                  Nice to see you again!
-                  {{
-                    getTextWithoutBlankCharacters(userStore.getDefaultDomain)
-                  }}
-                </template>
-                <!-- Greeting for connected users who do not have a domain -->
-                <template
-                  v-else-if="isActivated && !userStore.getDefaultDomain"
-                >
-                  Nice to meet you! We saw that you don't have a Domain yet.
-                  Choose your Nickname and join us on the Hub.
-                </template>
+            <div class="">
+              <!-- Greeting for users who are connected and have a domain -->
+              <template v-if="isActivated && userStore.getDefaultDomain">
+                <ongoing />
+              </template>
+              <!-- Greeting for connected users who do not have a domain -->
+              <template v-else-if="isActivated && !userStore.getDefaultDomain">
+                <onboarding />
+              </template>
 
-                <!-- Message for users who are not connected -->
-                <template v-else>
-                  You can create your Scrolly Domain now.
-                </template>
-              </div>
+              <!-- Message for users who are not connected -->
+              <template v-else>
+                <onboarding />
+              </template>
             </div>
-            <template v-if="!userStore.getDefaultDomain">
-              <div class="button-container">
-                <a
-                  href="https://sns.scrolly.xyz/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  class="create-domain-button"
-                >
-                  Create a domain
-                </a>
-              </div>
-            </template>
           </div>
-          <!-- Referrals -->
-          <ReferralWidget />
 
-          <!-- Swap tokens -->
+          <!-- Referrals
+          <ReferralWidget />
+ -->
+          <!-- Swap tokens 
           <SimpleSwapWidget
             v-if="$config.swapRouterAddress && $config.showFeatures.swap"
             :routerAddress="$config.swapRouterAddress"
             :tokens="tokens"
             title="Swap tokens"
-          />
+          />-->
 
           <!-- Playlist -->
           <div class="card m-2 bg-light" v-if="$config.showFeatures.spotify">
@@ -149,7 +129,7 @@
                   title="Scrolly TheMap"
                   target="_blank"
                   style="color: #cccccc; text-decoration: none"
-                  >Scrolly TheMap</a
+                  >Scrolly</a
                 >
                 ·
                 <a
@@ -216,21 +196,21 @@
                       <span
                         class="dropdown-item cursor-pointer"
                         @click="changeColorMode('scrolly')"
-                        >S</span
+                        >Scrolly</span
                       >
                     </li>
                     <li>
                       <span
                         class="dropdown-item cursor-pointer"
                         @click="changeColorMode('dark')"
-                        >D</span
+                        >Dark</span
                       >
                     </li>
                     <li>
                       <span
                         class="dropdown-item cursor-pointer"
                         @click="changeColorMode('light')"
-                        >L</span
+                        >Light</span
                       >
                     </li>
                   </ul>
@@ -258,6 +238,8 @@ import ReferralWidget from "~/components/referrals/ReferralWidget.vue";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 import { useEthers } from "vue-dapp";
 import { useRoute } from "vue-router";
+import ongoing from "~/components/sidebars/components/ongoing.vue";
+import onboarding from "~/components/sidebars/components/onboarding.vue";
 
 export default {
   name: "SidebarRight",
@@ -268,6 +250,8 @@ export default {
     NameMintWidget,
     ReferralWidget,
     SimpleSwapWidget,
+    ongoing,
+    onboarding,
   },
   setup() {
     const { disconnect, isConnected } = useWallet();

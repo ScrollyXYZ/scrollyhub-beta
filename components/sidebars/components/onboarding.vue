@@ -1,7 +1,7 @@
 <template>
   <div class="get-started-carousel">
     <Swiper
-      :modules="[Navigation, Pagination]"
+      :modules="[Navigation]"
       :slides-per-view="1"
       navigation
       grab-cursor="true"
@@ -23,16 +23,6 @@
                 {{ slide.buttonText }}
               </a>
             </template>
-            <template v-else-if="slide.link.startsWith('#')">
-              <button
-                type="button"
-                class="slide-button"
-                data-bs-toggle="modal"
-                :data-bs-target="slide.link"
-              >
-                {{ slide.buttonText }}
-              </button>
-            </template>
             <template v-else>
               <NuxtLink :to="slide.link" class="slide-button">
                 {{ slide.buttonText }}
@@ -42,78 +32,41 @@
         </div>
       </SwiperSlide>
     </Swiper>
-
-    <!-- Modal -->
-    <ReferralModal />
   </div>
 </template>
-
 <script>
 import { ref } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
-import { Navigation, Pagination } from "swiper/modules";
-import ReferralModal from "~/components/referrals/ReferralModal.vue";
+import { Navigation } from "swiper/modules";
 
 export default {
-  name: "GetStartedCarousel",
-  components: {
-    Swiper,
-    SwiperSlide,
-    ReferralModal,
-  },
+  name: "onboardingsidebar",
   setup() {
     const slides = ref([
       {
-        title: "Step 1: Create Your Scrolly Domain",
+        title: "",
         img: "http://scrolly.xyz/onboarding/1.png",
         alt: "Wallet Icon",
-        description:
-          "Join the hub and share with more than 1,000 scrollies around the world.",
-        buttonText: "Get your Scrolly Domain",
+        description: "",
+        buttonText: "Register",
         link: "https://sns.scrolly.xyz/#/",
       },
       {
-        title: "Step 2: Participate in Contests & Quests",
+        title: "",
         img: "http://scrolly.xyz/onboarding/2.png",
-        alt: "Activities Icon",
-        description: "Track your progress and earn Mappy Points as rewards.",
-        buttonText: "I want to be an adventurer",
-        link: "/quest",
+        alt: "Update Icon",
+        description: "",
+        buttonText: "Update",
+        link: "/profile",
       },
       {
-        title: "Step 3: Get MOAR Mappy Points with your on-chain activities",
+        title: "",
         img: "http://scrolly.xyz/onboarding/3.png",
         alt: "Progress Icon",
-        description: "Track your progress and earn Mappy Points as rewards.",
-        buttonText: "Learn More",
-        link: "/activity-points",
-      },
-      {
-        title: "Step 4: Refer Your Friends",
-        img: "http://scrolly.xyz/onboarding/4.png",
-        alt: "Progress Icon",
-        description:
-          "Earn passive Mappy Points rewards with your on-chain activities on the hub.",
-        buttonText: "Get my Link",
-        link: "#referralModal",
-      },
-      {
-        title: "Step 5: Evolve your Badge",
-        img: "http://scrolly.xyz/onboarding/4.png",
-        alt: "Progress Icon",
-        description: "Your badge evolved with your Mappy Points.",
-        buttonText: "Mint my Scrolly Badge",
-        link: "/badge",
-      },
-      {
-        title: "Step 6: Enjoy Your Rewards",
-        img: "http://scrolly.xyz/onboarding/4.png",
-        alt: "Progress Icon",
-        description:
-          "Keep engaging and enjoying the benefits of being part of the Scrolly community.",
-        buttonText: "Claim your Scrolly Badge",
-        link: "/badge",
+        description: "",
+        buttonText: "GM",
+        link: "/",
       },
     ]);
 
@@ -123,10 +76,13 @@ export default {
 
     return {
       Navigation,
-      Pagination,
       slides,
       isExternalLink,
     };
+  },
+  components: {
+    Swiper,
+    SwiperSlide,
   },
 };
 </script>
@@ -162,7 +118,6 @@ export default {
   left: 0;
   width: 100%;
   padding: 20px;
-  background: rgba(0, 0, 0, 0.5);
   color: white;
   display: flex;
   flex-direction: column;
