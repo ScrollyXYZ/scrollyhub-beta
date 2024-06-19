@@ -70,9 +70,9 @@ export default {
         alt: "Wallet Icon",
         description: "",
         buttonText: "Participate",
-        link: "/equilibre-memes",
+        link: "/post?id=kjzl6cwe1jw14bjnkujvj2b27uatvu8gt9avvyfv237arfsf85o6tc2b8oup3hc",
       },
-    {
+      {
         title: "",
         img: "http://scrolly.xyz/onboarding/2.png",
         alt: "Activities Icon",
