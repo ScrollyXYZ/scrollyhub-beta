@@ -100,15 +100,15 @@ export default {
       },
       {
         title: "Step 5: Evolve your Badge",
-        img: "http://scrolly.xyz/onboarding/4.png",
+        img: "http://scrolly.xyz/onboarding/5.png",
         alt: "Progress Icon",
         description: "Your badge evolved with your Mappy Points.",
         buttonText: "Mint my Scrolly Badge",
-        link: "/badge",
+        link: "/",
       },
       {
         title: "Step 6: Enjoy Your Rewards",
-        img: "http://scrolly.xyz/onboarding/4.png",
+        img: "http://scrolly.xyz/onboarding/6.png",
         alt: "Progress Icon",
         description:
           "Keep engaging and enjoying the benefits of being part of the Scrolly community.",

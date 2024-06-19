@@ -275,7 +275,7 @@
           class="nav-link"
           :class="$route.path.startsWith('/quest') ? 'active' : ''"
           aria-current="page"
-          to="/quest"
+          to="/scrollybadge"
         >
           <i class="bi bi-award"></i> Quests
         </NuxtLink>

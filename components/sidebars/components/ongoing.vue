@@ -72,7 +72,7 @@ export default {
         buttonText: "Participate",
         link: "/equilibre-memes",
       },
-      {
+    {
         title: "",
         img: "http://scrolly.xyz/onboarding/2.png",
         alt: "Activities Icon",

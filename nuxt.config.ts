@@ -43,13 +43,12 @@ export default defineNuxtConfig({
       airdropApAddress: "", // chat token claim for APs
       airdropClaimDomainsAddress: "", // chat token claim for domain holders
       badge: {
-        isLive: false,
+        isLive: true,
         apiBaseUrl: "https://api.scrolly.xyz/api/badge/",
         badgeContractAddress: "0x89b27e836BF46275e6D87cD55461D34ABaade51A",
-        defaultBadgeImage:
-          "https://cyan-passive-guan-475.mypinata.cloud/ipfs/QmY9rG94E1qpc5NPs1zFTM1hCCTmv9kiRvMoZjGyxCJ2ZE/0.png",
+        defaultBadgeImage: "/skelly/sticker.svg",
         graphqlUrl: "https://scroll-sepolia.easscan.org/graphql",
-        profileRegistryAddress: "0x19bA366e708006dF04B1aA42057b0aCb55F6960E",
+        profileRegistryAddress: "0xB23AF8707c442f59BDfC368612Bd8DbCca8a7a5a",
       },
       blockExplorerBaseUrl: "https://scrollscan.com",
       chatChannels: {
@@ -69,7 +68,7 @@ export default defineNuxtConfig({
         tippingAlerts:
           "kjzl6cwe1jw148e16hgprcsp07xoplt89mcxhdj6x0d0jwgplsdtq36hq7nexh8",
         equilibreMemes:
-          "kjzl6cwe1jw146bx6c9p4i6u27qcmfc6kx0qqf68gul23trbjvkiie854og9a08",
+          "kjzl6cwe1jw14aatupsk2vajdwffgprn2yi17b7ej6lma9gff4apfkc50mrtqlr",
       },
       chatTokenAddress: "0xb65aD8d81d1E4Cb2975352338805AF6e39BA8Be8", // chat token address
       chatTokenImage: "https://sns.scrolly.xyz/assets/logo.67955946.png", // chat token image

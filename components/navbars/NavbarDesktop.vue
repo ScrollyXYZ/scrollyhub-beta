@@ -38,15 +38,15 @@
               <span class="navbar-brand-text align-middle">Swap</span>
             </NuxtLink>
           </li>
-          <li class="nav-item">
-            <NuxtLink class="nav-link" to="/scrollybadge">
-              <span class="navbar-brand-text align-middle">Quests</span>
+          <!-- Badge -->
+          <li class="nav-item" v-if="$config.badge.isLive">
+            <NuxtLink
+              class="navbar-brand-text align-middle"
+              :class="$route.path.startsWith('/badge') ? 'active' : ''"
+              to="/scrollybadge"
+            >
+              <i class="navbar-brand-text align-middle"></i> Quests
             </NuxtLink>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link" href="https://sns.scrolly.xyz" target="_blank">
-              <span class="navbar-brand-text align-middle">SNS</span>
-            </a>
           </li>
           <li class="nav-item">
             <NuxtLink class="nav-link" to="/elector">
