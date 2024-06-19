@@ -43,7 +43,7 @@ export default defineNuxtConfig({
       airdropApAddress: "", // chat token claim for APs
       airdropClaimDomainsAddress: "", // chat token claim for domain holders
       badge: {
-        isLive: true,
+        isLive: false,
         apiBaseUrl: "https://api.scrolly.xyz/api/badge/",
         badgeContractAddress: "0x89b27e836BF46275e6D87cD55461D34ABaade51A",
         defaultBadgeImage: "/skelly/sticker.svg",

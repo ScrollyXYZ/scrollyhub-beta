@@ -38,7 +38,12 @@
               <span class="navbar-brand-text align-middle">Swap</span>
             </NuxtLink>
           </li>
-          <!-- Badge -->
+          <li class="nav-item">
+            <NuxtLink class="nav-link" to="/scrollybadge">
+              <span class="navbar-brand-text align-middle">Quests</span>
+            </NuxtLink>
+          </li>
+          <!-- Badge 
           <li class="nav-item" v-if="$config.badge.isLive">
             <NuxtLink
               class="navbar-brand-text align-middle"
@@ -47,7 +52,7 @@
             >
               <i class="navbar-brand-text align-middle"></i> Quests
             </NuxtLink>
-          </li>
+          </li>-->
           <li class="nav-item">
             <NuxtLink class="nav-link" to="/elector">
               <span class="navbar-brand-text align-middle">Vote</span>
