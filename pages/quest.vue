@@ -52,12 +52,6 @@
         community activities.
       </p>
 
-      <div class="view-toggle">
-        <button @click="setView('grid')" :class="{ active: view === 'grid' }">
-          Grid View
-        </button>
-      </div>
-
       <div v-if="view === 'grid'" class="grid-view">
         <div
           v-for="category in questStore.filteredCategories"

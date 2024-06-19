@@ -130,13 +130,13 @@ export const useQuestStore = defineStore("questStore", {
         quests: [
           {
             id: 6,
-            title: "Equilibre Memes Contestoor",
+            title: "Equilibre Memes Contestor",
             description:
               "Participate in the meme contest, share, and create as part of our community spirit. Regardless of winning, sharing and creating is what matters.",
             points: 50,
             validated: false,
             tbd: false,
-            ended: true, // Marked as ended
+            ended: false, // Marked as ended
             image: "http://scrolly.xyz/img/quests/ScrollyMemeConstest.png",
             contractAddress: "0x166E1FB48160D066C4724191463F4d3b298B3bbb",
             functions: {
