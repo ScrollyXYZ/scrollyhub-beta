@@ -659,6 +659,10 @@ a:hover {
   border-style: solid;
 }
 
+.modal-content {
+  border-color: var(--bs-modal-bg);
+}
+
 /* Desktop only */
 @media screen and (min-width: 1000px) {
   .navbar-expand-lg .navbar-nav .nav-link {

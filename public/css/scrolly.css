@@ -49,7 +49,7 @@
   --bs-danger-text: #b02a37;
   --bs-light-text: #6c757d;
   --bs-dark-text: #495057;
-  --bs-primary: #FFFFFF;
+  --bs-primary: #ffffff;
   --bs-primary-bg-subtle: #cfe2ff;
   --bs-secondary-bg-subtle: #f8f9fa;
   --bs-success-bg-subtle: #d1e7dd;
@@ -164,9 +164,12 @@
 }
 
 [data-bs-theme="scrolly"].btn-primary:hover {
-  background-color: var(--bs-purple); 
+  background-color: var(--bs-purple);
 }
 
 [data-bs-theme="scrolly"] .quest-page {
   background: #f5f5f5;
+}
+[data-bs-theme="light"] .modal-content {
+  background-color: var(--bs-mode) !important;
 }

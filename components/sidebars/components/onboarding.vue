@@ -54,18 +54,10 @@ export default {
       },
       {
         title: "",
-        img: "http://scrolly.xyz/onboarding/2.png",
-        alt: "Update Icon",
-        description: "",
-        buttonText: "Update",
-        link: "/profile",
-      },
-      {
-        title: "",
         img: "http://scrolly.xyz/onboarding/3.png",
         alt: "Progress Icon",
         description: "",
-        buttonText: "GM",
+        buttonText: "Say GM",
         link: "/",
       },
     ]);
