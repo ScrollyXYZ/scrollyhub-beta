@@ -170,6 +170,3 @@
 [data-bs-theme="scrolly"] .quest-page {
   background: #f5f5f5;
 }
-[data-bs-theme="light"] .modal-content {
-  background-color: var(--bs-mode) !important;
-}

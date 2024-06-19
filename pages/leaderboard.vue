@@ -503,6 +503,7 @@ export default {
   width: 80%;
   max-width: 500px;
   text-align: center;
+  background: var(--bs-mode);
 }
 
 .modal-button {

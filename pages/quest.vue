@@ -595,7 +595,7 @@ export default {
   color: #333;
   max-width: 400px;
   width: 80%;
-  z-index: 2001;
+  z-index: 2500;
 }
 
 .modal-content h3 {

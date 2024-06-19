@@ -135,6 +135,3 @@
 [data-bs-theme="light"] .bg-mode {
   background-color: var(--bs-mode) !important;
 }
-[data-bs-theme="light"] .modal-content {
-  background-color: var(--bs-mode) !important;
-}
