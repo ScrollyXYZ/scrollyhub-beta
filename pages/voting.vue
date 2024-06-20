@@ -233,15 +233,24 @@ export default {
       isVoteEnded: false,
       showMoreDetails: false,
       loading: true,
+      toast: null,
     };
   },
   async mounted() {
+    this.initializeToast();
     await this.loadProposal();
   },
   beforeDestroy() {
     clearInterval(this.timer);
   },
   methods: {
+    initializeToast() {
+      try {
+        this.toast = useToast();
+      } catch (error) {
+        console.error("Toastification could not be initialized:", error);
+      }
+    },
     async loadProposal() {
       const route = useRoute();
       const proposalId = parseInt(route.query.id);
@@ -347,7 +356,11 @@ export default {
       }
     },
     async castVote(proposalId, responseIndex) {
-      const toast = useToast();
+      if (!this.toast) {
+        console.error("Toastification not initialized.");
+        return;
+      }
+      const toast = this.toast;
       try {
         if (!window.ethereum) {
           alert(
@@ -413,7 +426,7 @@ export default {
     },
     truncatedDescription(description) {
       return description.length > 200
-        ? description.substring(0, 200) + "..."
+        ? description.substring(0, 200) + "... "
         : description;
     },
     toggleOptionDetails(index) {
