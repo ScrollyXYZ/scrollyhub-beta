@@ -434,11 +434,11 @@ export default {
     userTier() {
       const tiers = [
         { name: "Scrolly Baby", points: 1 },
-        { name: "Scrolly Novice", points: 333 },
-        { name: "Scrolly Explorer", points: 777 },
-        { name: "Scrolly Mapper", points: 1337 },
-        { name: "Carto Maestro", points: 2442 },
-        { name: "Grand Cartographer of Scrolly", points: 4200 },
+        { name: "Scrolly Novice", points: 667 },
+        { name: "Scrolly Explorer", points: 1221 },
+        { name: "Scrolly Mapper", points: 2442 },
+        { name: "Carto Maestro", points: 4200 },
+        { name: "Grand Cartographer of Scrolly", points: 6000 },
       ];
       const userPoints = this.balanceAp;
       let userTier = "Unknown";
