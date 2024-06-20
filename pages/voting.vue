@@ -202,12 +202,13 @@
     </div>
   </div>
 </template>
+
 <script>
 import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import ERC20ABI from "~/assets/abi/Erc20Abi.json";
-import { useToast, createToastInterface } from "vue-toastification";
+import { useToast } from "vue-toastification/dist/index.mjs";
 import votingInfoData from "~/assets/votingInfo.json";
 import { useRouter, useRoute } from "vue-router";
 
@@ -233,24 +234,15 @@ export default {
       isVoteEnded: false,
       showMoreDetails: false,
       loading: true,
-      toast: null,
     };
   },
   async mounted() {
-    this.initializeToast();
     await this.loadProposal();
   },
   beforeDestroy() {
     clearInterval(this.timer);
   },
   methods: {
-    initializeToast() {
-      try {
-        this.toast = useToast();
-      } catch (error) {
-        console.error("Toastification could not be initialized:", error);
-      }
-    },
     async loadProposal() {
       const route = useRoute();
       const proposalId = parseInt(route.query.id);
@@ -356,11 +348,6 @@ export default {
       }
     },
     async castVote(proposalId, responseIndex) {
-      if (!this.toast) {
-        console.error("Toastification not initialized.");
-        return;
-      }
-      const toast = this.toast;
       try {
         if (!window.ethereum) {
           alert(
@@ -381,7 +368,7 @@ export default {
         const tx = await votingContract.vote(proposalId, responseIndex);
         const receipt = await tx.wait();
         if (receipt.status === 1) {
-          toast("Vote successful!", {
+          this.toast("Vote successful!", {
             type: "success",
           });
           this.hasVoted = true;
@@ -392,7 +379,7 @@ export default {
           }, 3000);
           await this.fetchProposalDetails();
         } else {
-          toast("Transaction failed.", {
+          this.toast("Transaction failed.", {
             type: "error",
           });
         }
@@ -406,9 +393,9 @@ export default {
             "execution reverted:",
             "Error:",
           );
-          toast(extractMessage, { type: "error" });
+          this.toast(extractMessage, { type: "error" });
         } catch (e) {
-          toast("Transaction failed.", { type: "error" });
+          this.toast("Transaction failed.", { type: "error" });
         }
       } finally {
         this.isLoading = false;
@@ -452,8 +439,18 @@ export default {
       }
     },
   },
+  setup() {
+    const { address, signer } = useEthers();
+    const toast = useToast();
+    return {
+      address,
+      signer,
+      toast,
+    };
+  },
 };
 </script>
+
 <style scoped>
 .voting-container {
   padding: 20px;
