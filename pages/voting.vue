@@ -202,14 +202,12 @@
     </div>
   </div>
 </template>
-
 <script>
 import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import ERC20ABI from "~/assets/abi/Erc20Abi.json";
-import Toastification from "vue-toastification";
-const { useToast } = Toastification;
+import { useToast, createToastInterface } from "vue-toastification";
 import votingInfoData from "~/assets/votingInfo.json";
 import { useRouter, useRoute } from "vue-router";
 
@@ -368,36 +366,10 @@ export default {
         );
         this.isLoading = true;
         const tx = await votingContract.vote(proposalId, responseIndex);
-        const toastWait = toast(
-          {
-            component: WaitingToast,
-            props: {
-              text: "Please wait for your transaction to confirm. Click on this notification to see the transaction in the block explorer.",
-            },
-          },
-          {
-            type: "info",
-            onClick: () =>
-              window
-                .open(
-                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
-                  "_blank",
-                )
-                .focus(),
-          },
-        );
         const receipt = await tx.wait();
         if (receipt.status === 1) {
-          toast.dismiss(toastWait);
           toast("Vote successful!", {
             type: "success",
-            onClick: () =>
-              window
-                .open(
-                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
-                  "_blank",
-                )
-                .focus(),
           });
           this.hasVoted = true;
           this.userVoteChoice = responseIndex + 1;
@@ -407,16 +379,8 @@ export default {
           }, 3000);
           await this.fetchProposalDetails();
         } else {
-          toast.dismiss(toastWait);
           toast("Transaction failed.", {
             type: "error",
-            onClick: () =>
-              window
-                .open(
-                  this.$config.blockExplorerBaseUrl + "/tx/" + tx.hash,
-                  "_blank",
-                )
-                .focus(),
           });
         }
       } catch (e) {
@@ -477,7 +441,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .voting-container {
   padding: 20px;
