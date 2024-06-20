@@ -70,7 +70,7 @@ export const useQuestStore = defineStore("questStore", {
             id: 4,
             title: "Scrolly's Artist",
             description:
-              "Mint the Scrolly's Journey NFT Collection on the NFT Launchpad",
+              "Create your own NFT's collection on the NFT Launchpad to get this reward",
             points: 800,
             validated: false,
             tbd: false,
