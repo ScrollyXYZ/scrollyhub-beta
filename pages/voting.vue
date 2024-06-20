@@ -138,9 +138,8 @@
               {{ currentProposal.options[index].name }}:
               {{ getPercentage(vote) }}% ({{ formatEther(vote) }} votes)
             </p>
-            <template v-if="!isLoading && !isVoteEnded">
+            <template v-if="!isLoading && !isVoteEnded && !hasVoted">
               <button
-                v-if="!hasVoted"
                 @click="castVote(proposal.id, index)"
                 :disabled="!isEligible || isLoading"
                 class="vote-button"
@@ -163,10 +162,8 @@
           </div>
         </div>
         <p>Total Votes: {{ formatEther(totalVotes) }}</p>
-        <p v-if="isEligible">
-          Your Activity Points give you a voting bonus of: +{{
-            (multiplier / 10 - 1) * 100
-          }}%
+        <p v-if="isEligible && !hasVoted">
+          Your Mappy Points give you a voting power of: +{{ bonusPercentage }}%
         </p>
       </div>
 
@@ -234,6 +231,7 @@ export default {
       isVoteEnded: false,
       showMoreDetails: false,
       loading: true,
+      bonusPercentage: 0,
     };
   },
   async mounted() {
@@ -262,7 +260,7 @@ export default {
       await this.fetchProposalDetails();
       await this.checkEligibility();
       await this.checkHasVoted();
-      await this.fetchMultiplier();
+      await this.fetchActivityPoints();
       this.updateTimeRemaining();
       this.timer = setInterval(this.updateTimeRemaining, 1000);
       this.loading = false;
@@ -332,19 +330,44 @@ export default {
         console.error("Error checking if user has voted:", error);
       }
     },
-    async fetchMultiplier() {
+    async fetchActivityPoints() {
       try {
         const { address } = useEthers();
-        const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
-        const apContract = new ethers.Contract(
-          ACTIVITY_POINTS_CONTRACT_ADDRESS,
-          ERC20ABI,
-          provider,
-        );
-        const multiplier = await apContract.multiplier(address.value);
-        this.multiplier = parseInt(multiplier.toString(), 10);
+        console.log("Fetching activity points for address:", address.value);
+        const pointsWei = await this.getActivityPoints(address.value);
+        console.log("Activity points (Wei):", pointsWei.toString());
+        const points = parseFloat(ethers.utils.formatEther(pointsWei));
+        console.log("Activity points (Ether):", points);
+        this.calculateBonusPercentage(points);
       } catch (error) {
-        console.error("Error fetching multiplier:", error);
+        console.error("Error fetching activity points:", error);
+      }
+    },
+    async getActivityPoints(address) {
+      const provider = new ethers.providers.JsonRpcProvider(RPC_URL);
+      const apContract = new ethers.Contract(
+        ACTIVITY_POINTS_CONTRACT_ADDRESS,
+        [
+          // ABI snippet for the getPoints function
+          "function getPoints(address) view returns (uint256)",
+        ],
+        provider,
+      );
+      return await apContract.getPoints(address);
+    },
+    calculateBonusPercentage(points) {
+      if (points >= 4200) {
+        this.bonusPercentage = 300;
+      } else if (points >= 2442) {
+        this.bonusPercentage = 240;
+      } else if (points >= 1337) {
+        this.bonusPercentage = 210;
+      } else if (points >= 777) {
+        this.bonusPercentage = 170;
+      } else if (points >= 333) {
+        this.bonusPercentage = 130;
+      } else {
+        this.bonusPercentage = 100;
       }
     },
     async castVote(proposalId, responseIndex) {
@@ -450,7 +473,6 @@ export default {
   },
 };
 </script>
-
 <style scoped>
 .voting-container {
   padding: 20px;
