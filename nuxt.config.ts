@@ -116,6 +116,7 @@ export default defineNuxtConfig({
       previewImagePostNft: "/img/covers/cover-post-nft.png",
       previewImageProfile: "/img/covers/cover-profile.png",
       previewImageStake: "/img/covers/cover-stake.png",
+      previewVoting: "/img/covers/cover-vote.png",
       profileMintedPostIdsMax: 36, // max number of minted post ids to show in the profile page
       projectMetadataTitle:
         "Scrolly Hub | A Web3 Happy Place For The Scrolly Community",

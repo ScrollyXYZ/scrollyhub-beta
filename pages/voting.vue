@@ -8,7 +8,7 @@
       />
       <Meta
         property="og:image"
-        :content="$config.projectUrl + $config.previewImagePostNft"
+        :content="$config.projectUrl + $config.previewVoting"
       />
       <Meta
         property="og:description"
@@ -16,7 +16,7 @@
       />
       <Meta
         name="twitter:image"
-        :content="$config.projectUrl + $config.previewImagePostNft"
+        :content="$config.projectUrl + $config.previewVoting"
       />
       <Meta
         name="twitter:description"
