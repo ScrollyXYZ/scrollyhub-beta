@@ -8,7 +8,7 @@
       />
       <Meta
         property="og:image"
-        :content="$config.projectUrl + $config.previewVoting"
+        :content="$config.projectUrl + $config.previewImagePostNft"
       />
       <Meta
         property="og:description"
@@ -16,7 +16,7 @@
       />
       <Meta
         name="twitter:image"
-        :content="$config.projectUrl + $config.previewVoting"
+        :content="$config.projectUrl + $config.previewImagePostNft"
       />
       <Meta
         name="twitter:description"
@@ -163,7 +163,9 @@
         </div>
         <p>Total Votes: {{ formatEther(totalVotes) }}</p>
         <p v-if="isEligible && !hasVoted">
-          Your Mappy Points give you a voting power of: +{{ bonusPercentage }}%
+          Your Activity Points give you a voting bonus of: +{{
+            bonusPercentage
+          }}%
         </p>
       </div>
 
@@ -202,7 +204,7 @@
 
 <script>
 import { ethers } from "ethers";
-import { useEthers } from "vue-dapp";
+import { useEthers, useWallet } from "vue-dapp";
 import VotingTokenABI from "~/assets/abi/VotingToken.json";
 import ERC20ABI from "~/assets/abi/Erc20Abi.json";
 import { useToast } from "vue-toastification/dist/index.mjs";
@@ -236,6 +238,7 @@ export default {
   },
   async mounted() {
     await this.loadProposal();
+    this.checkConnection();
   },
   beforeDestroy() {
     clearInterval(this.timer);
@@ -264,6 +267,30 @@ export default {
       this.updateTimeRemaining();
       this.timer = setInterval(this.updateTimeRemaining, 1000);
       this.loading = false;
+    },
+    async checkConnection() {
+      const { address, isActivated } = useEthers();
+      if (isActivated) {
+        await this.fetchActivityPoints();
+        await this.checkEligibility();
+        await this.checkHasVoted();
+      }
+
+      watch(address, async (newAddress, oldAddress) => {
+        if (newAddress) {
+          await this.fetchActivityPoints();
+          await this.checkEligibility();
+          await this.checkHasVoted();
+        }
+      });
+
+      watch(isActivated, async (newStatus, oldStatus) => {
+        if (newStatus) {
+          await this.fetchActivityPoints();
+          await this.checkEligibility();
+          await this.checkHasVoted();
+        }
+      });
     },
     redirectToProposalsList() {
       const router = useRouter();
@@ -463,16 +490,20 @@ export default {
     },
   },
   setup() {
-    const { address, signer } = useEthers();
+    const { address, signer, isActivated } = useEthers();
+    const { disconnect } = useWallet();
     const toast = useToast();
     return {
       address,
       signer,
       toast,
+      isActivated,
+      disconnect,
     };
   },
 };
 </script>
+
 <style scoped>
 .voting-container {
   padding: 20px;
