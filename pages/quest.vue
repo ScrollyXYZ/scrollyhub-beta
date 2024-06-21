@@ -4,44 +4,12 @@
       <div class="leaderboard-link">
         <NuxtLink to="/leaderboard"></NuxtLink>
       </div>
-      <div class="points-display animate__animated animate__fadeInDown">
-        <div class="points-card">
-          <h2 class="mappy-point">Your Mappy Points</h2>
-          <p>{{ questStore.activityPoints }}</p>
-          <button @click="toggleDetails" class="details-button">
-            {{ showDetails ? "▲" : "▼" }} Details
-          </button>
-          <transition name="fade">
-            <div v-if="showDetails" class="points-details">
-              <div class="details-section">
-                <p class="details-header">Points Breakdown</p>
-                <p class="details-item">
-                  <strong>{{ pointsFromValidatedQuests }}</strong> points from
-                  completed quests
-                </p>
-                <p class="details-item">
-                  <strong>{{ pointsFromUserActivities }}</strong> points from
-                  user activities on the hub
-                </p>
-              </div>
-              <div class="details-section">
-                <p class="details-header">Points by Category</p>
-                <div
-                  v-for="category in questStore.questCategories"
-                  :key="category.category"
-                  class="details-item"
-                >
-                  <p>
-                    <strong>{{ category.category }}:</strong>
-                    {{ calculateCategoryPoints(category.quests) }} /
-                    {{ calculateMaxCategoryPoints(category.quests) }} points
-                  </p>
-                </div>
-              </div>
-            </div>
-          </transition>
-        </div>
-      </div>
+      <points-card
+        :activityPoints="questStore.activityPoints"
+        :pointsFromValidatedQuests="pointsFromValidatedQuests"
+        :pointsFromUserActivities="pointsFromUserActivities"
+        :questCategories="questStore.questCategories"
+      />
     </div>
     <div class="quest-management">
       <h2>Scrolly's Journey</h2>
@@ -51,7 +19,6 @@
         points by minting NFTs, creating collections, or participating in
         community activities.
       </p>
-
       <div v-if="view === 'grid'" class="grid-view">
         <div
           v-for="category in questStore.filteredCategories"
@@ -64,157 +31,52 @@
             }}/{{ category.quests.length }} completed)
           </h3>
           <div class="quest-path">
-            <div
+            <quest-card
               v-for="quest in category.quests"
               :key="quest.id"
-              class="quest-container"
-            >
-              <div
-                class="quest"
-                :class="{
-                  validated: quest.validated,
-                  notValidated: !quest.validated && !quest.tbd && !quest.ended,
-                  tbd: quest.tbd,
-                  ended: quest.ended,
-                  'validated-ended': quest.validated && quest.ended,
-                  flipped: questStore.hoveredQuest === quest.id,
-                }"
-                @mouseover="quest.tbd ? null : questStore.hoverQuest(quest.id)"
-                @mouseleave="questStore.hoverQuest(null)"
-                @click="
-                  quest.tbd ? null : questStore.showQuestDetails(quest.id)
-                "
-              >
-                <div class="quest-front">
-                  <div class="quest-image">
-                    <img :src="quest.image" alt="Quest Image" />
-                  </div>
-                  <div class="quest-title">{{ quest.title }}</div>
-                  <div
-                    v-if="!quest.validated && !quest.tbd && !quest.ended"
-                    class="points-box-front"
-                  >
-                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                    <span>{{ quest.points }} MP</span>
-                  </div>
-                </div>
-                <div class="quest-back">
-                  <div class="quest-title">{{ quest.title }}</div>
-                  <div class="points-box">
-                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                    <span>{{ quest.points }} MP</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              :quest="quest"
+              @showDetails="showQuestDetails"
+            />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Quest Details Modal -->
-    <div
+    <quest-details-modal
       v-if="questStore.showModal"
-      class="modal-overlay"
-      @click="questStore.closeModal"
-    >
-      <div class="modal-content animate__animated animate__zoomIn" @click.stop>
-        <h5>Quest: {{ questStore.selectedQuest.title }} Details</h5>
-        <div class="modal-body">
-          <p>
-            <span
-              :class="{
-                'validated-check':
-                  questStore.selectedQuest.validated &&
-                  !questStore.selectedQuest.ended,
-                'not-validated-check':
-                  !questStore.selectedQuest.validated &&
-                  !questStore.selectedQuest.ended,
-                'ended-check':
-                  questStore.selectedQuest.ended &&
-                  !questStore.selectedQuest.validated,
-                'validated-ended-check':
-                  questStore.selectedQuest.validated &&
-                  questStore.selectedQuest.ended,
-              }"
-            ></span>
-            Status:
-            {{
-              questStore.selectedQuest.validated &&
-              questStore.selectedQuest.ended
-                ? "Validated + Quest Ended"
-                : questStore.selectedQuest.validated
-                  ? "Validated"
-                  : questStore.selectedQuest.ended
-                    ? "Quest Ended"
-                    : "Not validated"
-            }}
-          </p>
-          <p
-            v-if="
-              questStore.selectedQuest.validated &&
-              questStore.selectedQuest.ended
-            "
-          >
-            Congratulations! You have successfully claimed
-            {{ questStore.selectedQuest.points }} Mappy Points and the quest has
-            ended!
-          </p>
-          <p v-else-if="questStore.selectedQuest.validated">
-            Congratulations! You have successfully claimed
-            {{ questStore.selectedQuest.points }} Mappy Points!
-          </p>
-          <p>Max points: {{ questStore.selectedQuest.points }} MP</p>
-          <p>Description: {{ questStore.questDetails }}</p>
-          <div
-            v-if="
-              questStore.selectedQuest.contractAddress &&
-              !questStore.selectedQuest.validated &&
-              !questStore.selectedQuest.ended
-            "
-          >
-            <p v-if="questStore.claimStatus">
-              You have already claimed this reward.
-            </p>
-            <p v-else-if="questStore.eligibilityStatus">
-              You are eligible to claim your reward!
-              <button class="claim-button" @click="claimReward">
-                Claim Reward
-              </button>
-            </p>
-            <p v-else>You are not eligible to claim this reward yet.</p>
-          </div>
-          <NuxtLink
-            v-if="questStore.selectedQuest.id === 1"
-            to="https://sns.scrolly.xyz/#/"
-            target="_blank"
-          >
-            Mint your domain
-          </NuxtLink>
-        </div>
-        <button @click="questStore.closeModal" class="modal-close-button">
-          Close
-        </button>
-      </div>
-    </div>
+      :quest="questStore.selectedQuest"
+      @close="questStore.closeModal"
+      @claim="claimReward"
+    />
+
     <!-- Popup Notification -->
-    <div v-if="questStore.showPopup" class="popup-notification">
-      {{ questStore.popupMessage }}
-    </div>
+    <transition name="fade">
+      <div v-if="questStore.showPopup" class="popup-notification">
+        {{ questStore.popupMessage }}
+      </div>
+    </transition>
   </div>
 </template>
 
 <script>
 import { useUserStore } from "~/store/user";
 import { useQuestStore } from "~/store/questStore";
+import PointsCard from "~/components/quests/PointsCard.vue";
+import QuestCard from "~/components/quests/QuestCard.vue";
+import QuestDetailsModal from "~/components/quests/QuestDetailsModal.vue";
 
 export default {
   name: "QuestPage",
+  components: {
+    PointsCard,
+    QuestCard,
+    QuestDetailsModal,
+  },
   data() {
     return {
-      view: "grid", // Default to grid view
-      hoverQuest: null, // Store hovered quest ID for tooltip
-      showDetails: false, // Show or hide points details
+      view: "grid",
+      showDetails: false,
     };
   },
   setup() {
@@ -454,226 +316,97 @@ export default {
   perspective: 1000px;
 }
 
-.quest {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
+.quest-card {
+  border: 1px solid #ddd;
   border-radius: 10px;
-  margin: 20px;
-  cursor: pointer;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  text-align: center;
-  width: 150px;
-  height: 150px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quest.flipped {
-  transform: rotateY(180deg);
-}
-
-.quest-front,
-.quest-back {
-  position: absolute;
-  backface-visibility: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
+  cursor: pointer;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  background: rgba(0, 0, 0, 0.7);
   padding: 10px;
+  margin: 20px;
+  width: 150px;
+  height: 150px;
 }
 
-.quest-back {
-  transform: rotateY(180deg);
-}
-
-.quest-image {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 10px;
+.quest-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
 .quest-image img {
   width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
+  height: auto;
 }
 
-.quest-title {
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 1em;
-  color: #fff;
-}
-
-.points-box-front {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-top: 10px;
-}
-
-.points-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-top: 10px;
-}
-
-.points-box img {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-
-.quest.validated {
-  border: 2px solid #4caf50;
-}
-
-.quest.notValidated {
-  border: 2px solid #f44336;
-}
-
-.quest.tbd {
-  border: 2px solid #9e9e9e;
-  background: rgba(158, 158, 158, 0.7);
-  cursor: not-allowed;
-}
-
-.quest.ended {
-  border: 2px solid #ff9800;
-}
-
-.quest.validated-ended {
-  border: 2px solid #4caf50;
-  background: linear-gradient(to right, #4caf50, #ff9800);
-}
-
-.claim-button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.claim-button:hover {
-  background-color: #45a049;
-}
-
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: var(--bs-mode);
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  color: #333;
-  max-width: 400px;
-  width: 80%;
-  z-index: 2500;
-}
-
-.modal-content h3 {
-  margin-top: 0;
-}
-
-.modal-body {
+.quest-info {
+  padding: 15px;
   text-align: left;
 }
 
-.validated-check::before {
-  content: "✔️";
-  color: green;
+.quest-info h3 {
+  margin: 0;
+  font-size: 1.2em;
 }
 
-.not-validated-check::before {
-  content: "❌";
-  color: red;
+.quest-info p {
+  margin: 5px 0;
+  color: #666;
 }
 
-.ended-check::before {
-  content: "⌛";
+.quest-status {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: #fff;
+}
+
+.validated .quest-status {
+  color: #4caf50;
+}
+
+.notValidated .quest-status {
+  color: #f44336;
+}
+
+.tbd .quest-status {
+  color: #9e9e9e;
+}
+
+.ended .quest-status {
   color: #ff9800;
 }
 
-.validated-ended-check::before {
-  content: "✔️⌛";
-  color: green;
+.badges {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
 }
 
-.modal-close-button {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
+.badge {
+  padding: 5px 10px;
   border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
-}
-
-.modal-close-button:hover {
-  background-color: #555;
-}
-
-.popup-notification {
-  position: fixed;
-  top: 50px;
-  right: 20px;
-  background: #333;
+  font-size: 0.8em;
   color: #fff;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 3000;
-  transition: opacity 0.3s ease-in-out;
 }
 
-.popup-notification-enter-active,
-.popup-notification-leave-active {
-  transition: opacity 0.5s;
+.badge-validated {
+  background-color: #4caf50;
 }
 
-.popup-notification-enter,
-.popup-notification-leave-to {
-  opacity: 0;
+.badge-ended {
+  background-color: #ff9800;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
+.badge-claimable {
+  background-color: #00bcd4;
 }
 
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.mappy-point {
-  color: var(--bs-black);
+.badge-not-claimable {
+  background-color: #9e9e9e;
 }
 </style>

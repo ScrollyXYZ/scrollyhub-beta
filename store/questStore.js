@@ -1,6 +1,5 @@
 import { defineStore } from "pinia";
 import { ethers } from "ethers";
-import { useUserStore } from "~/store/user";
 import { getActivityPoints } from "~/utils/balanceUtils";
 
 export const useQuestStore = defineStore("questStore", {
@@ -11,8 +10,8 @@ export const useQuestStore = defineStore("questStore", {
     questDetails: "",
     hoveredQuest: null,
     selectedCategory: "all",
-    claimStatus: null,
-    eligibilityStatus: null,
+    claimStatus: false,
+    eligibilityStatus: false,
     showPopup: false,
     popupMessage: "",
     questCategories: [
@@ -156,7 +155,7 @@ export const useQuestStore = defineStore("questStore", {
       }
       if (state.selectedCategory === "latest") {
         const allQuests = state.questCategories.flatMap(
-          (category) => category.quests,
+          (category) => category.quests
         );
         const latestQuests = allQuests.sort((a, b) => b.id - a.id).slice(0, 3);
         return [
@@ -167,7 +166,7 @@ export const useQuestStore = defineStore("questStore", {
         ];
       }
       return state.questCategories.filter(
-        (category) => category.category === state.selectedCategory,
+        (category) => category.category === state.selectedCategory
       );
     },
     getCompletedQuests: (state) => (quests) => {
@@ -180,41 +179,60 @@ export const useQuestStore = defineStore("questStore", {
       await this.updateData();
     },
     async updateData() {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
       await this.checkQuestConditions();
     },
     async fetchActivityPoints() {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
+      if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
         this.activityPoints = await getActivityPoints(userAddress, signer);
+      } else {
+        console.error("Invalid user address:", userAddress);
       }
     },
     async checkDomainOwnership() {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
+      if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
           "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
           ["function balanceOf(address owner) view returns (uint256)"],
-          provider,
+          provider
         );
         const balance = await contract.balanceOf(userAddress);
-
         let points = 169 * Math.min(balance.toNumber(), 3);
         const hubQuests = this.questCategories.find(
-          (category) => category.category === "Social Hub Quests",
+          (category) => category.category === "Social Hub Quests"
         );
         const quest = hubQuests.quests.find((q) => q.id === 1);
         quest.points = points;
         quest.validated = balance.toNumber() > 0;
+      } else {
+        console.error("Invalid user address:", userAddress);
       }
     },
     async checkQuestConditions() {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       const userAddress = this.userStore.getCurrentUserAddress;
-      if (userAddress) {
+      if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
 
         for (const category of this.questCategories) {
@@ -227,11 +245,13 @@ export const useQuestStore = defineStore("questStore", {
                 [
                   `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
                 ],
-                provider,
+                provider
               );
-              const eligible =
-                await contract[quest.functions.checkEligibility](userAddress);
+              const eligible = await contract[quest.functions.checkEligibility](
+                userAddress
+              );
               quest.validated = eligible;
+              console.log(`Quest ${quest.id} eligibility: ${eligible}`);
             } else if (quest.functions) {
               const contract = new ethers.Contract(
                 quest.contractAddress,
@@ -239,69 +259,111 @@ export const useQuestStore = defineStore("questStore", {
                   `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
                   `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
                 ],
-                provider,
+                provider
               );
-              const hasClaimed =
-                await contract[quest.functions.hasUserClaimed](userAddress);
+              const hasClaimed = await contract[quest.functions.hasUserClaimed](
+                userAddress
+              );
+              const isEligible = await contract[quest.functions.isEligible](
+                userAddress
+              );
+
               quest.validated = hasClaimed;
-              if (!hasClaimed) {
-                quest.eligible =
-                  await contract[quest.functions.isEligible](userAddress);
-              } else {
-                quest.eligible = false;
-              }
+              quest.eligible = isEligible;
+
+              this.claimStatus = hasClaimed;
+              this.eligibilityStatus = isEligible;
+
+              console.log(`Quest ${quest.id} hasClaimed: ${hasClaimed}`);
+              console.log(`Quest ${quest.id} isEligible: ${isEligible}`);
+              console.log("Updated claimStatus:", this.claimStatus);
+              console.log("Updated eligibilityStatus:", this.eligibilityStatus);
             }
           }
         }
+      } else {
+        console.error("Invalid user address:", userAddress);
       }
     },
     async checkEligibilityAndClaimStatus(contractAddress, functions) {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       const userAddress = this.userStore.getCurrentUserAddress;
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        [
-          `function ${functions.isEligible}(address _user) external view returns (bool)`,
-          `function ${functions.hasUserClaimed}(address _user) external view returns (bool)`,
-          `function ${functions.claim}(address _user) external`,
-        ],
-        signer,
-      );
+      if (ethers.utils.isAddress(userAddress)) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          [
+            `function ${functions.isEligible}(address _user) external view returns (bool)`,
+            `function ${functions.hasUserClaimed}(address _user) external view returns (bool)`,
+            `function ${functions.claim}(address _user) external`,
+          ],
+          signer
+        );
 
-      const hasClaimed = await contract[functions.hasUserClaimed](userAddress);
-      if (hasClaimed) {
-        this.claimStatus = true;
-        this.eligibilityStatus = false;
+        try {
+          const hasClaimed = await contract[functions.hasUserClaimed](
+            userAddress
+          );
+          const isEligible = await contract[functions.isEligible](userAddress);
+
+          if (hasClaimed) {
+            this.claimStatus = true;
+            this.eligibilityStatus = false;
+          } else {
+            this.claimStatus = false;
+            this.eligibilityStatus = isEligible;
+          }
+          console.log(
+            "Updated claimStatus in checkEligibilityAndClaimStatus:",
+            this.claimStatus
+          );
+          console.log(
+            "Updated eligibilityStatus in checkEligibilityAndClaimStatus:",
+            this.eligibilityStatus
+          );
+        } catch (error) {
+          console.error("Error checking eligibility and claim status:", error);
+        }
       } else {
-        this.claimStatus = false;
-        this.eligibilityStatus =
-          await contract[functions.isEligible](userAddress);
+        console.error("Invalid user address:", userAddress);
       }
     },
     async claimReward(contractAddress, functions, points) {
+      if (!this.userStore) {
+        console.error("User store is not defined");
+        return;
+      }
       const userAddress = this.userStore.getCurrentUserAddress;
-      const provider = new ethers.providers.Web3Provider(window.ethereum);
-      const signer = provider.getSigner();
-      const contract = new ethers.Contract(
-        contractAddress,
-        [`function ${functions.claim}(address _user) external`],
-        signer,
-      );
+      if (ethers.utils.isAddress(userAddress)) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const signer = provider.getSigner();
+        const contract = new ethers.Contract(
+          contractAddress,
+          [`function ${functions.claim}(address _user) external`],
+          signer
+        );
 
-      try {
-        await contract[functions.claim](userAddress);
-        this.claimStatus = true;
-        this.showPopupMessage(
-          `Congratulations! You have successfully claimed ${points} Mappy Points!`,
-        );
-        setTimeout(async () => {
-          await this.updateData(); // Refresh quest status
-        }, 5000);
-      } catch (error) {
-        this.showPopupMessage(
-          "There was an issue processing your claim. Please try again later.",
-        );
+        try {
+          await contract[functions.claim](userAddress);
+          this.claimStatus = true;
+          this.showPopupMessage(
+            `Congratulations! You have successfully claimed ${points} Mappy Points!`
+          );
+          setTimeout(async () => {
+            await this.updateData(); // Refresh quest status
+          }, 5000);
+        } catch (error) {
+          console.error("Error claiming reward:", error);
+          this.showPopupMessage(
+            "There was an issue processing your claim. Please try again later."
+          );
+        }
+      } else {
+        console.error("Invalid user address:", userAddress);
       }
     },
     showPopupMessage(message) {
@@ -325,25 +387,41 @@ export const useQuestStore = defineStore("questStore", {
             await this.checkDomainOwnership();
           } else if (quest.id === 6) {
             const userAddress = this.userStore.getCurrentUserAddress;
-            const provider = new ethers.providers.Web3Provider(window.ethereum);
-            const contract = new ethers.Contract(
-              quest.contractAddress,
-              [
-                `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
-                `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
-              ],
-              provider,
-            );
-            this.claimStatus =
-              await contract[quest.functions.checkEligibility](userAddress);
-            quest.validated =
-              await contract[quest.functions.hasUserClaimed](userAddress);
+            if (ethers.utils.isAddress(userAddress)) {
+              const provider = new ethers.providers.Web3Provider(
+                window.ethereum
+              );
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
+                  `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
+                ],
+                provider
+              );
+              this.claimStatus = await contract[
+                quest.functions.checkEligibility
+              ](userAddress);
+              quest.validated = await contract[quest.functions.hasUserClaimed](
+                userAddress
+              );
+            } else {
+              console.error("Invalid user address:", userAddress);
+            }
           } else {
             await this.checkEligibilityAndClaimStatus(
               quest.contractAddress,
-              quest.functions,
+              quest.functions
             );
           }
+          console.log(
+            "Updated claimStatus in showQuestDetails:",
+            this.claimStatus
+          );
+          console.log(
+            "Updated eligibilityStatus in showQuestDetails:",
+            this.eligibilityStatus
+          );
           break;
         }
       }

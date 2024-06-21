@@ -495,16 +495,15 @@ import { useToast } from "vue-toastification/dist/index.mjs";
 import { useNotificationsStore } from "~/store/notifications";
 import { useSidebarStore } from "~/store/sidebars";
 import { useUserStore } from "~/store/user";
+import { useQuestStore } from "~/store/questStore";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
-import { getActivityPoints } from "~/utils/balanceUtils";
-import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
   name: "DefaultSidebarContent",
   components: {
     ProfileImage,
   },
-  props: ["isMobile", "lSidebar"],
+  props: ["isMobile", "lSidebar", "address"],
   computed: {
     getUserAp() {
       if (this.userStore.getCurentUserActivityPoints > 0) {
@@ -527,8 +526,6 @@ export default {
     },
   },
   methods: {
-    getActivityPoints,
-    getTextWithoutBlankCharacters,
     closeLeftSidebar() {
       if (this.isMobile) {
         this.lSidebar.hide();
@@ -536,6 +533,7 @@ export default {
         this.sidebarStore.setMainContent(true);
       }
     },
+    getTextWithoutBlankCharacters,
   },
   setup() {
     const { address, isActivated } = useEthers();
