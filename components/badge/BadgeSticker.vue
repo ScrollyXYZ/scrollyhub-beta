@@ -1,6 +1,7 @@
 <template>
-  <div class="badge-sticker-container">
-    <div class="tooltip-container">
+  <div class="badge-sticker-container" v-if="showContainer">
+    <div class="tooltip-container" v-if="showPopup">
+      <button class="close-button" @click="closeContainer">×</button>
       <img src="/skelly/tooltip.svg" alt="Tooltip" class="tooltip-img" />
       <span class="rainbow-text">You are eligible to mint the Scrolly Badge</span>
       <NuxtLink to="/badge">
@@ -16,6 +17,17 @@
 <script>
 export default {
   name: "BadgeSticker",
+  data() {
+    return {
+      showPopup: true,
+      showContainer: true
+    }
+  },
+  methods: {
+    closeContainer() {
+      this.showContainer = false;
+    }
+  }
 }
 </script>
 
@@ -85,6 +97,17 @@ export default {
   box-sizing: border-box; 
 }
 
+.close-button {
+  position: absolute;
+  color: black;
+  top: 5px;
+  right: 5px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+}
+
 /* Mobile only */
 @media only screen and (max-width: 767px) {
   .badge-sticker-container {
@@ -95,5 +118,6 @@ export default {
     transform: translateX(-50%);
     right: auto;
   }
+
 }
 </style>
