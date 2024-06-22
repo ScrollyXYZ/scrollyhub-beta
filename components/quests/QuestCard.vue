@@ -4,37 +4,21 @@
     :class="questStatusClasses"
     @click="quest.tbd ? null : showDetails(quest)"
   >
-    <div class="quest-image">
-      <img :src="quest.image" alt="Quest Image" />
-    </div>
-    <div class="quest-info">
-      <div class="points-display">
-        <img
-          src="~/assets/img/icon/mappy_icon.png"
-          alt="Mappy Points"
-          class="mappy-icon"
-        />
-        <span class="points-text">{{ quest.points }} MP</span>
+    <div class="quest-card-inner">
+      <div class="quest-image">
+        <img :src="quest.image" alt="Quest Image" />
       </div>
-      <div class="badges">
-        <span v-if="quest.validated" class="badge badge-validated"
-          >Completed</span
-        >
-        <span v-if="!quest.validated && quest.ended" class="badge badge-ended"
-          >Ended</span
-        >
-        <span
-          v-if="!quest.validated && isEligible"
-          class="badge badge-claimable"
-          >Claimable</span
-        >
-        <span
-          v-if="!quest.validated && !isEligible && !quest.ended"
-          class="badge badge-not-claimable"
-          >Not Claimable</span
-        >
+      <div class="quest-info">
+        <h3 class="quest-title">{{ quest.title }}</h3>
+        <div class="points-display">
+          <img
+            src="~/assets/img/icon/mappy_icon.png"
+            alt="Mappy Points"
+            class="mappy-icon"
+          />
+          <span class="points-text">{{ quest.points }} MP</span>
+        </div>
       </div>
-      <span class="quest-status">{{ getQuestStatusText(quest) }}</span>
     </div>
   </div>
 </template>
@@ -64,8 +48,6 @@ export default {
       return this.quest.validated;
     },
     questStatusClasses() {
-      console.log("eligibilityStatus:", this.eligibilityStatus);
-      console.log("claimStatus:", this.claimStatus);
       return {
         claimed: this.hasUserClaimed,
         claimable: !this.quest.validated && this.isEligible,
@@ -76,13 +58,6 @@ export default {
     },
   },
   methods: {
-    getQuestStatusText(quest) {
-      if (!quest) return "";
-      if (quest.validated && quest.ended) return "Validated + Quest Ended";
-      if (quest.validated) return "Validated";
-      if (quest.ended) return "Quest Ended";
-      return "Not validated";
-    },
     showDetails(quest) {
       this.$emit("showDetails", quest);
     },
@@ -92,25 +67,80 @@ export default {
 
 <style scoped>
 .quest-card {
-  border: none; /* Supprimer la bordure par défaut */
+  border: none;
   border-radius: 10px;
   overflow: hidden;
-  display: flex;
-  flex-direction: column;
+  display: inline-block;
   cursor: pointer;
   transition:
     transform 0.3s,
-    box-shadow 0.3s;
+    box-shadow 0.3s,
+    width 0.3s,
+    height 0.3s;
   background: rgba(0, 0, 0, 0.7);
   padding: 10px;
-  margin: 20px;
   width: 150px;
   height: 150px;
+  position: relative;
 }
 
 .quest-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  transform: scale(1.2);
+  z-index: 10;
+}
+
+.quest-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.quest-image img {
+  width: 100%;
+  height: auto;
+}
+
+.quest-info {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.quest-card:hover .quest-info {
+  opacity: 1;
+}
+
+.quest-title {
+  margin: 0;
+  font-size: 1.2em;
+  color: #fff;
+}
+
+.points-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.mappy-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
+.points-text {
+  font-size: 1.1em;
+  color: #fff;
 }
 
 .claimed {
@@ -127,77 +157,5 @@ export default {
 
 .greyed {
   filter: grayscale(100%);
-}
-
-.quest-image img {
-  width: 100%;
-  height: auto;
-}
-
-.quest-info {
-  padding: 15px;
-  text-align: left;
-}
-
-.quest-info h3 {
-  margin: 0;
-  font-size: 1.2em;
-}
-
-.quest-info p {
-  margin: 5px 0;
-  color: #666;
-}
-
-.quest-status {
-  display: block;
-  margin-top: 10px;
-  font-size: 0.9em;
-  color: #fff;
-}
-
-.validated .quest-status {
-  color: #4caf50;
-}
-
-.notValidated .quest-status {
-  color: #f44336;
-}
-
-.tbd .quest-status {
-  color: #9e9e9e;
-}
-
-.ended .quest-status {
-  color: #ff9800;
-}
-
-.badges {
-  display: flex;
-  gap: 5px;
-  margin-top: 10px;
-}
-
-.badge {
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.8em;
-  color: #fff;
-}
-
-.badge-validated {
-  background-color: #4caf50;
-}
-
-.badge-ended {
-  background-color: #ff9800;
-}
-
-.badge-claimable {
-  background-color: #00bcd4;
-}
-
-.badge-not-claimable {
-  background-color: #9e9e9e;
 }
 </style>
