@@ -131,6 +131,8 @@ import { getActivityPoints } from "~/utils/balanceUtils";
 import { useUserStore } from "~/store/user";
 import { useThemeStore } from "~/store/theme";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
+import { getDomainName } from "~/utils/domainUtils";
+import { fetchUsername, storeUsername } from "~/utils/storageUtils";
 
 const orbis = new Orbis();
 
@@ -174,6 +176,25 @@ export default {
           const profileResponse = await orbis.getProfile(did);
           if (profileResponse.status === 200) {
             profile = profileResponse.data.details.profile;
+            profile.username = profile.username || address; // Ensure username fallback
+          }
+        }
+
+        // Check if domain is available
+        const storedDomain = fetchUsername(window, address);
+
+        if (storedDomain) {
+          profile.username = storedDomain;
+        } else {
+          let provider = new ethers.providers.JsonRpcProvider(
+            process.env.VUE_APP_INFURA_URL,
+          );
+
+          const domainName = await getDomainName(address, provider);
+
+          if (domainName) {
+            profile.username = domainName + ".scrolly";
+            storeUsername(window, address, profile.username);
           }
         }
       } catch (error) {
@@ -315,7 +336,7 @@ export default {
           }));
           totalPages.value = Math.ceil(leaderboard.value.length / itemsPerPage);
           await fetchUserRank();
-          await fetchUserProfiles();
+          await fetchUserProfiles(); // Fetch profiles immediately on mount
           paginateLeaderboard();
         } catch (error) {
           console.error("Error fetching leaderboard data:", error);
@@ -362,6 +383,7 @@ definePageMeta({
   layout: "quests",
 });
 </script>
+
 <style scoped>
 .leaderboard-container {
   margin: 0 auto;
