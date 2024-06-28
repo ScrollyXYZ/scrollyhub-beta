@@ -7,46 +7,39 @@
           Find answers to common questions about Scrolly Badges, how to earn
           them, their benefits, and more.
         </p>
-        <div class="toggle-container">
-          <input type="checkbox" id="toggle" v-model="showAll" />
-          <label for="toggle" class="slider"></label>
-          <span class="label-text">{{
-            showAll ? "Show All" : "Collapse All"
-          }}</span>
-        </div>
       </div>
     </header>
 
-    <main class="main-content">
-      <section class="faq-section box">
-        <div class="faq-frame">
-          <h2 class="faq-header">Frequently Asked Questions</h2>
-          <div class="faq">
-            <div
-              class="faq-category"
-              v-for="(category, index) in faqData"
-              :key="index"
-            >
-              <button @click="toggleCategory(index)" class="category-title">
-                {{ category.title }}
-              </button>
-              <hr class="category-separator" />
-              <div v-if="showAll || activeCategory === index">
-                <details
-                  v-for="(item, idx) in category.items"
-                  :key="idx"
-                  class="faq-item"
-                  @toggle="handleToggle($event, index, idx)"
-                >
-                  <summary class="faq-question">{{ item.question }}</summary>
-                  <p class="faq-answer">{{ item.answer }}</p>
-                </details>
-              </div>
+    <section class="faq-section">
+      <div class="faq-frame">
+        <div class="faq">
+          <div
+            class="faq-category"
+            v-for="(category, index) in faqData"
+            :key="index"
+          >
+            <button @click="toggleCategory(index)" class="category-title">
+              {{ category.title }}
+              <span
+                class="toggle-icon"
+                :class="{ open: activeCategory === index }"
+              ></span>
+            </button>
+            <div v-if="showAll || activeCategory === index">
+              <details
+                v-for="(item, idx) in category.items"
+                :key="idx"
+                class="faq-item"
+                @toggle="handleToggle($event, index, idx)"
+              >
+                <summary class="faq-question">{{ item.question }}</summary>
+                <p class="faq-answer">{{ item.answer }}</p>
+              </details>
             </div>
           </div>
         </div>
-      </section>
-    </main>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -54,7 +47,7 @@
 import { useThemeStore } from "~/store/theme";
 
 export default {
-  layout: "quests",
+  name: "FAQPage",
   data() {
     return {
       showAll: false,
@@ -210,7 +203,7 @@ export default {
         this.activeDetail = { category: categoryIndex, item: itemIndex };
         this.$nextTick(() => {
           const detailsElements = document.querySelectorAll(".faq-item");
-          detailsElements.forEach((detail, index) => {
+          detailsElements.forEach((detail) => {
             if (detail !== event.target) {
               detail.removeAttribute("open");
             }
@@ -259,22 +252,9 @@ definePageMeta({
 }
 
 .faq-frame {
-  background-color: rgba(245, 245, 245, 0.9);
   padding: 20px;
   border-radius: 10px;
   overflow: hidden;
-}
-
-.details {
-  margin: 0.5rem 0;
-  cursor: pointer;
-  padding: 10px;
-  transition: background-color 0.3s ease-in-out;
-  max-height: none;
-}
-.dark-mode .faq-frame {
-  background-color: rgba(50, 50, 50, 0.8);
-  color: rgba(220, 220, 220, 0.9);
 }
 
 .faq-title,
@@ -296,6 +276,32 @@ definePageMeta({
   width: 100%;
   padding: 0.5rem;
   cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--accordion-bg);
+  border-radius: 5px;
+  margin-bottom: 10px;
+  transition:
+    background-color 0.3s,
+    transform 0.3s;
+}
+
+.category-title:hover {
+  background: var(--accordion-hover-bg);
+  transform: translateY(-2px);
+}
+
+.toggle-icon {
+  transition: transform 0.3s;
+}
+
+.toggle-icon::after {
+  content: "▼";
+}
+
+.toggle-icon.open::after {
+  content: "▲";
 }
 
 .faq-question {
@@ -348,53 +354,6 @@ details[open] summary::after {
   margin: 20px 0;
 }
 
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.toggle-container input {
-  display: none;
-}
-
-.toggle-container .slider {
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.toggle-container .slider::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background-color: #fff;
-  border-radius: 50%;
-  transition: transform 0.3s;
-}
-
-.toggle-container input:checked + .slider {
-  background-color: var(--primary-color);
-}
-
-.toggle-container input:checked + .slider::before {
-  transform: translateX(26px);
-}
-
-.toggle-container .label-text {
-  margin-left: 10px;
-  font-size: 14px;
-  font-weight: bold;
-}
-
 /* Light Mode Styles */
 .faq-container:not(.dark-mode),
 .header-section:not(.dark-mode),
@@ -402,6 +361,8 @@ details[open] summary::after {
   --card-bg: rgba(255, 255, 255, 0.9);
   --card-text: #000000;
   --primary-color: #007bff;
+  --accordion-bg: #f8f9fa;
+  --accordion-hover-bg: #e9ecef;
 }
 
 /* Dark Mode Styles */
@@ -411,90 +372,7 @@ details[open] summary::after {
   --card-bg: rgba(30, 30, 30, 0.9);
   --card-text: #e0e0e0;
   --primary-color: #4caf50;
-}
-
-.faq-title,
-.faq-intro,
-.faq-header {
-  color: var(--card-text);
-}
-
-.dark-mode .category-title {
-  color: var(--card-text);
-}
-
-.dark-mode .faq-question {
-  color: var(--card-text);
-}
-
-.dark-mode .faq-answer {
-  color: var(--card-text);
-  background-color: rgba(70, 70, 70, 0.9);
-}
-
-.details[open] .faq-answer {
-  animation: fadeIn 0.5s;
-  background-color: rgba(245, 245, 245, 0.9);
-}
-
-.details[open] summary::after {
-  content: " \25B2";
-}
-
-.details summary::after {
-  content: " \25BC";
-}
-
-.category-separator {
-  height: 2px;
-  background-color: var(--primary-color);
-  margin: 20px 0;
-}
-
-.toggle-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-top: 10px;
-}
-
-.toggle-container input {
-  display: none;
-}
-
-.toggle-container .slider {
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: background-color 0.3s;
-}
-
-.toggle-container .slider::before {
-  content: "";
-  position: absolute;
-  top: 2px;
-  left: 2px;
-  width: 20px;
-  height: 20px;
-  background-color: #fff;
-  border-radius: 50%;
-  transition: transform 0.3s;
-}
-
-.toggle-container input:checked + .slider {
-  background-color: var(--primary-color);
-}
-
-.toggle-container input:checked + .slider::before {
-  transform: translateX(26px);
-}
-
-.toggle-container .label-text {
-  margin-left: 10px;
-  font-size: 14px;
-  font-weight: bold;
+  --accordion-bg: #3a3b3c;
+  --accordion-hover-bg: #484a4d;
 }
 </style>

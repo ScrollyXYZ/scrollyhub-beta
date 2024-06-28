@@ -58,9 +58,9 @@
     </div>
     <hr class="separator" />
     <NuxtLink
-      to="/scrollybadge"
+      to="/dashboard"
       class="list-group-item cursor-pointer hover-color bg-light border-0"
-      :class="$route.path === '/scrollybadge' ? 'active' : ''"
+      :class="$route.path === '/dashboard' ? 'active' : ''"
       @click="closeLeftSidebar"
     >
       <i class="fas fa-info-circle"></i> Badge Infos

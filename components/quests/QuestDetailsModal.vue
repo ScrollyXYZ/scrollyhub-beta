@@ -84,7 +84,7 @@ export default {
     // Simulate loading state for the eligibility check
     setTimeout(() => {
       loadingStatus.value = false;
-    }, 2000); // Replace with actual async call
+    }, 1000); // Replace with actual async call
 
     return {
       isDarkMode,

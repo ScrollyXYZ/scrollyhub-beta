@@ -1,61 +1,55 @@
 <template>
   <div
     :class="[
-      'quest-page',
+      'quest-page-custom',
       { 'dark-mode': isDarkMode, 'light-mode': !isDarkMode },
     ]"
   >
-    <div class="quest-header">
-      <div class="scrolly-journey">
-        <h2
-          :class="{
-            'dark-mode-text': isDarkMode,
-            'light-mode-text': !isDarkMode,
-          }"
+    <div class="quest-header-custom">
+      <div class="scrolly-journey-custom">
+        <div
+          :class="[
+            'scrolly-journey-title-custom',
+            {
+              'dark-mode-text-custom': isDarkMode,
+              'light-mode-text-custom': !isDarkMode,
+            },
+          ]"
         >
           Scrolly's Journey
-        </h2>
+        </div>
         <p
-          :class="{
-            'dark-mode-text': isDarkMode,
-            'light-mode-text': !isDarkMode,
-          }"
-          class="subtitle"
+          :class="[
+            'subtitle-custom',
+            {
+              'dark-mode-text-custom': isDarkMode,
+              'light-mode-text-custom': !isDarkMode,
+            },
+          ]"
         >
           The journey has just begun
         </p>
       </div>
     </div>
-    <div class="quest-management">
-      <div v-if="view === 'grid'" class="grid-view">
+    <div class="quest-management-custom">
+      <div v-if="view === 'grid'" class="grid-view-custom">
         <div
           v-for="category in questStore.filteredCategories"
           :key="category.category"
           :class="[
-            'quest-category',
+            'quest-category-custom',
             {
               'dark-mode-category': isDarkMode,
               'light-mode-category': !isDarkMode,
             },
           ]"
         >
-          <h3
-            :class="{
-              'dark-mode-text': isDarkMode,
-              'light-mode-text': !isDarkMode,
-            }"
-            class="category-title"
-          >
+          <div class="category-title-custom">
             {{ category.category }} ({{
               questStore.getCompletedQuests(category.quests)
             }}/{{ category.quests.length }} completed)
-          </h3>
-          <div
-            :class="[
-              'quest-path',
-              { 'dark-mode': isDarkMode, 'light-mode': !isDarkMode },
-            ]"
-          >
+          </div>
+          <div class="quest-path-custom">
             <quest-card
               v-for="quest in category.quests"
               :key="quest.id"
@@ -79,17 +73,18 @@
 
     <!-- Popup Notification -->
     <transition name="fade">
-      <div v-if="questStore.showPopup" class="popup-notification">
+      <div v-if="questStore.showPopup" class="popup-notification-custom">
         {{ questStore.popupMessage }}
       </div>
     </transition>
 
     <!-- Fixed Mappy Points Card -->
-    <div class="mappy-points-fixed">
+    <div class="mappy-points-fixed-custom">
       <points-card :activityPoints="questStore.activityPoints" />
     </div>
   </div>
 </template>
+
 <script>
 import { computed } from "vue";
 import { useUserStore } from "~/store/user";
@@ -116,7 +111,7 @@ export default {
     const userStore = useUserStore();
     const questStore = useQuestStore();
     const themeStore = useThemeStore();
-    const isDarkMode = computed(() => themeStore.getIsDarkMode);
+    const isDarkMode = computed(() => themeStore.isDarkMode);
 
     return {
       userStore,
@@ -199,10 +194,11 @@ definePageMeta({
   layout: "quests",
 });
 </script>
+
 <style scoped>
 @import "animate.css";
 
-.quest-page {
+.quest-page-custom {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -213,7 +209,7 @@ definePageMeta({
   position: relative;
 }
 
-.quest-header {
+.quest-header-custom {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -221,24 +217,24 @@ definePageMeta({
   text-align: center;
 }
 
-.scrolly-journey {
+.scrolly-journey-custom {
   width: 100%;
 }
 
-.scrolly-journey h2 {
+.scrolly-journey-title-custom {
   position: relative;
   font-size: 2em;
+  color: inherit;
 }
 
-.scrolly-journey h2::after {
-  content: url("/path/to/your/svg.svg"); /* URL of your SVG */
+.scrolly-journey-title-custom::after {
   position: absolute;
   top: -10px;
   left: -30px;
   opacity: 0.1; /* Adjust opacity for background effect */
 }
 
-.header-content {
+.header-content-custom {
   display: flex;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -247,14 +243,14 @@ definePageMeta({
   padding: 20px;
 }
 
-.mappy-points-fixed {
+.mappy-points-fixed-custom {
   position: fixed;
   top: 20px;
   right: 20px;
   z-index: 1000;
 }
 
-.quest-management {
+.quest-management-custom {
   flex: 1 1 auto;
   margin-top: 20px; /* Reduce top margin for better spacing */
   width: 100%;
@@ -262,32 +258,40 @@ definePageMeta({
   text-align: center;
 }
 
-.grid-view {
+.grid-view-custom {
   display: flex;
   flex-direction: column;
 }
 
-.quest-category {
+.quest-category-custom {
   margin-top: 20px;
   padding: 10px;
   border-radius: 10px;
-  transition: background-color 0.3s;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px; /* Space between categories */
 }
 
-.category-title {
+.category-title-custom {
   font-size: 1.5em;
   margin-bottom: 10px;
-  color: #333;
+  color: inherit;
 }
 
-.quest-path {
+.quest-path-custom {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  gap: 20px; /* Add space between quests */
 }
 
-.quest-card {
+.quest-card-custom {
   border: 1px solid #ddd;
   border-radius: 10px;
   overflow: hidden;
@@ -305,147 +309,180 @@ definePageMeta({
   color: inherit;
 }
 
-.quest-card:hover {
+.quest-card-custom:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.quest-info {
+.quest-info-custom {
   padding: 15px;
   text-align: left;
 }
 
-.quest-info h3 {
+.quest-info-custom div {
   margin: 0;
   font-size: 1.2em;
 }
 
-.quest-info p {
+.quest-info-custom p {
   margin: 5px 0;
   color: #666;
 }
 
-.quest-status {
+.quest-status-custom {
   display: block;
   margin-top: 10px;
   font-size: 0.9em;
-  color: #333;
+  color: inherit;
 }
 
-.validated .quest-status {
+.validated .quest-status-custom {
   color: #4caf50;
 }
 
-.notValidated .quest-status {
+.notValidated .quest-status-custom {
   color: #f44336;
 }
 
-.tbd .quest-status {
+.tbd .quest-status-custom {
   color: #9e9e9e;
 }
 
-.ended .quest-status {
+.ended .quest-status-custom {
   color: #ff9800;
 }
 
-.badges {
+.badges-custom {
   display: flex;
   gap: 5px;
   margin-top: 10px;
 }
 
-.badge {
+.badge-custom {
   padding: 5px 10px;
   border-radius: 5px;
   font-size: 0.8em;
   color: #fff;
 }
 
-.badge-validated {
+.badge-validated-custom {
   background-color: #4caf50;
 }
 
-.badge-ended {
+.badge-ended-custom {
   background-color: #ff9800;
 }
 
-.badge-claimable {
+.badge-claimable-custom {
   background-color: #00bcd4;
 }
 
-.badge-not-claimable {
+.badge-not-claimable-custom {
   background-color: #9e9e9e;
 }
 
 /* Light Mode Styles */
-body.light-mode .quest-page {
-  background-color: transparent;
+.light-mode .quest-page-custom {
+  background-color: #f5f5f5;
   color: #000;
 }
 
-body.light-mode .quest-category {
+.light-mode .quest-category-custom {
+  background: rgba(
+    255,
+    255,
+    255,
+    0.9
+  ); /* Light background with slight transparency */
+  color: #000; /* Black text color */
+  border-color: #ddd; /* Light border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.light-mode .category-title-custom,
+.light-mode .quest-info-custom div {
+  color: #000;
+}
+
+.light-mode .quest-card-custom {
   background: rgba(255, 255, 255, 0.9);
-  color: #000;
 }
 
-body.light-mode .category-title,
-body.light-mode .quest-info h3 {
-  color: #000;
-}
-
-body.light-mode .quest-card {
-  background: rgba(255, 255, 255, 0.9);
-}
-
-body.light-mode .quest-card:hover {
+.light-mode .quest-card-custom:hover {
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-body.light-mode .quest-path {
-  background: rgba(240, 240, 240, 0.9);
-}
-
 /* Dark Mode Styles */
-body.dark-mode .quest-page {
-  background-color: transparent;
+.dark-mode .quest-page-custom {
+  background-color:;
   color: #fff;
 }
 
-body.dark-mode .quest-category {
-  background: rgba(51, 51, 51, 0.9);
+.dark-mode .quest-category-custom {
+  background: rgba(
+    51,
+    51,
+    51,
+    0.9
+  ); /* Dark background with slight transparency */
+  color: #fff; /* White text color */
+  border-color: #666; /* Dark border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Dark shadow */
+}
+
+.dark-mode .category-title-custom,
+.dark-mode .quest-info-custom div {
   color: #fff;
 }
 
-body.dark-mode .category-title,
-body.dark-mode .quest-info h3 {
-  color: #fff;
-}
-
-body.dark-mode .quest-card {
+.dark-mode .quest-card-custom {
   background: rgba(51, 51, 51, 0.9);
   border: 1px solid #666;
 }
 
-body.dark-mode .quest-card:hover {
+.dark-mode .quest-card-custom:hover {
   box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
 }
+/* Notification Styles */
+.popup-notification-custom {
+  position: fixed;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1em;
+  z-index: 2000;
+  text-align: center;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
 
-body.dark-mode .quest-path {
-  background: rgba(40, 40, 40, 0.9);
+.light-mode .popup-notification-custom {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .popup-notification-custom {
+  background-color: rgba(51, 51, 51, 0.9);
+  color: #fff;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
 /* Responsive Styles */
 @media (max-width: 767px) {
-  .header-content {
+  .header-content-custom {
     flex-direction: column;
     align-items: center;
   }
-  .mappy-points-fixed {
+  .mappy-points-fixed-custom {
     top: 10px;
     right: 10px;
     text-align: center;
   }
-  .quest-management {
+  .quest-management-custom {
     margin-top: 20px;
   }
 }

@@ -2,7 +2,7 @@
   <div :class="['leaderboard-container', { 'dark-mode': isDarkMode }]">
     <div :class="['header-section', { 'dark-mode': isDarkMode }]">
       <div class="header">
-        <h3 :class="['title', { 'dark-mode': isDarkMode }]">Leaderboard</h3>
+        <div :class="['title', { 'dark-mode': isDarkMode }]">Leaderboard</div>
         <a @click="showModal = true" class="refresh-link"
           >Clear Cache and Refresh</a
         >
@@ -362,7 +362,6 @@ definePageMeta({
   layout: "quests",
 });
 </script>
-
 <style scoped>
 .leaderboard-container {
   margin: 0 auto;
@@ -387,6 +386,11 @@ definePageMeta({
   display: flex;
   justify-content: space-between;
   align-items: center;
+}
+
+.title {
+  font-size: 1.5em;
+  font-weight: bold;
 }
 
 .refresh-link {
@@ -567,7 +571,7 @@ definePageMeta({
 .leaderboard-container.dark-mode,
 .header-section.dark-mode,
 .modal-content.dark-mode {
-  --card-bg: rgba(0, 0, 0, 0.9);
+  --card-bg: rgba(50, 50, 50, 0.9);
   --card-text: #ffffff;
   --highlight-bg: rgba(30, 59, 73, 0.9);
   --welcome-message-color: #ffffff; /* Added for text color */
@@ -578,5 +582,8 @@ definePageMeta({
 
 body.dark-mode .title {
   color: #ffffff; /* Title color for dark mode */
+}
+body:not(.dark-mode) .title {
+  color: #000000; /* Title color for light mode */
 }
 </style>

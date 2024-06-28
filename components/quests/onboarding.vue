@@ -23,12 +23,11 @@
                 {{ slide.buttonText }}
               </a>
             </template>
-            <template v-else-if="slide.link.startsWith('#')">
+            <template v-else-if="slide.link === 'referral'">
               <button
                 type="button"
                 class="slide-button"
-                data-bs-toggle="modal"
-                :data-bs-target="slide.link"
+                @click="copyReferralLink"
               >
                 {{ slide.buttonText }}
               </button>
@@ -42,7 +41,6 @@
         </div>
       </SwiperSlide>
     </Swiper>
-    <ReferralModal />
   </div>
 </template>
 
@@ -51,15 +49,17 @@ import { ref, computed } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import { Navigation, Pagination } from "swiper/modules";
-import ReferralModal from "~/components/referrals/ReferralModal.vue";
 import { useThemeStore } from "~/store/theme";
+import { useToast } from "vue-toastification/dist/index.mjs";
+import { useEthers } from "vue-dapp";
+import { useUserStore } from "~/store/user";
+import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
   name: "GetStartedCarousel",
   components: {
     Swiper,
     SwiperSlide,
-    ReferralModal,
   },
   setup() {
     const slides = ref([
@@ -93,9 +93,9 @@ export default {
         img: "http://scrolly.xyz/onboarding/4.png",
         alt: "Progress Icon",
         description:
-          "Earn passive Mappy Points rewards with your friends activities on-chain.",
-        buttonText: "Get my Link",
-        link: "#referralModal",
+          "Earn passive Mappy Points rewards with your friends' activities on-chain.",
+        buttonText: "Copy Referral Link",
+        link: "referral", // Custom link to identify referral action
       },
       {
         title: "Step 5: Evolve your Badge",
@@ -116,17 +116,37 @@ export default {
       },
     ]);
 
-    const isExternalLink = (link) => link.startsWith("https");
-
     const themeStore = useThemeStore();
     const isDarkMode = computed(() => themeStore.getIsDarkMode);
+    const { address } = useEthers();
+    const toast = useToast();
+    const userStore = useUserStore();
+
+    const getDomainNameOrAddress = () => {
+      if (userStore.getDefaultDomain) {
+        return getTextWithoutBlankCharacters(userStore.getDefaultDomain);
+      }
+      return address;
+    };
+
+    const getReferralLink = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("ref", getDomainNameOrAddress());
+      return url.toString();
+    };
+
+    const copyReferralLink = () => {
+      navigator.clipboard.writeText(getReferralLink());
+      toast("Referral link copied to your clipboard!", { type: "success" });
+    };
 
     return {
       Navigation,
       Pagination,
       slides,
-      isExternalLink,
+      isExternalLink: (link) => link.startsWith("https"),
       isDarkMode,
+      copyReferralLink,
     };
   },
 };
@@ -153,6 +173,7 @@ export default {
   text-align: center;
   border-radius: 10px;
   overflow: hidden;
+  color: #fff; /* Default text color */
 }
 
 .slide-image {
@@ -220,6 +241,12 @@ export default {
 
 .dark-mode .slide-title,
 .dark-mode .slide-button {
+  color: #fff;
+}
+
+/* Ensure text is white in both light and dark modes */
+.overlay h2,
+.overlay p {
   color: #fff;
 }
 
