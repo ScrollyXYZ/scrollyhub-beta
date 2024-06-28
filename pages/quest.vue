@@ -388,11 +388,11 @@ definePageMeta({
 }
 
 .light-mode .quest-category-custom {
-  background: rgba(
-    255,
-    255,
-    255,
-    0.9
+  background: hsla(
+    0,
+    0%,
+    100%,
+    0.6
   ); /* Light background with slight transparency */
   color: #000; /* Black text color */
   border-color: #ddd; /* Light border */
@@ -423,7 +423,7 @@ definePageMeta({
     51,
     51,
     51,
-    0.9
+    0.6
   ); /* Dark background with slight transparency */
   color: #fff; /* White text color */
   border-color: #666; /* Dark border */

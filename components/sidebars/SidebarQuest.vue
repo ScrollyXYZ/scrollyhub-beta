@@ -464,7 +464,7 @@ export default {
 }
 
 .dark-mode .quest-user-title {
-  color: #666;
+  color: white;
 }
 
 .quest-logout-btn {
@@ -485,7 +485,7 @@ export default {
 }
 
 .dark-mode .quest-tooltip-icon {
-  color: #666;
+  color: white;
 }
 
 .quest-user-rank {
@@ -495,7 +495,7 @@ export default {
 }
 
 .dark-mode .quest-user-rank {
-  color: #666;
+  color: white;
 }
 
 .quest-progress-bar {
