@@ -1,25 +1,26 @@
-import { defineStore } from 'pinia';
-import { ethers } from 'ethers';
+import { defineStore } from "pinia";
+import { ethers, BigNumber } from "ethers";
+import { useQuestStore } from "~/store/questStore";
 
 export const useUserStore = defineStore({
-  id: 'user',
+  id: "user",
 
   state: () => {
     return {
       activityPoints: 0, // not in wei
-      address: null,
+      address: null as string | null,
       chatTokenBalanceWei: BigInt(0),
-      defaultDomain: null,
-      did: null,
-      didParent: null,
+      defaultDomain: null as string | null,
+      did: null as string | null,
+      didParent: null as string | null,
       followers: 0,
       following: 0,
       isConnectedToOrbis: false,
-      lastActivityTimestamp: null,
+      lastActivityTimestamp: null as number | null,
       lpTokenBalanceWei: BigInt(0),
-      orbisImage: null,
-      stakeTokenBalanceWei: BigInt(0) // receipt token from the staking contract (aka governance token)
-    }
+      orbisImage: null as string | null,
+      stakeTokenBalanceWei: BigInt(0), // receipt token from the staking contract (aka governance token)
+    };
   },
 
   getters: {
@@ -33,9 +34,7 @@ export const useUserStore = defineStore({
 
     getChatTokenBalance(state) {
       const balance = ethers.utils.formatEther(state.chatTokenBalanceWei);
-
-      const formatter = Intl.NumberFormat('en', { notation: 'compact' });
-
+      const formatter = Intl.NumberFormat("en", { notation: "compact" });
       return formatter.format(Number(balance));
     },
 
@@ -81,73 +80,78 @@ export const useUserStore = defineStore({
 
     getStakeTokenBalanceWei(state) {
       return ethers.BigNumber.from(state.stakeTokenBalanceWei);
-    }
+    },
   },
 
   actions: {
-    addToChatTokenBalanceWei(balance: ethers.BigNumber) {
+    addToChatTokenBalanceWei(balance: BigNumber) {
       this.chatTokenBalanceWei += balance.toBigInt();
     },
 
-    addToLpTokenBalanceWei(balance: ethers.BigNumber) {
+    addToLpTokenBalanceWei(balance: BigNumber) {
       this.lpTokenBalanceWei += balance.toBigInt();
     },
 
-    addToStakeTokenBalanceWei(balance: ethers.BigNumber) {
+    addToStakeTokenBalanceWei(balance: BigNumber) {
       this.stakeTokenBalanceWei += balance.toBigInt();
     },
 
-    setChatTokenBalanceWei(balance: ethers.BigNumber) {
+    setChatTokenBalanceWei(balance: BigNumber) {
       this.chatTokenBalanceWei = balance.toBigInt();
     },
 
-    setCurrentUserActivityPoints(points: any) {
+    setCurrentUserActivityPoints(points: number) {
       this.activityPoints = points;
     },
 
-    setCurrentUserAddress(address: any) {
+    setCurrentUserAddress(address: string) {
       this.address = address;
     },
 
-    setDefaultDomain(domain: any) {
+    setDefaultDomain(domain: string) {
       this.defaultDomain = domain;
     },
 
-    setDid(did: any) {
+    setDid(did: string) {
       this.did = did;
     },
 
-    setDidParent(didParent: any) {
+    setDidParent(didParent: string) {
       this.didParent = didParent;
     },
 
-    setFollowers(followers: any) {
+    setFollowers(followers: number) {
       this.followers = followers;
     },
 
-    setFollowing(following: any) {
+    setFollowing(following: number) {
       this.following = following;
     },
 
-    setIsConnectedToOrbis(isConnected: any) {
+    setIsConnectedToOrbis(isConnected: boolean) {
       this.isConnectedToOrbis = isConnected;
     },
 
-    setLastActivityTimestamp(timestamp: any) {
+    setLastActivityTimestamp(timestamp: number) {
       this.lastActivityTimestamp = timestamp;
     },
 
-    setLpTokenBalanceWei(balance: ethers.BigNumber) {
+    setLpTokenBalanceWei(balance: BigNumber) {
       this.lpTokenBalanceWei = balance.toBigInt();
     },
 
-    setOrbisImage(image: any) {
+    setOrbisImage(image: string) {
       this.orbisImage = image;
     },
 
-    setStakeTokenBalanceWei(balance: ethers.BigNumber) {
+    setStakeTokenBalanceWei(balance: BigNumber) {
       this.stakeTokenBalanceWei = balance.toBigInt();
-    }
+    },
 
-  }
-})
+    async login(userAddress: string) {
+      this.address = userAddress;
+      const questStore = useQuestStore();
+      await questStore.initializeQuests(this);
+    },
+  },
+});

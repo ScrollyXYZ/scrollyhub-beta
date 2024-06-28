@@ -1,21 +1,28 @@
 <template>
-  <div class="leaderboard-container">
-    <div class="header-section">
+  <div :class="['leaderboard-container', { 'dark-mode': isDarkMode }]">
+    <div :class="['header-section', { 'dark-mode': isDarkMode }]">
       <div class="header">
-        <h3>Leaderboard</h3>
+        <h3 :class="['title', { 'dark-mode': isDarkMode }]">Leaderboard</h3>
         <a @click="showModal = true" class="refresh-link"
           >Clear Cache and Refresh</a
         >
       </div>
-      <p class="welcome-message">
+      <p :class="['welcome-message', { 'dark-mode': isDarkMode }]">
         We are thrilled to present the top 100 members of the Scrolly community
         on the hub! Their engagement, quest completions, and interactions on the
         hub have earned them this spot. Join the quests and participate in the
         community life on the hub—every message and interaction counts!
       </p>
     </div>
-
-    <div v-if="userRank !== null" class="user-rank leaderboard-item highlight">
+    <div
+      v-if="userRank !== null"
+      :class="[
+        'user-rank',
+        'leaderboard-item',
+        'highlight',
+        { 'dark-mode': isDarkMode },
+      ]"
+    >
       <div class="rank-container">
         <span>{{ userRank }}</span>
       </div>
@@ -31,21 +38,22 @@
       </div>
       <div class="profile-info">
         <router-link to="/profile">
-          <p class="profile-name">
+          <p :class="['profile-name', { 'dark-mode': isDarkMode }]">
             {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
           </p>
-          <p class="profile-points">Points: {{ getUserAp }}</p>
+          <p :class="['profile-points', { 'dark-mode': isDarkMode }]">
+            Points: {{ getUserAp }}
+          </p>
         </router-link>
       </div>
     </div>
     <p v-else-if="userRankError">{{ userRankError }}</p>
-
-    <hr class="section-separator" />
-
-    <!-- Clear Cache and Refresh Modal -->
+    <hr :class="['section-separator', { 'dark-mode': isDarkMode }]" />
     <div v-if="showModal" class="modal-overlay">
-      <div class="modal-content">
-        <h2>Trouble Displaying Data?</h2>
+      <div :class="['modal-content', { 'dark-mode': isDarkMode }]">
+        <h2 :class="['title', { 'dark-mode': isDarkMode }]">
+          Trouble Displaying Data?
+        </h2>
         <p>
           If you are experiencing display issues, you can clear the cache and
           refresh the data. Please note that data is fetched from the
@@ -67,17 +75,15 @@
         <button @click="showModal = false" class="modal-button">Close</button>
       </div>
     </div>
-
     <div v-if="loading" class="loading-indicator">
       Refreshing data, please wait...
     </div>
-
     <div
       v-for="(item, index) in paginatedLeaderboard"
       :key="index"
       :class="[
         'leaderboard-item',
-        isCurrentUser(item.address) ? 'highlight' : '',
+        { highlight: isCurrentUser(item.address), 'dark-mode': isDarkMode },
       ]"
     >
       <div class="rank-container">
@@ -95,14 +101,15 @@
       </div>
       <div class="profile-info">
         <router-link :to="'/profile/?id=' + getProfileLink(item)">
-          <p class="profile-name">{{ cleanDisplayName(item.displayName) }}</p>
-          <p class="profile-points">
+          <p :class="['profile-name', { 'dark-mode': isDarkMode }]">
+            {{ cleanDisplayName(item.displayName) }}
+          </p>
+          <p :class="['profile-points', { 'dark-mode': isDarkMode }]">
             Points: {{ Math.round(item.roundedPoints) }}
           </p>
         </router-link>
       </div>
     </div>
-
     <div class="pagination">
       <button @click="previousPage" :disabled="currentPage === 1">
         Previous
@@ -115,13 +122,14 @@
 </template>
 
 <script>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import ProfileImage from "@/components/profile/ProfileImage.vue";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import { Orbis } from "@orbisclub/orbis-sdk";
 import { useEthers } from "vue-dapp";
 import { getActivityPoints } from "~/utils/balanceUtils";
 import { useUserStore } from "~/store/user";
+import { useThemeStore } from "~/store/theme";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 const orbis = new Orbis();
@@ -133,6 +141,8 @@ export default {
   setup() {
     const { address, isActivated, signer } = useEthers();
     const userStore = useUserStore();
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
     const leaderboard = ref([]);
     const paginatedLeaderboard = ref([]);
     const currentPage = ref(1);
@@ -149,13 +159,11 @@ export default {
     const maxRetries = 3;
     const retryDelay = 2000;
 
-    const shortenAddress = (address) => {
-      return address.slice(0, 6) + "..." + address.slice(-4);
-    };
+    const shortenAddress = (address) =>
+      address.slice(0, 6) + "..." + address.slice(-4);
 
-    const cleanDisplayName = (displayName) => {
-      return displayName.replace(/\.scrolly/g, "");
-    };
+    const cleanDisplayName = (displayName) =>
+      displayName.replace(/\.scrolly/g, "");
 
     const fetchOrbisProfile = async (address) => {
       let profile = { username: null, pfp: null };
@@ -251,16 +259,13 @@ export default {
       }
     };
 
-    const getRank = (index) => {
-      return (currentPage.value - 1) * itemsPerPage + index + 1;
-    };
+    const getRank = (index) =>
+      (currentPage.value - 1) * itemsPerPage + index + 1;
 
-    const getProfileLink = (item) => {
-      return item.address;
-    };
+    const getProfileLink = (item) => item.address;
 
     const fetchUserRank = async () => {
-      if (isActivated && address.value) {
+      if (isActivated.value && address.value) {
         try {
           const response = await fetch(
             `https://leaderboard-scrolly.vercel.app/rank/${address.value}`,
@@ -278,10 +283,7 @@ export default {
               "Sorry, only Scrolly Domains Holders are displayed on this leaderboard.";
           }
         } catch (error) {
-          console.error(
-            "Sorry, only Scrolly Domains Holders are displayed on this leaderboard.",
-            error,
-          );
+          console.error("Error fetching user rank:", error);
           userRankError.value = "Error fetching user rank.";
         }
       }
@@ -294,11 +296,9 @@ export default {
       }
     };
 
-    const isCurrentUser = (userAddress) => {
-      return (
-        isActivated && address.value.toLowerCase() === userAddress.toLowerCase()
-      );
-    };
+    const isCurrentUser = (userAddress) =>
+      isActivated.value &&
+      address.value.toLowerCase() === userAddress.toLowerCase();
 
     onMounted(async () => {
       if (typeof window !== "undefined") {
@@ -324,6 +324,13 @@ export default {
       }
     });
 
+    watch([address, isActivated], async ([newAddress, newIsActivated]) => {
+      if (newIsActivated) {
+        await fetchUserRank();
+        await fetchOrbisProfile(newAddress);
+      }
+    });
+
     return {
       leaderboard,
       paginatedLeaderboard,
@@ -344,25 +351,34 @@ export default {
       getRank,
       displayName,
       profileImage,
+      isDarkMode,
       getUserAp: userStore.getCurentUserActivityPoints,
       getTextWithoutBlankCharacters,
       userStore,
     };
   },
 };
+definePageMeta({
+  layout: "quests",
+});
 </script>
+
 <style scoped>
 .leaderboard-container {
-  max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  max-width: 800px; /* Centering the leaderboard */
   font-family: Arial, sans-serif;
+  background: var(--card-bg); /* Variable for background */
+  color: var(--card-text); /* Variable for text color */
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .header-section {
   padding: 20px;
   margin-bottom: 20px;
-  background-color: var(--bs-mode);
+  background: var(--card-bg);
   border-radius: 10px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -384,6 +400,7 @@ export default {
   margin-top: 10px;
   font-size: 1em;
   text-align: center;
+  color: var(--welcome-message-color); /* Added for text color */
 }
 
 .user-rank {
@@ -391,7 +408,7 @@ export default {
   align-items: center;
   padding: 8px 16px;
   margin: 8px 0;
-  background-color: #e6f7ff;
+  background: var(--highlight-bg);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -426,10 +443,15 @@ export default {
 .profile-name {
   font-weight: bold;
   font-size: 1em;
+  color: var(--profile-name-color);
+}
+
+.profile-name:hover {
+  color: var(--profile-name-hover-color);
 }
 
 .profile-points {
-  color: #888888;
+  color: var(--profile-points-color);
   font-size: 0.9em;
 }
 
@@ -445,7 +467,7 @@ export default {
   align-items: center;
   padding: 8px 16px;
   margin: 8px 0;
-  background-color: var(--bs-mode);
+  background: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
@@ -481,7 +503,7 @@ export default {
 }
 
 .highlight {
-  background-color: #1e3b49 !important;
+  background-color: var(--highlight-bg);
 }
 
 .modal-overlay {
@@ -503,7 +525,8 @@ export default {
   width: 80%;
   max-width: 500px;
   text-align: center;
-  background: var(--bs-mode);
+  background: var(--card-bg);
+  color: var(--card-text);
 }
 
 .modal-button {
@@ -525,5 +548,35 @@ export default {
   height: 1px;
   background-color: #ddd;
   margin: 20px 0;
+}
+
+/* Light Mode Styles */
+.leaderboard-container:not(.dark-mode),
+.header-section:not(.dark-mode),
+.modal-content:not(.dark-mode) {
+  --card-bg: rgba(255, 255, 255, 0.9);
+  --card-text: #000000;
+  --highlight-bg: rgba(230, 247, 255, 0.9);
+  --welcome-message-color: #000000; /* Added for text color */
+  --profile-points-color: #888888;
+  --profile-name-color: #000000;
+  --profile-name-hover-color: #666666;
+}
+
+/* Dark Mode Styles */
+.leaderboard-container.dark-mode,
+.header-section.dark-mode,
+.modal-content.dark-mode {
+  --card-bg: rgba(0, 0, 0, 0.9);
+  --card-text: #ffffff;
+  --highlight-bg: rgba(30, 59, 73, 0.9);
+  --welcome-message-color: #ffffff; /* Added for text color */
+  --profile-points-color: #aaaaaa;
+  --profile-name-color: #ffffff;
+  --profile-name-hover-color: #cccccc;
+}
+
+body.dark-mode .title {
+  color: #ffffff; /* Title color for dark mode */
 }
 </style>

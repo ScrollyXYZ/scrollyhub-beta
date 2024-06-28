@@ -118,8 +118,7 @@ h1 {
   text-align: center;
   margin-bottom: 20px;
 }
-.vi-pr
-osals-list {
+.vi-prosals-list {
   list-style: none;
   padding: 0;
   margin: 0;

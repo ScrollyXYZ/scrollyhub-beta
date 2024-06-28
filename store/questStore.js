@@ -434,5 +434,8 @@ export const useQuestStore = defineStore("questStore", {
     hoverQuest(questId) {
       this.hoveredQuest = questId;
     },
+    $reset() {
+      this.$state = this.$options.state();
+    },
   },
 });

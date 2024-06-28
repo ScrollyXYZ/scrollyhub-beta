@@ -1,5 +1,5 @@
 <template>
-  <div class="get-started-carousel">
+  <div :class="['get-started-carousel', { 'dark-mode': isDarkMode }]">
     <Swiper
       :modules="[Navigation, Pagination]"
       :slides-per-view="1"
@@ -42,18 +42,17 @@
         </div>
       </SwiperSlide>
     </Swiper>
-
-    <!-- Modal -->
     <ReferralModal />
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import { Navigation, Pagination } from "swiper/modules";
 import ReferralModal from "~/components/referrals/ReferralModal.vue";
+import { useThemeStore } from "~/store/theme";
 
 export default {
   name: "GetStartedCarousel",
@@ -94,7 +93,7 @@ export default {
         img: "http://scrolly.xyz/onboarding/4.png",
         alt: "Progress Icon",
         description:
-          "Earn passive Mappy Points rewards with your on-chain activities on the hub.",
+          "Earn passive Mappy Points rewards with your friends activities on-chain.",
         buttonText: "Get my Link",
         link: "#referralModal",
       },
@@ -103,8 +102,8 @@ export default {
         img: "http://scrolly.xyz/onboarding/5.png",
         alt: "Progress Icon",
         description: "Your badge evolved with your Mappy Points.",
-        buttonText: "Soon",
-        link: "#",
+        buttonText: "Get my Badge",
+        link: "/badge",
       },
       {
         title: "Step 6: Enjoy Your Rewards",
@@ -117,15 +116,17 @@ export default {
       },
     ]);
 
-    const isExternalLink = (link) => {
-      return link.startsWith("http");
-    };
+    const isExternalLink = (link) => link.startsWith("https");
+
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
 
     return {
       Navigation,
       Pagination,
       slides,
       isExternalLink,
+      isDarkMode,
     };
   },
 };
@@ -133,14 +134,18 @@ export default {
 
 <style scoped>
 .get-started-carousel {
+  width: 100%;
   text-align: center;
-  padding: 20px;
+  background-color: #f0f0f0; /* Light mode background color */
+  transition: background-color 0.3s ease;
+}
+
+.get-started-carousel.dark-mode {
+  background-color: #333; /* Dark mode background color */
 }
 
 .main-swiper {
-  margin-bottom: 20px;
   width: 100%;
-  margin: 0 auto;
 }
 
 .slide-content {
@@ -172,13 +177,11 @@ export default {
 .overlay h2 {
   font-size: 1.8em;
   margin-bottom: 10px;
-  color: white;
 }
 
 .overlay p {
   font-size: 1.2em;
   margin-bottom: 15px;
-  color: white;
 }
 
 .slide-button {
@@ -200,7 +203,6 @@ export default {
   transform: scale(1.05);
 }
 
-/* Custom styles */
 .swiper {
   width: 100%;
   height: 100%;
@@ -210,5 +212,32 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.dark-mode .overlay {
+  background: rgba(51, 51, 51, 0.9);
+}
+
+.dark-mode .slide-title,
+.dark-mode .slide-button {
+  color: #fff;
+}
+
+@media (max-width: 874px) {
+  .get-started-carousel {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+  }
+
+  .swiper-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .slide-content {
+    width: 100%;
+  }
 }
 </style>

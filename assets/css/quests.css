@@ -1,0 +1,42 @@
+.quests-layout {
+  background-color: #282c34 !important; /* Ensure this overrides other styles */
+  color: black;
+  min-height: 100vh; /* Ensure it covers the full height */
+}
+
+.contain-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #282c34 !important; /* Ensure this overrides other styles */
+}
+
+.scrolly-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+  padding: 20px;
+  background-color: #282c34 !important; /* Simple background color */
+}
+
+.header-section {
+  background-color: #4caf50; /* Simple background color for header */
+  color: white;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.main-content {
+  width: 100%;
+  padding: 20px;
+  background-color: #333;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.quests-layout .scrolly-page {
+  background-color: #282c3400 !important;
+}

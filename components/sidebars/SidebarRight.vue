@@ -264,7 +264,7 @@ export default {
     const isNftRoute = computed(
       () =>
         route.path.startsWith("/nft") ||
-        route.name === "scrollybadge" ||
+        route.name === "faq" ||
         route.name === "leaderboard" ||
         route.name === "badge" ||
         route.name === "quest",

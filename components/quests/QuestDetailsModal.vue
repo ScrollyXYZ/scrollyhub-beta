@@ -1,8 +1,12 @@
 <template>
-  <div class="modal-overlay" @click="close">
-    <div class="modal-content animate__animated animate__zoomIn" @click.stop>
+  <div class="quest-dm-modal-overlay" @click="close">
+    <div
+      class="quest-dm-modal-content animate__animated animate__zoomIn"
+      @click.stop
+      :class="{ 'dark-mode': isDarkMode, 'light-mode': !isDarkMode }"
+    >
       <h5>Quest: {{ quest.title }} Details</h5>
-      <div class="modal-body">
+      <div class="quest-dm-modal-body">
         <p>
           <span :class="questStatusClass"></span>
           Status: {{ questStatusText }}
@@ -18,12 +22,16 @@
         <p>Max points: {{ quest.points }} MP</p>
         <p>Description: {{ quest.description }}</p>
         <div v-if="quest.contractAddress && !quest.validated && !quest.ended">
-          <p v-if="claimStatus">You have already claimed this reward.</p>
-          <p v-else-if="eligibilityStatus">
-            You are eligible to claim your reward!
-            <button class="claim-button" @click="claim">Claim Reward</button>
-          </p>
-          <p v-else>You are not eligible to claim this reward yet.</p>
+          <p v-if="loadingStatus">Loading status...</p>
+          <div v-else>
+            <p v-if="quest.claimStatus">
+              You have already claimed this reward.
+            </p>
+            <p v-else-if="quest.eligible">
+              You are eligible to claim your reward!
+            </p>
+            <p v-else>You are not eligible to claim this reward yet.</p>
+          </div>
         </div>
         <NuxtLink
           v-if="quest.id === 1"
@@ -33,31 +41,67 @@
           Mint your domain
         </NuxtLink>
       </div>
-      <button @click="close" class="modal-close-button">Close</button>
+      <div class="button-group">
+        <button
+          v-if="
+            !loadingStatus && !quest.validated && quest.eligible && !quest.ended
+          "
+          class="quest-dm-claim-button"
+          @click="claim"
+        >
+          Claim Reward
+        </button>
+        <button @click="close" class="quest-dm-modal-close-button">
+          Close
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import { mapState } from "pinia";
+import { computed, ref } from "vue";
 import { useQuestStore } from "~/store/questStore";
+import { useThemeStore } from "~/store/theme";
 
 export default {
   props: {
     quest: {
       type: Object,
-      default: () => ({}),
+      required: true,
+    },
+    isDarkMode: {
+      type: Boolean,
+      default: false,
     },
   },
+  setup(props) {
+    const themeStore = useThemeStore();
+    const questStore = useQuestStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
+    const loadingStatus = ref(true);
+
+    // Simulate loading state for the eligibility check
+    setTimeout(() => {
+      loadingStatus.value = false;
+    }, 2000); // Replace with actual async call
+
+    return {
+      isDarkMode,
+      questStore,
+      loadingStatus,
+    };
+  },
   computed: {
-    ...mapState(useQuestStore, ["claimStatus", "eligibilityStatus"]),
     questStatusClass() {
       if (!this.quest) return "";
       return {
-        "validated-check": this.quest.validated && !this.quest.ended,
-        "not-validated-check": !this.quest.validated && !this.quest.ended,
-        "ended-check": this.quest.ended && !this.quest.validated,
-        "validated-ended-check": this.quest.validated && this.quest.ended,
+        "quest-dm-validated-check": this.quest.validated && !this.quest.ended,
+        "quest-dm-not-validated-check":
+          !this.quest.validated && !this.quest.ended,
+        "quest-dm-ended-check": this.quest.ended && !this.quest.validated,
+        "quest-dm-validated-ended-check":
+          this.quest.validated && this.quest.ended,
       };
     },
     questStatusText() {
@@ -67,6 +111,12 @@ export default {
       if (this.quest.validated) return "Validated";
       if (this.quest.ended) return "Quest Ended";
       return "Not validated";
+    },
+    claimStatus() {
+      return this.quest.claimStatus;
+    },
+    eligibilityStatus() {
+      return this.quest.eligible;
     },
   },
   methods: {
@@ -81,7 +131,7 @@ export default {
 </script>
 
 <style scoped>
-.modal-overlay {
+.quest-dm-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -94,56 +144,109 @@ export default {
   z-index: 2000;
 }
 
-.modal-content {
-  background: var(--bs-mode);
+.quest-dm-modal-content {
   padding: 20px;
   border-radius: 10px;
   text-align: center;
-  color: #333;
   max-width: 400px;
   width: 80%;
   z-index: 2500;
 }
 
-.modal-content h3 {
-  margin-top: 0;
+.quest-dm-modal-content.light-mode {
+  background-color: #ffffff;
+  color: #000;
 }
 
-.modal-body {
+.quest-dm-modal-content.dark-mode {
+  background-color: #2c2c2c;
+  color: #ffffff;
+}
+
+.quest-dm-modal-content h5 {
+  margin-top: 0;
+  color: inherit;
+}
+
+.quest-dm-modal-body {
   text-align: left;
 }
 
-.validated-check::before {
+.quest-dm-validated-check::before {
   content: "✔️";
   color: green;
 }
 
-.not-validated-check::before {
+.quest-dm-not-validated-check::before {
   content: "❌";
   color: red;
 }
 
-.ended-check::before {
+.quest-dm-ended-check::before {
   content: "⌛";
   color: #ff9800;
 }
 
-.validated-ended-check::before {
+.quest-dm-validated-ended-check::before {
   content: "✔️⌛";
   color: green;
 }
 
-.modal-close-button {
-  background-color: #333;
-  color: #fff;
+.quest-dm-modal-close-button {
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  border: none;
+  display: block;
+}
+
+.quest-dm-modal-close-button.light-mode {
+  background-color: #888888; /* Gris */
+  color: #ffffff;
+}
+
+.quest-dm-modal-close-button.light-mode:hover {
+  background-color: #aaaaaa; /* Gris clair */
+}
+
+.quest-dm-modal-close-button.dark-mode {
+  background-color: #888888; /* Gris */
+  color: #ffffff;
+}
+
+.quest-dm-modal-close-button.dark-mode:hover {
+  background-color: #aaaaaa; /* Gris clair */
+}
+
+.quest-dm-claim-button {
+  background-color: #4caf50;
+  color: white;
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
+}
+
+.quest-dm-claim-button:hover {
+  background-color: #45a049;
+}
+
+.button-group {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
   margin-top: 20px;
 }
 
-.modal-close-button:hover {
-  background-color: #555;
+/* Responsive Styles for Mobile */
+@media (max-width: 767px) {
+  .quest-dm-modal-content {
+    width: 90%; /* Augmente la largeur pour les écrans mobiles */
+  }
+  .quest-dm-modal-close-button,
+  .quest-dm-claim-button {
+    padding: 10px;
+    font-size: 14px;
+  }
 }
 </style>

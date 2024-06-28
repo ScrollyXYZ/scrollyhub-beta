@@ -1,41 +1,67 @@
 <template>
-  <div class="quest-page">
-    <div class="header-section">
-      <div class="leaderboard-link">
-        <NuxtLink to="/leaderboard"></NuxtLink>
+  <div
+    :class="[
+      'quest-page',
+      { 'dark-mode': isDarkMode, 'light-mode': !isDarkMode },
+    ]"
+  >
+    <div class="quest-header">
+      <div class="scrolly-journey">
+        <h2
+          :class="{
+            'dark-mode-text': isDarkMode,
+            'light-mode-text': !isDarkMode,
+          }"
+        >
+          Scrolly's Journey
+        </h2>
+        <p
+          :class="{
+            'dark-mode-text': isDarkMode,
+            'light-mode-text': !isDarkMode,
+          }"
+          class="subtitle"
+        >
+          The journey has just begun
+        </p>
       </div>
-      <points-card
-        :activityPoints="questStore.activityPoints"
-        :pointsFromValidatedQuests="pointsFromValidatedQuests"
-        :pointsFromUserActivities="pointsFromUserActivities"
-        :questCategories="questStore.questCategories"
-      />
     </div>
     <div class="quest-management">
-      <h2>Scrolly's Journey</h2>
-      <p class="subtitle">The journey has just begun</p>
-      <p class="activity-info">
-        Activity points can be earned by using Scrolly's features. Earn extra
-        points by minting NFTs, creating collections, or participating in
-        community activities.
-      </p>
       <div v-if="view === 'grid'" class="grid-view">
         <div
           v-for="category in questStore.filteredCategories"
           :key="category.category"
-          class="quest-category"
+          :class="[
+            'quest-category',
+            {
+              'dark-mode-category': isDarkMode,
+              'light-mode-category': !isDarkMode,
+            },
+          ]"
         >
-          <h3 class="category-title">
+          <h3
+            :class="{
+              'dark-mode-text': isDarkMode,
+              'light-mode-text': !isDarkMode,
+            }"
+            class="category-title"
+          >
             {{ category.category }} ({{
               questStore.getCompletedQuests(category.quests)
             }}/{{ category.quests.length }} completed)
           </h3>
-          <div class="quest-path">
+          <div
+            :class="[
+              'quest-path',
+              { 'dark-mode': isDarkMode, 'light-mode': !isDarkMode },
+            ]"
+          >
             <quest-card
               v-for="quest in category.quests"
               :key="quest.id"
               :quest="quest"
               @showDetails="showQuestDetails"
+              :isDarkMode="isDarkMode"
             />
           </div>
         </div>
@@ -48,6 +74,7 @@
       :quest="questStore.selectedQuest"
       @close="questStore.closeModal"
       @claim="claimReward"
+      :isDarkMode="isDarkMode"
     />
 
     <!-- Popup Notification -->
@@ -56,12 +83,18 @@
         {{ questStore.popupMessage }}
       </div>
     </transition>
+
+    <!-- Fixed Mappy Points Card -->
+    <div class="mappy-points-fixed">
+      <points-card :activityPoints="questStore.activityPoints" />
+    </div>
   </div>
 </template>
-
 <script>
+import { computed } from "vue";
 import { useUserStore } from "~/store/user";
 import { useQuestStore } from "~/store/questStore";
+import { useThemeStore } from "~/store/theme";
 import PointsCard from "~/components/quests/PointsCard.vue";
 import QuestCard from "~/components/quests/QuestCard.vue";
 import QuestDetailsModal from "~/components/quests/QuestDetailsModal.vue";
@@ -82,10 +115,13 @@ export default {
   setup() {
     const userStore = useUserStore();
     const questStore = useQuestStore();
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
 
     return {
       userStore,
       questStore,
+      isDarkMode,
     };
   },
   computed: {
@@ -108,7 +144,7 @@ export default {
     this.handleHashChange();
     window.addEventListener("hashchange", this.handleHashChange);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener("hashchange", this.handleHashChange);
   },
   watch: {
@@ -159,136 +195,71 @@ export default {
     },
   },
 };
+definePageMeta({
+  layout: "quests",
+});
 </script>
-
 <style scoped>
 @import "animate.css";
 
 .quest-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
   padding: 20px;
-  text-align: center;
+  background-color: transparent;
+  position: relative;
 }
 
-.header-section {
+.quest-header {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.points-display {
+  width: 100%;
   text-align: center;
 }
 
-.points-card {
-  background: rgba(255, 255, 255, 0.9);
+.scrolly-journey {
+  width: 100%;
+}
+
+.scrolly-journey h2 {
+  position: relative;
+  font-size: 2em;
+}
+
+.scrolly-journey h2::after {
+  content: url("/path/to/your/svg.svg"); /* URL of your SVG */
+  position: absolute;
+  top: -10px;
+  left: -30px;
+  opacity: 0.1; /* Adjust opacity for background effect */
+}
+
+.header-content {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
   padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.points-card h2 {
-  margin: 0;
-  font-size: 1.5em;
-}
-
-.points-card p {
-  margin: 0;
-  font-size: 1em;
-  font-weight: bold;
-}
-
-.details-button {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-.details-button:hover {
-  text-decoration: underline;
-}
-
-.points-details {
-  margin-top: 10px;
-  text-align: left;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 0.9em;
-}
-
-.details-section {
-  margin-bottom: 10px;
-}
-
-.details-header {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.details-item {
-  margin: 5px 0;
-}
-
-.leaderboard-link {
-  margin: 20px;
-}
-
-.leaderboard-button {
-  display: inline-block;
-  background: #ddd;
-  color: #999;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  cursor: not-allowed;
+.mappy-points-fixed {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
 .quest-management {
-  margin-top: 40px;
-}
-
-.quest-management .subtitle {
-  font-size: 1.2em;
-  margin-bottom: 20px;
-}
-
-.activity-info {
-  margin-bottom: 30px;
-  font-size: 1.1em;
-}
-
-.view-toggle {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
-}
-
-.view-toggle button {
-  padding: 10px 20px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.view-toggle button.active {
-  background-color: #333;
-  color: #fff;
-}
-
-.view-toggle button:not(.active) {
-  background-color: #ddd;
-  color: #333;
+  flex: 1 1 auto;
+  margin-top: 20px; /* Reduce top margin for better spacing */
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
 }
 
 .grid-view {
@@ -298,11 +269,15 @@ export default {
 
 .quest-category {
   margin-top: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  transition: background-color 0.3s;
 }
 
 .category-title {
   font-size: 1.5em;
   margin-bottom: 10px;
+  color: #333;
 }
 
 .quest-path {
@@ -310,10 +285,6 @@ export default {
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-}
-
-.quest-container {
-  perspective: 1000px;
 }
 
 .quest-card {
@@ -326,21 +297,17 @@ export default {
   transition:
     transform 0.3s,
     box-shadow 0.3s;
-  background: rgba(0, 0, 0, 0.7);
   padding: 10px;
   margin: 20px;
   width: 150px;
   height: 150px;
+  background: rgba(255, 255, 255, 0.9);
+  color: inherit;
 }
 
 .quest-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
-}
-
-.quest-image img {
-  width: 100%;
-  height: auto;
 }
 
 .quest-info {
@@ -362,7 +329,7 @@ export default {
   display: block;
   margin-top: 10px;
   font-size: 0.9em;
-  color: #fff;
+  color: #333;
 }
 
 .validated .quest-status {
@@ -408,5 +375,78 @@ export default {
 
 .badge-not-claimable {
   background-color: #9e9e9e;
+}
+
+/* Light Mode Styles */
+body.light-mode .quest-page {
+  background-color: transparent;
+  color: #000;
+}
+
+body.light-mode .quest-category {
+  background: rgba(255, 255, 255, 0.9);
+  color: #000;
+}
+
+body.light-mode .category-title,
+body.light-mode .quest-info h3 {
+  color: #000;
+}
+
+body.light-mode .quest-card {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+body.light-mode .quest-card:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+body.light-mode .quest-path {
+  background: rgba(240, 240, 240, 0.9);
+}
+
+/* Dark Mode Styles */
+body.dark-mode .quest-page {
+  background-color: transparent;
+  color: #fff;
+}
+
+body.dark-mode .quest-category {
+  background: rgba(51, 51, 51, 0.9);
+  color: #fff;
+}
+
+body.dark-mode .category-title,
+body.dark-mode .quest-info h3 {
+  color: #fff;
+}
+
+body.dark-mode .quest-card {
+  background: rgba(51, 51, 51, 0.9);
+  border: 1px solid #666;
+}
+
+body.dark-mode .quest-card:hover {
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+
+body.dark-mode .quest-path {
+  background: rgba(40, 40, 40, 0.9);
+}
+
+/* Responsive Styles */
+@media (max-width: 767px) {
+  .header-content {
+    flex-direction: column;
+    align-items: center;
+  }
+  .mappy-points-fixed {
+    top: 10px;
+    right: 10px;
+    text-align: center;
+  }
+  .quest-management {
+    margin-top: 20px;
+  }
 }
 </style>
