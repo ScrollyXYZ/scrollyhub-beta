@@ -105,6 +105,7 @@ export default {
           };
         });
         this.leaders = await Promise.all(leaderPromises);
+        this.refreshProfileImages();
       } catch (error) {
         console.error("Error fetching leaderboard data:", error);
       }
@@ -146,11 +147,16 @@ export default {
 
       return profile;
     },
-    async getDomainName(address, provider) {
-      // Your implementation for fetching the domain name
-    },
+    async getDomainName(address, provider) {},
     cleanDisplayName(displayName) {
       return displayName.replace(/\.scrolly/g, "");
+    },
+    async refreshProfileImages() {
+      const leaderPromises = this.leaders.map(async (leader) => {
+        const profile = await this.fetchOrbisProfile(leader.address);
+        leader.profilePicture = profile.profilePicture || leader.profilePicture;
+      });
+      await Promise.all(leaderPromises);
     },
   },
   async created() {
