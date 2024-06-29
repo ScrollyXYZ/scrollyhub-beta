@@ -12,6 +12,7 @@
     <NuxtLink to="/quest" class="access-quests-btn">Access to Quests</NuxtLink>
   </div>
 </template>
+
 <script>
 import { computed, onMounted } from "vue";
 import { useQuestStore } from "~/store/questStore";
@@ -64,10 +65,8 @@ export default {
   text-align: center;
   margin: 20px 0;
   width: 100%;
-  background: rgba(255, 255, 255, 0.9);
   padding: 15px;
   border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   transition:
     transform 0.3s ease-in-out,
     box-shadow 0.3s ease-in-out;
@@ -95,7 +94,7 @@ export default {
 }
 
 .dark-mode .latest-quests {
-  background-color: rgba(51, 51, 51, 0.9);
+  background-color: transparent; /* Removed background color */
   color: #fff;
 }
 

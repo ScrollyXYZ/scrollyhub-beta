@@ -252,7 +252,7 @@ definePageMeta({
 
 .quest-management-custom {
   flex: 1 1 auto;
-  margin-top: 20px; /* Reduce top margin for better spacing */
+  margin-top: 20px;
   width: 100%;
   max-width: 800px;
   text-align: center;
@@ -264,6 +264,7 @@ definePageMeta({
 }
 
 .quest-category-custom {
+  position: relative;
   margin-top: 20px;
   padding: 10px;
   border-radius: 10px;
@@ -274,7 +275,21 @@ definePageMeta({
   color: inherit;
   border: 1px solid;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px; /* Space between categories */
+  margin-bottom: 40px;
+}
+
+.quest-category-custom::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background-image: url("~/assets/Vector.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  z-index: -1;
 }
 
 .category-title-custom {
@@ -288,7 +303,8 @@ definePageMeta({
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  gap: 20px; /* Add space between quests */
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
 .quest-card-custom {
