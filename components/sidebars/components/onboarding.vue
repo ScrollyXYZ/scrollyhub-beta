@@ -4,7 +4,7 @@
       :modules="[Navigation]"
       :slides-per-view="1"
       navigation
-      grab-cursor="true"
+      :grab-cursor="true"
       class="main-swiper"
     >
       <SwiperSlide v-for="(slide, index) in slides" :key="index">

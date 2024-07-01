@@ -1,229 +1,122 @@
 <template>
-  <div class="quest-page">
-    <div class="header-section">
-      <div class="leaderboard-link">
-        <NuxtLink to="/leaderboard"></NuxtLink>
-      </div>
-      <div class="points-display animate__animated animate__fadeInDown">
-        <div class="points-card">
-          <h2 class="mappy-point">Your Mappy Points</h2>
-          <p>{{ questStore.activityPoints }}</p>
-          <button @click="toggleDetails" class="details-button">
-            {{ showDetails ? "▲" : "▼" }} Details
-          </button>
-          <transition name="fade">
-            <div v-if="showDetails" class="points-details">
-              <div class="details-section">
-                <p class="details-header">Points Breakdown</p>
-                <p class="details-item">
-                  <strong>{{ pointsFromValidatedQuests }}</strong> points from
-                  completed quests
-                </p>
-                <p class="details-item">
-                  <strong>{{ pointsFromUserActivities }}</strong> points from
-                  user activities on the hub
-                </p>
-              </div>
-              <div class="details-section">
-                <p class="details-header">Points by Category</p>
-                <div
-                  v-for="category in questStore.questCategories"
-                  :key="category.category"
-                  class="details-item"
-                >
-                  <p>
-                    <strong>{{ category.category }}:</strong>
-                    {{ calculateCategoryPoints(category.quests) }} /
-                    {{ calculateMaxCategoryPoints(category.quests) }} points
-                  </p>
-                </div>
-              </div>
-            </div>
-          </transition>
+  <div
+    :class="[
+      'quest-page-custom',
+      { 'dark-mode': isDarkMode, 'light-mode': !isDarkMode },
+    ]"
+  >
+    <div class="quest-header-custom">
+      <div class="scrolly-journey-custom">
+        <div
+          :class="[
+            'scrolly-journey-title-custom',
+            {
+              'dark-mode-text-custom': isDarkMode,
+              'light-mode-text-custom': !isDarkMode,
+            },
+          ]"
+        >
+          Scrolly's Journey
         </div>
+        <p
+          :class="[
+            'subtitle-custom',
+            {
+              'dark-mode-text-custom': isDarkMode,
+              'light-mode-text-custom': !isDarkMode,
+            },
+          ]"
+        >
+          The journey has just begun
+        </p>
       </div>
     </div>
-    <div class="quest-management">
-      <h2>Scrolly's Journey</h2>
-      <p class="subtitle">The journey has just begun</p>
-      <p class="activity-info">
-        Activity points can be earned by using Scrolly's features. Earn extra
-        points by minting NFTs, creating collections, or participating in
-        community activities.
-      </p>
-
-      <div v-if="view === 'grid'" class="grid-view">
+    <div class="quest-management-custom">
+      <div v-if="view === 'grid'" class="grid-view-custom">
         <div
           v-for="category in questStore.filteredCategories"
           :key="category.category"
-          class="quest-category"
+          :class="[
+            'quest-category-custom',
+            {
+              'dark-mode-category': isDarkMode,
+              'light-mode-category': !isDarkMode,
+            },
+          ]"
         >
-          <h3 class="category-title">
+          <div class="category-title-custom">
             {{ category.category }} ({{
               questStore.getCompletedQuests(category.quests)
             }}/{{ category.quests.length }} completed)
-          </h3>
-          <div class="quest-path">
-            <div
+          </div>
+          <div class="quest-path-custom">
+            <quest-card
               v-for="quest in category.quests"
               :key="quest.id"
-              class="quest-container"
-            >
-              <div
-                class="quest"
-                :class="{
-                  validated: quest.validated,
-                  notValidated: !quest.validated && !quest.tbd && !quest.ended,
-                  tbd: quest.tbd,
-                  ended: quest.ended,
-                  'validated-ended': quest.validated && quest.ended,
-                  flipped: questStore.hoveredQuest === quest.id,
-                }"
-                @mouseover="quest.tbd ? null : questStore.hoverQuest(quest.id)"
-                @mouseleave="questStore.hoverQuest(null)"
-                @click="
-                  quest.tbd ? null : questStore.showQuestDetails(quest.id)
-                "
-              >
-                <div class="quest-front">
-                  <div class="quest-image">
-                    <img :src="quest.image" alt="Quest Image" />
-                  </div>
-                  <div class="quest-title">{{ quest.title }}</div>
-                  <div
-                    v-if="!quest.validated && !quest.tbd && !quest.ended"
-                    class="points-box-front"
-                  >
-                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                    <span>{{ quest.points }} MP</span>
-                  </div>
-                </div>
-                <div class="quest-back">
-                  <div class="quest-title">{{ quest.title }}</div>
-                  <div class="points-box">
-                    <img src="/img/mappy_icon.png" alt="Mappy Icon" />
-                    <span>{{ quest.points }} MP</span>
-                  </div>
-                </div>
-              </div>
-            </div>
+              :quest="quest"
+              @showDetails="showQuestDetails"
+              :isDarkMode="isDarkMode"
+            />
           </div>
         </div>
       </div>
     </div>
 
     <!-- Quest Details Modal -->
-    <div
+    <quest-details-modal
       v-if="questStore.showModal"
-      class="modal-overlay"
-      @click="questStore.closeModal"
-    >
-      <div class="modal-content animate__animated animate__zoomIn" @click.stop>
-        <h5>Quest: {{ questStore.selectedQuest.title }} Details</h5>
-        <div class="modal-body">
-          <p>
-            <span
-              :class="{
-                'validated-check':
-                  questStore.selectedQuest.validated &&
-                  !questStore.selectedQuest.ended,
-                'not-validated-check':
-                  !questStore.selectedQuest.validated &&
-                  !questStore.selectedQuest.ended,
-                'ended-check':
-                  questStore.selectedQuest.ended &&
-                  !questStore.selectedQuest.validated,
-                'validated-ended-check':
-                  questStore.selectedQuest.validated &&
-                  questStore.selectedQuest.ended,
-              }"
-            ></span>
-            Status:
-            {{
-              questStore.selectedQuest.validated &&
-              questStore.selectedQuest.ended
-                ? "Validated + Quest Ended"
-                : questStore.selectedQuest.validated
-                  ? "Validated"
-                  : questStore.selectedQuest.ended
-                    ? "Quest Ended"
-                    : "Not validated"
-            }}
-          </p>
-          <p
-            v-if="
-              questStore.selectedQuest.validated &&
-              questStore.selectedQuest.ended
-            "
-          >
-            Congratulations! You have successfully claimed
-            {{ questStore.selectedQuest.points }} Mappy Points and the quest has
-            ended!
-          </p>
-          <p v-else-if="questStore.selectedQuest.validated">
-            Congratulations! You have successfully claimed
-            {{ questStore.selectedQuest.points }} Mappy Points!
-          </p>
-          <p>Max points: {{ questStore.selectedQuest.points }} MP</p>
-          <p>Description: {{ questStore.questDetails }}</p>
-          <div
-            v-if="
-              questStore.selectedQuest.contractAddress &&
-              !questStore.selectedQuest.validated &&
-              !questStore.selectedQuest.ended
-            "
-          >
-            <p v-if="questStore.claimStatus">
-              You have already claimed this reward.
-            </p>
-            <p v-else-if="questStore.eligibilityStatus">
-              You are eligible to claim your reward!
-              <button class="claim-button" @click="claimReward">
-                Claim Reward
-              </button>
-            </p>
-            <p v-else>You are not eligible to claim this reward yet.</p>
-          </div>
-          <NuxtLink
-            v-if="questStore.selectedQuest.id === 1"
-            to="https://sns.scrolly.xyz/#/"
-            target="_blank"
-          >
-            Mint your domain
-          </NuxtLink>
-        </div>
-        <button @click="questStore.closeModal" class="modal-close-button">
-          Close
-        </button>
-      </div>
-    </div>
+      :quest="questStore.selectedQuest"
+      @close="questStore.closeModal"
+      @claim="claimReward"
+      :isDarkMode="isDarkMode"
+    />
+
     <!-- Popup Notification -->
-    <div v-if="questStore.showPopup" class="popup-notification">
-      {{ questStore.popupMessage }}
+    <transition name="fade">
+      <div v-if="questStore.showPopup" class="popup-notification-custom">
+        {{ questStore.popupMessage }}
+      </div>
+    </transition>
+
+    <!-- Fixed Mappy Points Card -->
+    <div class="mappy-points-fixed-custom">
+      <points-card :activityPoints="questStore.activityPoints" />
     </div>
   </div>
 </template>
 
 <script>
+import { computed } from "vue";
 import { useUserStore } from "~/store/user";
 import { useQuestStore } from "~/store/questStore";
+import { useThemeStore } from "~/store/theme";
+import PointsCard from "~/components/quests/PointsCard.vue";
+import QuestCard from "~/components/quests/QuestCard.vue";
+import QuestDetailsModal from "~/components/quests/QuestDetailsModal.vue";
 
 export default {
   name: "QuestPage",
+  components: {
+    PointsCard,
+    QuestCard,
+    QuestDetailsModal,
+  },
   data() {
     return {
-      view: "grid", // Default to grid view
-      hoverQuest: null, // Store hovered quest ID for tooltip
-      showDetails: false, // Show or hide points details
+      view: "grid",
+      showDetails: false,
     };
   },
   setup() {
     const userStore = useUserStore();
     const questStore = useQuestStore();
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.isDarkMode);
 
     return {
       userStore,
       questStore,
+      isDarkMode,
     };
   },
   computed: {
@@ -246,7 +139,7 @@ export default {
     this.handleHashChange();
     window.addEventListener("hashchange", this.handleHashChange);
   },
-  beforeDestroy() {
+  beforeUnmount() {
     window.removeEventListener("hashchange", this.handleHashChange);
   },
   watch: {
@@ -297,383 +190,316 @@ export default {
     },
   },
 };
+definePageMeta({
+  layout: "quests",
+});
 </script>
 
 <style scoped>
 @import "animate.css";
 
-.quest-page {
+.quest-page-custom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
   min-height: 100vh;
   padding: 20px;
-  text-align: center;
+  background-color: transparent;
+  position: relative;
 }
 
-.header-section {
+.quest-header-custom {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  margin-bottom: 20px;
-}
-
-.points-display {
+  width: 100%;
   text-align: center;
 }
 
-.points-card {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+.scrolly-journey-custom {
+  width: 100%;
 }
 
-.points-card h2 {
-  margin: 0;
-  font-size: 1.5em;
+.scrolly-journey-title-custom {
+  position: relative;
+  font-size: 2em;
+  color: inherit;
 }
 
-.points-card p {
-  margin: 0;
-  font-size: 1em;
-  font-weight: bold;
+.scrolly-journey-title-custom::after {
+  position: absolute;
+  top: -10px;
+  left: -30px;
+  opacity: 0.1; /* Adjust opacity for background effect */
 }
 
-.details-button {
-  margin-top: 10px;
-  background: none;
-  border: none;
-  color: #333;
-  font-size: 1em;
-  cursor: pointer;
-}
-
-.details-button:hover {
-  text-decoration: underline;
-}
-
-.points-details {
-  margin-top: 10px;
-  text-align: left;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #fff;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 0.9em;
-}
-
-.details-section {
-  margin-bottom: 10px;
-}
-
-.details-header {
-  font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.details-item {
-  margin: 5px 0;
-}
-
-.leaderboard-link {
-  margin: 20px;
-}
-
-.leaderboard-button {
-  display: inline-block;
-  background: #ddd;
-  color: #999;
-  padding: 10px 20px;
-  border-radius: 5px;
-  text-decoration: none;
-  font-weight: bold;
-  cursor: not-allowed;
-}
-
-.quest-management {
-  margin-top: 40px;
-}
-
-.quest-management .subtitle {
-  font-size: 1.2em;
-  margin-bottom: 20px;
-}
-
-.activity-info {
-  margin-bottom: 30px;
-  font-size: 1.1em;
-}
-
-.view-toggle {
+.header-content-custom {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%;
+  padding: 20px;
 }
 
-.view-toggle button {
-  padding: 10px 20px;
-  margin: 0 5px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-weight: bold;
+.mappy-points-fixed-custom {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
 }
 
-.view-toggle button.active {
-  background-color: #333;
-  color: #fff;
+.quest-management-custom {
+  flex: 1 1 auto;
+  margin-top: 20px;
+  width: 100%;
+  max-width: 800px;
+  text-align: center;
 }
 
-.view-toggle button:not(.active) {
-  background-color: #ddd;
-  color: #333;
-}
-
-.grid-view {
+.grid-view-custom {
   display: flex;
   flex-direction: column;
 }
 
-.quest-category {
+.quest-category-custom {
+  position: relative;
   margin-top: 20px;
+  padding: 10px;
+  border-radius: 10px;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+  background-color: inherit;
+  color: inherit;
+  border: 1px solid;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 40px;
 }
 
-.category-title {
+.quest-category-custom::before {
+  content: "";
+  position: absolute;
+  top: -20px;
+  left: -20px;
+  right: -20px;
+  bottom: -20px;
+  background-image: url("~/assets/Vector.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  border-radius: 10px;
+  z-index: -1;
+}
+
+.category-title-custom {
   font-size: 1.5em;
   margin-bottom: 10px;
+  color: inherit;
 }
 
-.quest-path {
+.quest-path-custom {
   display: flex;
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 20px;
 }
 
-.quest-container {
-  perspective: 1000px;
-}
-
-.quest {
-  background: rgba(0, 0, 0, 0.7);
-  padding: 10px;
+.quest-card-custom {
+  border: 1px solid #ddd;
   border-radius: 10px;
-  margin: 20px;
-  cursor: pointer;
-  transition: transform 0.6s;
-  transform-style: preserve-3d;
-  text-align: center;
-  width: 150px;
-  height: 150px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.quest.flipped {
-  transform: rotateY(180deg);
-}
-
-.quest-front,
-.quest-back {
-  position: absolute;
-  backface-visibility: hidden;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: 10px;
-  padding: 10px;
-}
-
-.quest-back {
-  transform: rotateY(180deg);
-}
-
-.quest-image {
-  width: 60px;
-  height: 60px;
-  margin-bottom: 10px;
-}
-
-.quest-image img {
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  object-fit: cover;
-}
-
-.quest-title {
-  margin-top: 10px;
-  font-weight: bold;
-  font-size: 1em;
-  color: #fff;
-}
-
-.points-box-front {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-top: 10px;
-}
-
-.points-box {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, 0.3);
-  border-radius: 5px;
-  padding: 5px 10px;
-  margin-top: 10px;
-}
-
-.points-box img {
-  width: 20px;
-  height: 20px;
-  margin-right: 5px;
-}
-
-.quest.validated {
-  border: 2px solid #4caf50;
-}
-
-.quest.notValidated {
-  border: 2px solid #f44336;
-}
-
-.quest.tbd {
-  border: 2px solid #9e9e9e;
-  background: rgba(158, 158, 158, 0.7);
-  cursor: not-allowed;
-}
-
-.quest.ended {
-  border: 2px solid #ff9800;
-}
-
-.quest.validated-ended {
-  border: 2px solid #4caf50;
-  background: linear-gradient(to right, #4caf50, #ff9800);
-}
-
-.claim-button {
-  background-color: #4caf50;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
+  transition:
+    transform 0.3s,
+    box-shadow 0.3s;
+  padding: 10px;
+  margin: 20px;
+  width: 150px;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.9);
+  color: inherit;
 }
 
-.claim-button:hover {
-  background-color: #45a049;
+.quest-card-custom:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
 }
 
-.modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.8);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 2000;
-}
-
-.modal-content {
-  background: var(--bs-mode);
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  color: #333;
-  max-width: 400px;
-  width: 80%;
-  z-index: 2500;
-}
-
-.modal-content h3 {
-  margin-top: 0;
-}
-
-.modal-body {
+.quest-info-custom {
+  padding: 15px;
   text-align: left;
 }
 
-.validated-check::before {
-  content: "✔️";
-  color: green;
+.quest-info-custom div {
+  margin: 0;
+  font-size: 1.2em;
 }
 
-.not-validated-check::before {
-  content: "❌";
-  color: red;
+.quest-info-custom p {
+  margin: 5px 0;
+  color: #666;
 }
 
-.ended-check::before {
-  content: "⌛";
+.quest-status-custom {
+  display: block;
+  margin-top: 10px;
+  font-size: 0.9em;
+  color: inherit;
+}
+
+.validated .quest-status-custom {
+  color: #4caf50;
+}
+
+.notValidated .quest-status-custom {
+  color: #f44336;
+}
+
+.tbd .quest-status-custom {
+  color: #9e9e9e;
+}
+
+.ended .quest-status-custom {
   color: #ff9800;
 }
 
-.validated-ended-check::before {
-  content: "✔️⌛";
-  color: green;
+.badges-custom {
+  display: flex;
+  gap: 5px;
+  margin-top: 10px;
 }
 
-.modal-close-button {
-  background-color: #333;
-  color: #fff;
-  border: none;
-  padding: 10px 20px;
+.badge-custom {
+  padding: 5px 10px;
   border-radius: 5px;
-  cursor: pointer;
-  margin-top: 20px;
+  font-size: 0.8em;
+  color: #fff;
 }
 
-.modal-close-button:hover {
-  background-color: #555;
+.badge-validated-custom {
+  background-color: #4caf50;
 }
 
-.popup-notification {
+.badge-ended-custom {
+  background-color: #ff9800;
+}
+
+.badge-claimable-custom {
+  background-color: #00bcd4;
+}
+
+.badge-not-claimable-custom {
+  background-color: #9e9e9e;
+}
+
+/* Light Mode Styles */
+.light-mode .quest-page-custom {
+  background-color: #f5f5f5;
+  color: #000;
+}
+
+.light-mode .quest-category-custom {
+  background: hsla(
+    0,
+    0%,
+    100%,
+    0.6
+  ); /* Light background with slight transparency */
+  color: #000; /* Black text color */
+  border-color: #ddd; /* Light border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Light shadow */
+}
+
+.light-mode .category-title-custom,
+.light-mode .quest-info-custom div {
+  color: #000;
+}
+
+.light-mode .quest-card-custom {
+  background: rgba(255, 255, 255, 0.9);
+}
+
+.light-mode .quest-card-custom:hover {
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark Mode Styles */
+.dark-mode .quest-page-custom {
+  background-color:;
+  color: #fff;
+}
+
+.dark-mode .quest-category-custom {
+  background: rgba(
+    51,
+    51,
+    51,
+    0.6
+  ); /* Dark background with slight transparency */
+  color: #fff; /* White text color */
+  border-color: #666; /* Dark border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Dark shadow */
+}
+
+.dark-mode .category-title-custom,
+.dark-mode .quest-info-custom div {
+  color: #fff;
+}
+
+.dark-mode .quest-card-custom {
+  background: rgba(51, 51, 51, 0.9);
+  border: 1px solid #666;
+}
+
+.dark-mode .quest-card-custom:hover {
+  box-shadow: 0 10px 20px rgba(255, 255, 255, 0.2);
+}
+/* Notification Styles */
+.popup-notification-custom {
   position: fixed;
-  top: 50px;
-  right: 20px;
-  background: #333;
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 15px 30px;
+  border-radius: 10px;
+  font-size: 1em;
+  z-index: 2000;
+  text-align: center;
+  transition:
+    background-color 0.3s,
+    color 0.3s;
+}
+
+.light-mode .popup-notification-custom {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .popup-notification-custom {
+  background-color: rgba(51, 51, 51, 0.9);
   color: #fff;
-  padding: 15px;
-  border-radius: 5px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 3000;
-  transition: opacity 0.3s ease-in-out;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.2);
 }
 
-.popup-notification-enter-active,
-.popup-notification-leave-active {
-  transition: opacity 0.5s;
-}
-
-.popup-notification-enter,
-.popup-notification-leave-to {
-  opacity: 0;
-}
-
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
-
-.mappy-point {
-  color: var(--bs-black);
+/* Responsive Styles */
+@media (max-width: 767px) {
+  .header-content-custom {
+    flex-direction: column;
+    align-items: center;
+  }
+  .mappy-points-fixed-custom {
+    top: 10px;
+    right: 10px;
+    text-align: center;
+  }
+  .quest-management-custom {
+    margin-top: 20px;
+  }
 }
 </style>

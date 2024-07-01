@@ -39,7 +39,7 @@
             </NuxtLink>
           </li>
           <li class="nav-item">
-            <NuxtLink class="nav-link" to="/scrollybadge">
+            <NuxtLink class="nav-link" to="/dashboard">
               <span class="navbar-brand-text align-middle">Quests</span>
             </NuxtLink>
           </li>
@@ -81,7 +81,9 @@
             >
               Theme:
               {{
-                `${String(siteStore.getColorMode).charAt(0).toUpperCase()}${String(siteStore.getColorMode).slice(1)}`
+                `${String(siteStore.getColorMode)
+                  .charAt(0)
+                  .toUpperCase()}${String(siteStore.getColorMode).slice(1)}`
               }}
             </a>
             <div class="dropdown-menu dropdown-menu-end">
@@ -146,7 +148,7 @@
                         <i class="user-name">
                           {{
                             getTextWithoutBlankCharacters(
-                              userStore.getDefaultDomain,
+                              userStore.getDefaultDomain
                             )
                           }}
                         </i>
@@ -371,7 +373,7 @@ export default {
         this.$config.chatTokenAddress,
         this.$config.chatTokenSymbol,
         18, // decimals
-        this.$config.chatTokenImage,
+        this.$config.chatTokenImage
       );
     },
 
@@ -379,7 +381,7 @@ export default {
       this.siteStore.setColorMode(newMode);
       document.documentElement.setAttribute(
         "data-bs-theme",
-        this.siteStore.getColorMode,
+        this.siteStore.getColorMode
       );
     },
 

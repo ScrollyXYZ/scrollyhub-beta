@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="default-layout">
     <Head>
       <Title>{{ $config.projectMetadataTitle }}</Title>
       <Meta name="description" :content="$config.projectDescription" />
@@ -23,150 +23,148 @@
       />
     </Head>
 
-    <div id="cloud-intro">
-      <NavbarDesktop v-if="!isMobile" />
-      <NavbarMobile v-if="isMobile" :lSidebar="lSidebar" :rSidebar="rSidebar" />
+    <NavbarDesktop v-if="!isMobile" />
+    <NavbarMobile v-if="isMobile" :lSidebar="lSidebar" :rSidebar="rSidebar" />
 
-      <!-- Main content with sidebars -->
-      <div class="container-fluid page-container">
-        <div class="row flex-nowrap">
-          <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
+    <!-- Main content with sidebars -->
+    <div class="container-fluid page-container">
+      <div class="row flex-nowrap">
+        <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
 
-          <main
-            class="col col-lg-4 ps-md-2 pt-2 main-containter"
-            v-show="sidebarStore.showMainContent"
-          >
-            <slot></slot>
-          </main>
+        <main
+          class="col col-lg-4 ps-md-2 pt-2 main-containter"
+          v-show="sidebarStore.showMainContent"
+        >
+          <slot></slot>
+        </main>
 
-          <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
-        </div>
-        <BadgeSticker
-          v-show="badgeIsEligible"
-          class="fixed-bottom"
-          style="margin-right: 0; margin-left: auto"
-        />
+        <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
       </div>
+      <BadgeSticker
+        v-show="badgeIsEligible"
+        class="fixed-bottom"
+        style="margin-right: 0; margin-left: auto"
+      />
     </div>
+  </div>
 
-    <!-- Connect Wallet modal -->
-    <div
-      class="modal modal-sm fade"
-      id="connectModal"
-      tabindex="-1"
-      aria-labelledby="connectModalLabel"
-      aria-hidden="true"
-    >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title">Connect your wallet</h5>
-            <button
-              id="closeConnectModal"
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            >
-              <span aria-hidden="true"></span>
-            </button>
+  <!-- Connect Wallet modal -->
+  <div
+    class="modal modal-sm fade"
+    id="connectModal"
+    tabindex="-1"
+    aria-labelledby="connectModalLabel"
+    aria-hidden="true"
+  >
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Connect your wallet</h5>
+          <button
+            id="closeConnectModal"
+            type="button"
+            class="btn-close"
+            data-bs-dismiss="modal"
+            aria-label="Close"
+          >
+            <span aria-hidden="true"></span>
+          </button>
+        </div>
+        <div class="modal-body row">
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/metamask.png"
+              class="card-img-top card-img-wallet"
+              alt="MetaMask"
+            />
+            <small class="text-center mb-3 text-muted">MetaMask</small>
           </div>
-          <div class="modal-body row">
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/metamask.png"
-                class="card-img-top card-img-wallet"
-                alt="MetaMask"
-              />
-              <small class="text-center mb-3 text-muted">MetaMask</small>
-            </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/rabby.png"
-                class="card-img-top card-img-wallet"
-                alt="Rabby"
-              />
-              <small class="text-center mb-3 text-muted">Rabby</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/rabby.png"
+              class="card-img-top card-img-wallet"
+              alt="Rabby"
+            />
+            <small class="text-center mb-3 text-muted">Rabby</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/bifrost.png"
-                class="card-img-top card-img-wallet"
-                alt="Bifrost"
-              />
-              <small class="text-center mb-3 text-muted">Bifrost</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/bifrost.png"
+              class="card-img-top card-img-wallet"
+              alt="Bifrost"
+            />
+            <small class="text-center mb-3 text-muted">Bifrost</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/zerion.png"
-                class="card-img-top card-img-wallet"
-                alt="Zerion"
-              />
-              <small class="text-center mb-3 text-muted">Zerion</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/zerion.png"
+              class="card-img-top card-img-wallet"
+              alt="Zerion"
+            />
+            <small class="text-center mb-3 text-muted">Zerion</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectCoinbase"
-            >
-              <img
-                src="@/assets/img/wallets/coinbase.png"
-                class="card-img-top card-img-wallet"
-                alt="Coinbase"
-              />
-              <small class="text-center mb-3 text-muted">Coinbase</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectCoinbase"
+          >
+            <img
+              src="@/assets/img/wallets/coinbase.png"
+              class="card-img-top card-img-wallet"
+              alt="Coinbase"
+            />
+            <small class="text-center mb-3 text-muted">Coinbase</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/brave.png"
-                class="card-img-top card-img-wallet"
-                alt="Brave"
-              />
-              <small class="text-center mb-3 text-muted">Brave</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/brave.png"
+              class="card-img-top card-img-wallet"
+              alt="Brave"
+            />
+            <small class="text-center mb-3 text-muted">Brave</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/trust.png"
-                class="card-img-top card-img-wallet"
-                alt="Trust Wallet"
-              />
-              <small class="text-center mb-3 text-muted">Trust Wallet</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/trust.png"
+              class="card-img-top card-img-wallet"
+              alt="Trust Wallet"
+            />
+            <small class="text-center mb-3 text-muted">Trust Wallet</small>
+          </div>
 
-            <div
-              class="card col-6 cursor-pointer wallet-img-wrapper"
-              @click="connectMetaMask"
-            >
-              <img
-                src="@/assets/img/wallets/imtoken.png"
-                class="card-img-top card-img-wallet"
-                alt="imToken"
-              />
-              <small class="text-center mb-3 text-muted">imToken</small>
-            </div>
+          <div
+            class="card col-6 cursor-pointer wallet-img-wrapper"
+            @click="connectMetaMask"
+          >
+            <img
+              src="@/assets/img/wallets/imtoken.png"
+              class="card-img-top card-img-wallet"
+              alt="imToken"
+            />
+            <small class="text-center mb-3 text-muted">imToken</small>
           </div>
         </div>
       </div>
@@ -183,7 +181,6 @@
 
     <VerifyAccountOwnership />
   </div>
-
   <!-- Do not delete: ugly hack to make "global" work with Vite -->
   <component :is="'script'"> var global = global || window; </component>
 </template>
@@ -675,3 +672,12 @@ export default {
   },
 };
 </script>
+<style scoped>
+.default-layout {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  background: url("/css/clouds/1500x500.jpg") no-repeat center center fixed;
+  background-size: cover;
+}
+</style>

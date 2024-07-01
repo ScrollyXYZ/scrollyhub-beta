@@ -1,10 +1,10 @@
 <template>
-  <div class="get-started-carousel">
+  <div :class="['get-started-carousel', { 'dark-mode': isDarkMode }]">
     <Swiper
       :modules="[Navigation, Pagination]"
       :slides-per-view="1"
       navigation
-      grab-cursor="true"
+      :grab-cursor="true"
       class="main-swiper"
     >
       <SwiperSlide v-for="(slide, index) in slides" :key="index">
@@ -23,12 +23,11 @@
                 {{ slide.buttonText }}
               </a>
             </template>
-            <template v-else-if="slide.link.startsWith('#')">
+            <template v-else-if="slide.link === 'referral'">
               <button
                 type="button"
                 class="slide-button"
-                data-bs-toggle="modal"
-                :data-bs-target="slide.link"
+                @click="copyReferralLink"
               >
                 {{ slide.buttonText }}
               </button>
@@ -42,25 +41,25 @@
         </div>
       </SwiperSlide>
     </Swiper>
-
-    <!-- Modal -->
-    <ReferralModal />
   </div>
 </template>
 
 <script>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import { Navigation, Pagination } from "swiper/modules";
-import ReferralModal from "~/components/referrals/ReferralModal.vue";
+import { useThemeStore } from "~/store/theme";
+import { useToast } from "vue-toastification/dist/index.mjs";
+import { useEthers } from "vue-dapp";
+import { useUserStore } from "~/store/user";
+import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
   name: "GetStartedCarousel",
   components: {
     Swiper,
     SwiperSlide,
-    ReferralModal,
   },
   setup() {
     const slides = ref([
@@ -94,9 +93,9 @@ export default {
         img: "http://scrolly.xyz/onboarding/4.png",
         alt: "Progress Icon",
         description:
-          "Earn passive Mappy Points rewards with your on-chain activities on the hub.",
-        buttonText: "Get my Link",
-        link: "#referralModal",
+          "Earn passive Mappy Points rewards with your friends' activities on-chain.",
+        buttonText: "Copy Referral Link",
+        link: "referral", // Custom link to identify referral action
       },
       {
         title: "Step 5: Evolve your Badge",
@@ -117,15 +116,37 @@ export default {
       },
     ]);
 
-    const isExternalLink = (link) => {
-      return link.startsWith("http");
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
+    const { address } = useEthers();
+    const toast = useToast();
+    const userStore = useUserStore();
+
+    const getDomainNameOrAddress = () => {
+      if (userStore.getDefaultDomain) {
+        return getTextWithoutBlankCharacters(userStore.getDefaultDomain);
+      }
+      return address;
+    };
+
+    const getReferralLink = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("ref", getDomainNameOrAddress());
+      return url.toString();
+    };
+
+    const copyReferralLink = () => {
+      navigator.clipboard.writeText(getReferralLink());
+      toast("Referral link copied to your clipboard!", { type: "success" });
     };
 
     return {
       Navigation,
       Pagination,
       slides,
-      isExternalLink,
+      isExternalLink: (link) => link.startsWith("https"),
+      isDarkMode,
+      copyReferralLink,
     };
   },
 };
@@ -133,14 +154,18 @@ export default {
 
 <style scoped>
 .get-started-carousel {
+  width: 100%;
   text-align: center;
-  padding: 20px;
+  background-color: #f0f0f0; /* Light mode background color */
+  transition: background-color 0.3s ease;
+}
+
+.get-started-carousel.dark-mode {
+  background-color: #333; /* Dark mode background color */
 }
 
 .main-swiper {
-  margin-bottom: 20px;
   width: 100%;
-  margin: 0 auto;
 }
 
 .slide-content {
@@ -148,6 +173,7 @@ export default {
   text-align: center;
   border-radius: 10px;
   overflow: hidden;
+  color: #fff; /* Default text color */
 }
 
 .slide-image {
@@ -172,13 +198,11 @@ export default {
 .overlay h2 {
   font-size: 1.8em;
   margin-bottom: 10px;
-  color: white;
 }
 
 .overlay p {
   font-size: 1.2em;
   margin-bottom: 15px;
-  color: white;
 }
 
 .slide-button {
@@ -200,7 +224,6 @@ export default {
   transform: scale(1.05);
 }
 
-/* Custom styles */
 .swiper {
   width: 100%;
   height: 100%;
@@ -210,5 +233,38 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+.dark-mode .overlay {
+  background: rgba(51, 51, 51, 0.9);
+}
+
+.dark-mode .slide-title,
+.dark-mode .slide-button {
+  color: #fff;
+}
+
+/* Ensure text is white in both light and dark modes */
+.overlay h2,
+.overlay p {
+  color: #fff;
+}
+
+@media (max-width: 874px) {
+  .get-started-carousel {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+  }
+
+  .swiper-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .slide-content {
+    width: 100%;
+  }
 }
 </style>

@@ -7,89 +7,57 @@
     />
   </Head>
 
-  <div class="card border scroll-500">
-    <div class="card-body mb-5">
-      <p class="fs-3">
-        <i
-          class="bi bi-arrow-left-circle cursor-pointer"
-          @click="$router.back()"
-        ></i>
-      </p>
+  <div :class="['badge-container', { 'dark-mode': isDarkMode }]">
+    <div class="badge-card">
+      <i class="bi bi-arrow-left-circle back-icon" @click="$router.back()"></i>
+      <h3 class="badge-title">Scroll Badge</h3>
 
-      <div class="row">
-        <div class="col-md-6 offset-md-3 text-center">
-          <h3 class="mb-3">Scroll Badge</h3>
+      <div class="loading-spinner" v-if="waiting">
+        <span class="spinner"></span>
+      </div>
 
-          <div class="d-flex justify-content-center mb-3" v-if="waiting">
-            <span
-              class="spinner-border spinner-border-lg"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          </div>
+      <BadgeNotConnected v-if="!isActivated" />
+      <BadgeSwitchNetwork v-if="isActivated && !isSupportedChain" />
 
-          <BadgeNotConnected v-if="!isActivated" />
-          <BadgeSwitchNetwork v-if="isActivated && !isSupportedChain" />
+      <BadgeCheckEligibility
+        @check-eligibility="checkEligibility"
+        v-if="
+          isActivated &&
+          isSupportedChain &&
+          !isEligible &&
+          !badgeMetadata &&
+          !hasBadge &&
+          !waiting
+        "
+      />
 
-          <BadgeCheckEligibility
-            @check-eligibility="checkEligibility"
-            v-if="
-              isActivated &&
-              isSupportedChain &&
-              !isEligible &&
-              !badgeMetadata &&
-              !hasBadge &&
-              !waiting
-            "
-          />
+      <BadgeNotEligible v-if="isActivated && isSupportedChain && !isEligible" />
 
-          <BadgeNotEligible
-            v-if="isActivated && isSupportedChain && !isEligible"
-          />
+      <BadgeMintProfile
+        v-if="isActivated && isSupportedChain && isEligible && !isProfileMinted"
+        :profileRegistryAddress="profileRegistryAddress"
+        @checkIfProfileMinted="checkIfProfileMinted"
+      />
 
-          <BadgeMintProfile
-            v-if="
-              isActivated && isSupportedChain && isEligible && !isProfileMinted
-            "
-            :profileRegistryAddress="profileRegistryAddress"
-            @checkIfProfileMinted="checkIfProfileMinted"
-          />
+      <div
+        v-if="isActivated && isSupportedChain && isEligible && isProfileMinted"
+      >
+        <BadgeMintBadge
+          v-if="badgeMetadata && !hasBadge"
+          :apiBaseUrl="apiBaseUrl"
+          :badgeContractAddress="badgeContractAddress"
+          :badgeMetadata="badgeMetadata"
+          @checkIfBadgeMinted="checkIfBadgeMinted"
+        />
 
-          <div
-            v-if="
-              isActivated && isSupportedChain && isEligible && isProfileMinted
-            "
-          >
-            <BadgeMintBadge
-              v-if="badgeMetadata && !hasBadge"
-              :apiBaseUrl="apiBaseUrl"
-              :badgeContractAddress="badgeContractAddress"
-              :badgeMetadata="badgeMetadata"
-              @checkIfBadgeMinted="checkIfBadgeMinted"
-            />
-
-            <BadgeDetails
-              v-if="badgeMetadata && hasBadge"
-              :badgeMetadata="badgeMetadata"
-              :badgeContractAddress="badgeContractAddress"
-              :graphqlUrl="graphqlUrl"
-              :profileAddress="profileAddress"
-              :profileRegistryAddress="profileRegistryAddress"
-            />
-          </div>
-
-          <!-- Data 
-          <hr />
-          <p class="text-break mt-3">
-            Data:
-            <ul>
-              <li>Is eligible for minting: {{ isEligible }}</li>
-              <li>Is profile already minted: {{ isProfileMinted }}</li>
-              <li>User already has badge: {{ hasBadge }}</li>
-            </ul>
-          </p>
-          -->
-        </div>
+        <BadgeDetails
+          v-if="badgeMetadata && hasBadge"
+          :badgeMetadata="badgeMetadata"
+          :badgeContractAddress="badgeContractAddress"
+          :graphqlUrl="graphqlUrl"
+          :profileAddress="profileAddress"
+          :profileRegistryAddress="profileRegistryAddress"
+        />
       </div>
     </div>
   </div>
@@ -107,6 +75,8 @@ import BadgeMintProfile from "~/components/badge/BadgeMintProfile.vue";
 import BadgeNotConnected from "~/components/badge/BadgeNotConnected.vue";
 import BadgeNotEligible from "~/components/badge/BadgeNotEligible.vue";
 import BadgeSwitchNetwork from "~/components/badge/BadgeSwitchNetwork.vue";
+import { useThemeStore } from "~/store/theme";
+
 export default {
   name: "Badge",
   components: {
@@ -134,11 +104,11 @@ export default {
   },
   computed: {
     isSupportedChain() {
-      if (this.chainId === this.$config.supportedChainId) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.chainId === this.$config.supportedChainId;
+    },
+    isDarkMode() {
+      const themeStore = useThemeStore();
+      return themeStore.getIsDarkMode;
     },
   },
   methods: {
@@ -151,11 +121,7 @@ export default {
       const checkUrl = `${this.apiBaseUrl}check?badge=${this.badgeContractAddress}&recipient=${this.address}`;
       try {
         const response = await axios.get(checkUrl);
-        if (response.data.eligibility) {
-          this.isEligible = true;
-        } else {
-          this.isEligible = false;
-        }
+        this.isEligible = response.data.eligibility;
       } catch (error) {
         console.error(error);
         this.toast.error("An error occurred. Please try again later.");
@@ -225,16 +191,12 @@ export default {
       );
       try {
         const level = await contract.getLevel(this.address);
-        //console.log(level);
         const mdUrl = await contract.badgeTokenURI(
           "0x0000000000000000000000000000000000000000000000000000000000000000",
         );
         if (mdUrl.startsWith("https://")) {
-          // Fetch the metadata
           const response = await axios.get(mdUrl + "?level=" + level);
-          //console.log(response.data);
           this.badgeMetadata = response.data;
-          //console.log(response.data.image);
         } else {
           console.error("Invalid IPFS URL");
         }
@@ -280,14 +242,84 @@ export default {
         this.checkEligibility();
       }
     },
-    /*
-    isActivated(newValue, oldValue) {
-      console.log("isActivated changed");
-      if (oldValue && oldValue !== newValue && !this.waiting && this.isSupportedChain) {
-        this.checkEligibility();
-      }
-    }
-    */
   },
 };
+definePageMeta({
+  layout: "quests",
+});
 </script>
+<style scoped>
+.badge-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: var(--background-color);
+  color: var(--text-color);
+}
+
+.badge-card {
+  background: var(--card-bg);
+  color: var(--card-text);
+  padding: 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  width: 90%;
+  max-width: 600px;
+  position: relative;
+}
+
+.back-icon {
+  font-size: 2rem;
+  cursor: pointer;
+  position: absolute;
+  top: 1rem;
+  left: 1rem;
+}
+
+.badge-title {
+  margin-bottom: 1.5rem;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100px;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(0, 0, 0, 0.1);
+  border-top: 5px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* Light Mode Styles */
+.badge-container:not(.dark-mode) {
+  --text-color: #333;
+  --card-bg: #fff;
+  --card-text: #000;
+  --primary-color: #007bff;
+}
+
+/* Dark Mode Styles */
+.badge-container.dark-mode {
+  --text-color: #333;
+  --card-bg: #444;
+  --card-text: #fff;
+  --primary-color: #4caf50;
+}
+</style>

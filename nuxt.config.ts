@@ -30,6 +30,7 @@ export default defineNuxtConfig({
   css: [
     "vue-toastification/dist/index.css",
     "@fortawesome/fontawesome-free/css/all.css",
+    "~/assets/css/quests.css",
   ],
   modules: ["@pinia/nuxt", "@vueuse/nuxt"],
   router: {

@@ -58,9 +58,9 @@
     </div>
     <hr class="separator" />
     <NuxtLink
-      to="/scrollybadge"
+      to="/dashboard"
       class="list-group-item cursor-pointer hover-color bg-light border-0"
-      :class="$route.path === '/scrollybadge' ? 'active' : ''"
+      :class="$route.path === '/dashboard' ? 'active' : ''"
       @click="closeLeftSidebar"
     >
       <i class="fas fa-info-circle"></i> Badge Infos
@@ -102,7 +102,13 @@ export default {
   components: {
     ProfileImage,
   },
-  props: ["isMobile", "lSidebar"],
+  props: {
+    isMobile: Boolean,
+    lSidebar: Object,
+    address: String, // Ajout de la prop address
+    completedQuests: Number,
+    totalQuests: Number,
+  },
   setup(props) {
     const userStore = useUserStore();
     const questStore = useQuestStore();
@@ -190,20 +196,8 @@ export default {
         { name: "Grand Cartographer of Scrolly", points: 6000 },
       ];
       return grades.find(
-        (grade) => this.questStore.activityPoints < grade.points,
+        (grade) => this.questStore.activityPoints < grade.points
       );
-    },
-    completedQuests() {
-      if (!this.questStore.questCategories) return 0;
-      return this.questStore.questCategories.reduce((total, category) => {
-        return total + this.questStore.getCompletedQuests(category.quests);
-      }, 0);
-    },
-    totalQuests() {
-      if (!this.questStore.questCategories) return 0;
-      return this.questStore.questCategories.reduce((total, category) => {
-        return total + category.quests.length;
-      }, 0);
     },
   },
   mounted() {

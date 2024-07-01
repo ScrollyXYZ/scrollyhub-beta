@@ -11,10 +11,12 @@
             <component
               :is="currentSidebarComponent"
               :user-store="userStore"
+              :quest-store="questStore"
               :current-grade="currentGrade"
               :progress="progress"
               :completed-quests="completedQuests"
               :total-quests="totalQuests"
+              :address="address"
               :is-mobile="isMobile"
               :l-sidebar="lSidebar"
               @update:is-mobile="updateIsMobile"
@@ -32,6 +34,7 @@ import { useToast } from "vue-toastification/dist/index.mjs";
 import { useNotificationsStore } from "~/store/notifications";
 import { useSidebarStore } from "~/store/sidebars";
 import { useUserStore } from "~/store/user";
+import { useQuestStore } from "~/store/questStore";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
 
 import QuestPageSidebar from "./QuestPageSidebar.vue";
@@ -66,6 +69,9 @@ export default {
     },
     notificationsStore() {
       return useNotificationsStore();
+    },
+    questStore() {
+      return useQuestStore();
     },
     currentGrade() {
       const tiers = [
@@ -106,8 +112,20 @@ export default {
         return 0;
       }
     },
+    completedQuests() {
+      if (!this.questStore.questCategories) return 0;
+      return this.questStore.questCategories.reduce((total, category) => {
+        return total + this.questStore.getCompletedQuests(category.quests);
+      }, 0);
+    },
+    totalQuests() {
+      if (!this.questStore.questCategories) return 0;
+      return this.questStore.questCategories.reduce((total, category) => {
+        return total + category.quests.length;
+      }, 0);
+    },
     address() {
-      return this.userStore.address;
+      return this.userStore.getCurrentUserAddress;
     },
   },
   methods: {
@@ -138,6 +156,11 @@ export default {
       isActivated,
       toast,
     };
+  },
+  mounted() {
+    if (this.currentSidebarComponent === "QuestPageSidebar") {
+      this.questStore.initializeQuests();
+    }
   },
 };
 </script>
