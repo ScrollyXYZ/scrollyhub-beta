@@ -8,7 +8,7 @@
             class="profile-picture"
             :address="leaders[1].address"
             :domain="leaders[1].username"
-            :image="leaders[1].profilePicture"
+            :image="convertIpfsUrl(leaders[1].profilePicture)"
           />
           <span :class="['badge silver', { 'dark-mode-badge': isDarkMode }]"
             >2</span
@@ -27,7 +27,7 @@
             class="profile-picture"
             :address="leaders[0].address"
             :domain="leaders[0].username"
-            :image="leaders[0].profilePicture"
+            :image="convertIpfsUrl(leaders[0].profilePicture)"
           />
           <span :class="['badge gold', { 'dark-mode-badge': isDarkMode }]"
             >1</span
@@ -46,7 +46,7 @@
             class="profile-picture"
             :address="leaders[2].address"
             :domain="leaders[2].username"
-            :image="leaders[2].profilePicture"
+            :image="convertIpfsUrl(leaders[2].profilePicture)"
           />
           <span :class="['badge bronze', { 'dark-mode-badge': isDarkMode }]"
             >3</span
@@ -102,7 +102,9 @@ export default {
           return {
             ...leader,
             username: profile.username || "Unknown",
-            profilePicture: profile.profilePicture || "/img/user/anon.svg",
+            profilePicture:
+              this.convertIpfsUrl(profile.profilePicture) ||
+              "/img/user/anon.svg",
           };
         });
         this.leaders = await Promise.all(leaderPromises);
@@ -161,10 +163,17 @@ export default {
       }
       return "Unknown"; // Fallback if displayName is null or undefined
     },
+    convertIpfsUrl(ipfsUrl) {
+      if (ipfsUrl && ipfsUrl.startsWith("ipfs://")) {
+        return ipfsUrl.replace("ipfs://", "https://ipfs.io/ipfs/");
+      }
+      return ipfsUrl;
+    },
     async refreshProfileImages() {
       const leaderPromises = this.leaders.map(async (leader) => {
         const profile = await this.fetchOrbisProfile(leader.address);
-        leader.profilePicture = profile.profilePicture || leader.profilePicture;
+        leader.profilePicture =
+          this.convertIpfsUrl(profile.profilePicture) || leader.profilePicture;
         leader.username = profile.username || leader.username;
       });
       await Promise.all(leaderPromises);
