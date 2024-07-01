@@ -68,6 +68,7 @@ import ProfileImage from "~/components/profile/ProfileImage.vue";
 import { Orbis } from "@orbisclub/orbis-sdk";
 import { fetchUsername, storeUsername } from "~/utils/storageUtils";
 import { useThemeStore } from "~/store/theme";
+import { getDomainName } from "~/utils/domainUtils";
 
 const orbis = new Orbis();
 
@@ -135,26 +136,36 @@ export default {
           let provider = this.$getFallbackProvider(
             this.$config.supportedChainId,
           );
-          const domainName = await this.getDomainName(address, provider);
+          const domainName = await getDomainName(address, provider);
           if (domainName) {
             profile.username = domainName + this.$config.tldName;
             storeUsername(window, address, profile.username);
+          } else {
+            // Store the address as the fallback username
+            profile.username = address;
+            storeUsername(window, address, address);
           }
         } catch (error) {
           console.error(`Error fetching profile for ${address}:`, error);
         }
       }
 
+      console.log(`Profile for ${address}:`, profile); // Log the profile for debugging
+
       return profile;
     },
-    async getDomainName(address, provider) {},
     cleanDisplayName(displayName) {
-      return displayName.replace(/\.scrolly/g, "");
+      console.log("Cleaning display name:", displayName);
+      if (displayName) {
+        return displayName.replace(/\.scrolly/g, "");
+      }
+      return "Unknown"; // Fallback if displayName is null or undefined
     },
     async refreshProfileImages() {
       const leaderPromises = this.leaders.map(async (leader) => {
         const profile = await this.fetchOrbisProfile(leader.address);
         leader.profilePicture = profile.profilePicture || leader.profilePicture;
+        leader.username = profile.username || leader.username;
       });
       await Promise.all(leaderPromises);
     },
