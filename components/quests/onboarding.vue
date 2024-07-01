@@ -102,8 +102,8 @@ export default {
         img: "http://scrolly.xyz/onboarding/5.png",
         alt: "Progress Icon",
         description: "Your badge evolved with your Mappy Points.",
-        buttonText: "Get my Badge",
-        link: "/badge",
+        buttonText: "Soon",
+        link: "#",
       },
       {
         title: "Step 6: Enjoy Your Rewards",
