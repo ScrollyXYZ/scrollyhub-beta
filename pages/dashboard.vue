@@ -284,5 +284,9 @@ definePageMeta({
     flex-direction: row;
     align-items: center;
   }
+
+  .dashboard-page {
+    width: 100%;
+  }
 }
 </style>
