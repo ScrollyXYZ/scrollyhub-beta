@@ -5,6 +5,7 @@
       <div v-if="leaders[1]" class="leader second">
         <div :class="['podium', { 'dark-mode-podium': isDarkMode }]">
           <ProfileImage
+            v-if="leaders[1].profilePicture"
             class="profile-picture"
             :address="leaders[1].address"
             :domain="leaders[1].username"
@@ -24,6 +25,7 @@
       <div v-if="leaders[0]" class="leader first">
         <div :class="['podium', { 'dark-mode-podium': isDarkMode }]">
           <ProfileImage
+            v-if="leaders[0].profilePicture"
             class="profile-picture"
             :address="leaders[0].address"
             :domain="leaders[0].username"
@@ -43,6 +45,7 @@
       <div v-if="leaders[2]" class="leader third">
         <div :class="['podium', { 'dark-mode-podium': isDarkMode }]">
           <ProfileImage
+            v-if="leaders[2].profilePicture"
             class="profile-picture"
             :address="leaders[2].address"
             :domain="leaders[2].username"
@@ -128,9 +131,10 @@ export default {
             const did = data[0].did;
             const profileResponse = await orbis.getProfile(did);
             if (profileResponse.status === 200) {
-              profile = profileResponse.data.details.profile;
+              profile = profileResponse.data.details.profile || {};
               profile.username = profile.username || address;
-              profile.profilePicture = profile.pfp || profile.profilePicture;
+              profile.profilePicture =
+                profile.pfp || profile.profilePicture || null;
             }
           }
 
