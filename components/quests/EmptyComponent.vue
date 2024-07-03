@@ -32,9 +32,9 @@ export default {
 
 <style scoped>
 .empty-component {
-  width: 300px;
-  height: 300px;
-  background: rgba(255, 255, 255, 0.5);
+  height: 330px;
+  width: 250px;
+  background: rgba(255, 255, 255, 0.4);
   border: 1px solid #ddd;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -47,8 +47,7 @@ export default {
 }
 
 .unrevealed-image {
-  max-width: 100%;
-  max-height: 100%;
+  max-width: 175px;
   object-fit: contain;
   margin-bottom: 20px;
 }
