@@ -2,10 +2,7 @@
   <div :class="['leaderboard-container', { 'dark-mode': isDarkMode }]">
     <div :class="['header-section', { 'dark-mode': isDarkMode }]">
       <div class="header">
-        <div :class="['title', { 'dark-mode': isDarkMode }]">Leaderboard</div>
-        <a @click="showModal = true" class="refresh-link"
-          >Clear Cache and Refresh</a
-        >
+        <div :class="['title', { 'dark-mode': isDarkMode }]">Top Leaders</div>
       </div>
       <p :class="['welcome-message', { 'dark-mode': isDarkMode }]">
         We are thrilled to present the top 100 members of the Scrolly community
@@ -14,107 +11,61 @@
         community life on the hub—every message and interaction counts!
       </p>
     </div>
-    <div
-      v-if="userRank !== null"
-      :class="[
-        'user-rank',
-        'leaderboard-item',
-        'highlight',
-        { 'dark-mode': isDarkMode },
-      ]"
-    >
-      <div class="rank-container">
-        <span>{{ userRank }}</span>
-      </div>
-      <div class="profile-container">
-        <router-link to="/profile">
+    <div class="linear-container">
+      <div
+        v-for="(leader, index) in paginatedLeaders"
+        :key="leader.address"
+        :class="['leader-row', 'leaderboard-item', { 'dark-mode': isDarkMode }]"
+      >
+        <div class="rank-container">
+          <span :class="['rank', { 'dark-mode-text': isDarkMode }]">
+            {{ (page - 1) * 20 + index + 1 }}
+          </span>
+        </div>
+        <div class="profile-container">
           <ProfileImage
-            :address="address"
-            :domain="displayName"
-            :image="profileImage"
+            v-if="leader.profilePicture"
             class="profile-image"
+            :address="leader.address"
+            :domain="leader.username"
+            :image="convertIpfsUrl(leader.profilePicture)"
           />
-        </router-link>
-      </div>
-      <div class="profile-info">
-        <router-link to="/profile">
-          <p :class="['profile-name', { 'dark-mode': isDarkMode }]">
-            {{ getTextWithoutBlankCharacters(userStore.getDefaultDomain) }}
-          </p>
-          <p :class="['profile-points', { 'dark-mode': isDarkMode }]">
-            Points: {{ getUserAp }}
-          </p>
-        </router-link>
-      </div>
-    </div>
-    <p v-else-if="userRankError">{{ userRankError }}</p>
-    <hr :class="['section-separator', { 'dark-mode': isDarkMode }]" />
-    <div v-if="showModal" class="modal-overlay">
-      <div :class="['modal-content', { 'dark-mode': isDarkMode }]">
-        <h2 :class="['title', { 'dark-mode': isDarkMode }]">
-          Trouble Displaying Data?
-        </h2>
-        <p>
-          If you are experiencing display issues, you can clear the cache and
-          refresh the data. Please note that data is fetched from the
-          blockchain, and due to our RPC limitations, there may be delays or
-          missing usernames. This can happen when the RPC requests are
-          overloaded. You can try to clear cache and refresh to update missing
-          data. All data is stored on Ceramic or Scroll Network, and we ensure
-          your data's safety.
-        </p>
-        <p>
-          If you do not see your points updated in the table, the data refreshes
-          automatically. Our Scrolly engineers progressively fetch data from the
-          blockchain, and your updated balance appears at the top of your
-          screen!
-        </p>
-        <button @click="clearCacheAndRefresh" class="modal-button">
-          Clear Cache and Refresh
-        </button>
-        <button @click="showModal = false" class="modal-button">Close</button>
-      </div>
-    </div>
-    <div v-if="loading" class="loading-indicator">
-      Refreshing data, please wait...
-    </div>
-    <div
-      v-for="(item, index) in paginatedLeaderboard"
-      :key="index"
-      :class="[
-        'leaderboard-item',
-        { highlight: isCurrentUser(item.address), 'dark-mode': isDarkMode },
-      ]"
-    >
-      <div class="rank-container">
-        <span>{{ getRank(index) }}</span>
-      </div>
-      <div class="profile-container">
-        <router-link :to="'/profile/?id=' + getProfileLink(item)">
-          <ProfileImage
-            :address="item.address"
-            :domain="item.displayName"
-            :image="item.profileImage"
-            class="profile-image"
-          />
-        </router-link>
-      </div>
-      <div class="profile-info">
-        <router-link :to="'/profile/?id=' + getProfileLink(item)">
-          <p :class="['profile-name', { 'dark-mode': isDarkMode }]">
-            {{ cleanDisplayName(item.displayName) }}
-          </p>
-          <p :class="['profile-points', { 'dark-mode': isDarkMode }]">
-            Points: {{ Math.round(item.roundedPoints) }}
-          </p>
-        </router-link>
+        </div>
+        <div class="profile-info">
+          <span
+            :class="[
+              'leader-name',
+              'profile-name',
+              { 'dark-mode-text': isDarkMode },
+            ]"
+          >
+            {{ cleanDisplayName(leader.username) }}
+          </span>
+        </div>
+        <span
+          :class="[
+            'leader-points',
+            'profile-points',
+            { 'dark-mode-text': isDarkMode },
+          ]"
+        >
+          {{ Math.round(leader.points) }} Points
+        </span>
       </div>
     </div>
     <div class="pagination">
-      <button @click="previousPage" :disabled="currentPage === 1">
+      <button
+        @click="previousPage"
+        :disabled="page === 1"
+        :class="{ 'dark-mode-button': isDarkMode }"
+      >
         Previous
       </button>
-      <button @click="nextPage" :disabled="currentPage === totalPages">
+      <button
+        @click="nextPage"
+        :disabled="page * 20 >= leaders.length"
+        :class="{ 'dark-mode-button': isDarkMode }"
+      >
         Next
       </button>
     </div>
@@ -122,17 +73,11 @@
 </template>
 
 <script>
-import { ref, onMounted, watch, computed } from "vue";
-import ProfileImage from "@/components/profile/ProfileImage.vue";
-import { useToast } from "vue-toastification/dist/index.mjs";
+import ProfileImage from "~/components/profile/ProfileImage.vue";
 import { Orbis } from "@orbisclub/orbis-sdk";
-import { useEthers } from "vue-dapp";
-import { getActivityPoints } from "~/utils/balanceUtils";
-import { useUserStore } from "~/store/user";
-import { useThemeStore } from "~/store/theme";
-import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
-import { getDomainName } from "~/utils/domainUtils";
 import { fetchUsername, storeUsername } from "~/utils/storageUtils";
+import { useThemeStore } from "~/store/theme";
+import { getDomainName } from "~/utils/domainUtils";
 
 const orbis = new Orbis();
 
@@ -140,243 +85,148 @@ export default {
   components: {
     ProfileImage,
   },
-  setup() {
-    const { address, isActivated, signer } = useEthers();
-    const userStore = useUserStore();
-    const themeStore = useThemeStore();
-    const isDarkMode = computed(() => themeStore.getIsDarkMode);
-    const leaderboard = ref([]);
-    const paginatedLeaderboard = ref([]);
-    const currentPage = ref(1);
-    const itemsPerPage = 20;
-    const totalPages = ref(1);
-    const showModal = ref(false);
-    const loading = ref(false);
-    const userRank = ref(null);
-    const userPoints = ref(0);
-    const userRankError = ref("");
-    const displayName = ref("");
-    const profileImage = ref("");
-    const toast = useToast();
-    const maxRetries = 3;
-    const retryDelay = 2000;
-
-    const shortenAddress = (address) =>
-      address.slice(0, 6) + "..." + address.slice(-4);
-
-    const cleanDisplayName = (displayName) =>
-      displayName.replace(/\.scrolly/g, "");
-
-    const fetchOrbisProfile = async (address) => {
-      let profile = { username: null, pfp: null };
-      try {
-        const { data } = await orbis.getDids(address);
-        if (data && data.length > 0) {
-          const did = data[0].did;
-          const profileResponse = await orbis.getProfile(did);
-          if (profileResponse.status === 200) {
-            profile = profileResponse.data.details.profile;
-            profile.username = profile.username || address; // Ensure username fallback
-          }
-        }
-
-        // Check if domain is available
-        const storedDomain = fetchUsername(window, address);
-
-        if (storedDomain) {
-          profile.username = storedDomain;
-        } else {
-          let provider = new ethers.providers.JsonRpcProvider(
-            process.env.VUE_APP_INFURA_URL,
-          );
-
-          const domainName = await getDomainName(address, provider);
-
-          if (domainName) {
-            profile.username = domainName + ".scrolly";
-            storeUsername(window, address, profile.username);
-          }
-        }
-      } catch (error) {
-        console.error(`Error fetching profile for ${address}:`, error);
-      }
-      return profile;
-    };
-
-    const fetchUserProfiles = async (forceRefresh = false, retryCount = 0) => {
-      const batchSize = 20;
-      const delay = 3000;
-      let allProfilesLoaded = true;
-
-      for (let i = 0; i < leaderboard.value.length; i += batchSize) {
-        const batch = leaderboard.value.slice(i, i + batchSize);
-        await Promise.all(
-          batch.map(async (item) => {
-            const address = item.address.toLowerCase();
-            try {
-              const profile = await fetchOrbisProfile(address);
-              item.displayName =
-                profile.username || shortenAddress(item.address);
-              item.profileImage = profile.pfp || "/img/user/anon.svg";
-              if (forceRefresh) {
-                sessionStorage.removeItem(
-                  String(address).toLowerCase() + "-img",
-                );
-              }
-              if (!profile.username || !profile.pfp) {
-                allProfilesLoaded = false;
-              }
-            } catch (error) {
-              console.error("Error fetching profile:", error);
-              item.displayName = shortenAddress(item.address);
-              item.profileImage = "/img/user/anon.svg";
-              allProfilesLoaded = false;
-            }
-          }),
-        );
-        paginateLeaderboard();
-        await new Promise((resolve) => setTimeout(resolve, delay));
-      }
-
-      if (!allProfilesLoaded && retryCount < maxRetries) {
-        console.log(
-          `Retrying to fetch missing profiles, attempt ${retryCount + 1}`,
-        );
-        setTimeout(
-          () => fetchUserProfiles(forceRefresh, retryCount + 1),
-          retryDelay,
-        );
-      } else {
-        loading.value = false;
-      }
-    };
-
-    const clearCacheAndRefresh = async () => {
-      loading.value = true;
-      sessionStorage.clear();
-      await fetchUserProfiles(true);
-      toast.success("Cache cleared and data refreshed!");
-    };
-
-    const paginateLeaderboard = () => {
-      const start = (currentPage.value - 1) * itemsPerPage;
-      const end = start + itemsPerPage;
-      paginatedLeaderboard.value = leaderboard.value.slice(start, end);
-    };
-
-    const nextPage = async () => {
-      if (currentPage.value < totalPages.value) {
-        currentPage.value++;
-        paginateLeaderboard();
-        await fetchUserProfiles(); // Ensure fetching user profiles for the new page
-      }
-    };
-
-    const previousPage = async () => {
-      if (currentPage.value > 1) {
-        currentPage.value--;
-        paginateLeaderboard();
-        await fetchUserProfiles(); // Ensure fetching user profiles for the new page
-      }
-    };
-
-    const getRank = (index) =>
-      (currentPage.value - 1) * itemsPerPage + index + 1;
-
-    const getProfileLink = (item) => item.address;
-
-    const fetchUserRank = async () => {
-      if (isActivated.value && address.value) {
-        try {
-          const response = await fetch(
-            `https://leaderboard-scrolly.vercel.app/rank/${address.value}`,
-          );
-          const data = await response.json();
-          if (data.rank) {
-            userRank.value = data.rank;
-            await fetchActivityPoints();
-            const profile = await fetchOrbisProfile(address.value);
-            displayName.value =
-              profile.username || shortenAddress(address.value);
-            profileImage.value = profile.pfp || "/img/user/anon.svg";
-          } else {
-            userRankError.value =
-              "Sorry, only Scrolly Domains Holders are displayed on this leaderboard.";
-          }
-        } catch (error) {
-          console.error("Error fetching user rank:", error);
-          userRankError.value = "Error fetching user rank.";
-        }
-      }
-    };
-
-    const fetchActivityPoints = async () => {
-      if (address.value) {
-        userPoints.value = await getActivityPoints(address.value, signer);
-        userStore.setCurrentUserActivityPoints(userPoints.value);
-      }
-    };
-
-    const isCurrentUser = (userAddress) =>
-      isActivated.value &&
-      address.value.toLowerCase() === userAddress.toLowerCase();
-
-    onMounted(async () => {
-      if (typeof window !== "undefined") {
-        try {
-          const response = await fetch(
-            "https://leaderboard-scrolly.vercel.app/leaderboard",
-          );
-          const data = await response.json();
-          leaderboard.value = data.leaderboard.map((item) => ({
-            ...item,
-            roundedPoints: Math.round(item.points),
-            displayName: shortenAddress(item.address),
-            profileImage: "/img/user/anon.svg", // Placeholder until we fetch the actual image
-          }));
-          totalPages.value = Math.ceil(leaderboard.value.length / itemsPerPage);
-          await fetchUserRank();
-          await fetchUserProfiles(); // Fetch profiles immediately on mount
-          paginateLeaderboard();
-        } catch (error) {
-          console.error("Error fetching leaderboard data:", error);
-          toast.error("Error fetching leaderboard data");
-        }
-      }
-    });
-
-    watch([address, isActivated], async ([newAddress, newIsActivated]) => {
-      if (newIsActivated) {
-        await fetchUserRank();
-        await fetchOrbisProfile(newAddress);
-      }
-    });
-
+  data() {
     return {
-      leaderboard,
-      paginatedLeaderboard,
-      currentPage,
-      totalPages,
-      nextPage,
-      previousPage,
-      shortenAddress,
-      getProfileLink,
-      showModal,
-      clearCacheAndRefresh,
-      loading,
-      userRank,
-      userPoints,
-      userRankError,
-      isCurrentUser,
-      cleanDisplayName,
-      getRank,
-      displayName,
-      profileImage,
-      isDarkMode,
-      getUserAp: userStore.getCurentUserActivityPoints,
-      getTextWithoutBlankCharacters,
-      userStore,
+      leaders: [],
+      page: 1,
+      allLoaded: false,
     };
+  },
+  computed: {
+    paginatedLeaders() {
+      const start = (this.page - 1) * 20;
+      const end = start + 20;
+      return this.leaders.slice(start, end);
+    },
+    isDarkMode() {
+      return useThemeStore().getIsDarkMode;
+    },
+  },
+  methods: {
+    async fetchInitialLeaders() {
+      try {
+        const response = await fetch(
+          "https://leaderboard-scrolly.vercel.app/leaderboard",
+        );
+        const data = await response.json();
+        const top20 = data.leaderboard.slice(0, 20);
+        const leaderPromises = top20.map(async (leader) => {
+          const profile = await this.fetchOrbisProfile(leader.address);
+          return {
+            ...leader,
+            username: profile.username || "Unknown",
+            profilePicture:
+              this.convertIpfsUrl(profile.profilePicture) ||
+              "/img/user/anon.svg",
+          };
+        });
+        this.leaders = await Promise.all(leaderPromises);
+        this.refreshProfileImages();
+      } catch (error) {
+        console.error("Error fetching initial leaderboard data:", error);
+      }
+    },
+    async fetchRemainingLeaders() {
+      try {
+        const response = await fetch(
+          "https://leaderboard-scrolly.vercel.app/leaderboard",
+        );
+        const data = await response.json();
+        const remaining = data.leaderboard.slice(20, 100);
+        const leaderPromises = remaining.map(async (leader) => {
+          const profile = await this.fetchOrbisProfile(leader.address);
+          return {
+            ...leader,
+            username: profile.username || "Unknown",
+            profilePicture:
+              this.convertIpfsUrl(profile.profilePicture) ||
+              "/img/user/anon.svg",
+          };
+        });
+        const remainingLeaders = await Promise.all(leaderPromises);
+        this.leaders = this.leaders.concat(remainingLeaders);
+        this.allLoaded = true;
+        this.refreshProfileImages();
+      } catch (error) {
+        console.error("Error fetching remaining leaderboard data:", error);
+      }
+    },
+    async fetchOrbisProfile(address) {
+      let profile = { username: null, profilePicture: null };
+
+      const storedDomain = fetchUsername(window, address);
+      if (storedDomain) {
+        profile.username = storedDomain;
+      } else {
+        try {
+          const { data } = await orbis.getDids(address);
+          if (data && data.length > 0) {
+            const did = data[0].did;
+            const profileResponse = await orbis.getProfile(did);
+            if (profileResponse.status === 200) {
+              profile = profileResponse.data.details.profile || {};
+              profile.username = profile.username || address;
+              profile.profilePicture =
+                profile.pfp || profile.profilePicture || null;
+            }
+          }
+
+          let provider = this.$getFallbackProvider(
+            this.$config.supportedChainId,
+          );
+          const domainName = await getDomainName(address, provider);
+          if (domainName) {
+            profile.username = domainName + this.$config.tldName;
+            storeUsername(window, address, profile.username);
+          } else {
+            profile.username = address;
+            storeUsername(window, address, address);
+          }
+        } catch (error) {
+          console.error(`Error fetching profile for ${address}:`, error);
+        }
+      }
+
+      return profile;
+    },
+    cleanDisplayName(displayName) {
+      if (displayName) {
+        return displayName.replace(/\.scrolly/g, "");
+      }
+      return "Unknown";
+    },
+    convertIpfsUrl(ipfsUrl) {
+      if (ipfsUrl && ipfsUrl.startsWith("ipfs://")) {
+        return ipfsUrl.replace("ipfs://", "https://ipfs.io/ipfs/");
+      }
+      return ipfsUrl;
+    },
+    async refreshProfileImages() {
+      const leaderPromises = this.leaders.map(async (leader) => {
+        const profile = await this.fetchOrbisProfile(leader.address);
+        leader.profilePicture =
+          this.convertIpfsUrl(profile.profilePicture) || leader.profilePicture;
+        leader.username = profile.username || leader.username;
+      });
+      await Promise.all(leaderPromises);
+    },
+    async nextPage() {
+      if (this.page * 20 < this.leaders.length) {
+        this.page++;
+      }
+      if (!this.allLoaded && this.leaders.length < this.page * 20 + 20) {
+        await this.fetchRemainingLeaders();
+      }
+    },
+    async previousPage() {
+      if (this.page > 1) {
+        this.page--;
+      }
+    },
+  },
+  async created() {
+    await this.fetchInitialLeaders();
+    this.fetchRemainingLeaders();
   },
 };
 definePageMeta({
@@ -388,10 +238,10 @@ definePageMeta({
 .leaderboard-container {
   margin: 0 auto;
   padding: 20px;
-  max-width: 800px; /* Centering the leaderboard */
+  max-width: 800px;
   font-family: Arial, sans-serif;
-  background: var(--card-bg); /* Variable for background */
-  color: var(--card-text); /* Variable for text color */
+  background: var(--card-bg);
+  color: var(--card-text);
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -426,17 +276,7 @@ definePageMeta({
   margin-top: 10px;
   font-size: 1em;
   text-align: center;
-  color: var(--welcome-message-color); /* Added for text color */
-}
-
-.user-rank {
-  display: flex;
-  align-items: center;
-  padding: 8px 16px;
-  margin: 8px 0;
-  background: var(--highlight-bg);
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  color: var(--welcome-message-color);
 }
 
 .rank-container,
@@ -447,13 +287,13 @@ definePageMeta({
 }
 
 .profile-container {
-  flex: 0 0 30px;
+  flex: 0 0 40px; /* Increased to make the rows larger */
   margin-right: 10px;
 }
 
 .profile-image {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
 }
 
@@ -468,7 +308,7 @@ definePageMeta({
 
 .profile-name {
   font-weight: bold;
-  font-size: 1em;
+  font-size: 1.2em; /* Increased font size */
   color: var(--profile-name-color);
 }
 
@@ -478,7 +318,7 @@ definePageMeta({
 
 .profile-points {
   color: var(--profile-points-color);
-  font-size: 0.9em;
+  font-size: 1.2em; /* Increased font size */
 }
 
 .loading-indicator {
@@ -491,8 +331,8 @@ definePageMeta({
 .leaderboard-item {
   display: flex;
   align-items: center;
-  padding: 8px 16px;
-  margin: 8px 0;
+  padding: 8px 16px; /* Increased padding */
+  margin: 4px 0;
   background: var(--card-bg);
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -501,6 +341,46 @@ definePageMeta({
 
 .leaderboard-item:hover {
   transform: translateY(-3px);
+}
+
+.linear-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  margin-top: 30px;
+}
+
+.leader-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 600px;
+  padding: 8px; /* Increased padding */
+  border-bottom: 1px solid #ccc;
+}
+
+.rank {
+  width: 40px; /* Increased to make the rows larger */
+  text-align: center;
+}
+
+.profile-picture {
+  width: 50px; /* Increased to make the rows larger */
+  height: 50px; /* Increased to make the rows larger */
+  border-radius: 50%;
+  margin: 0 10px;
+}
+
+.leader-name {
+  flex-grow: 1;
+  text-align: left;
+}
+
+.leader-points {
+  text-align: right;
+  margin-left: auto;
 }
 
 .pagination {
@@ -583,7 +463,7 @@ definePageMeta({
   --card-bg: rgba(255, 255, 255, 0.9);
   --card-text: #000000;
   --highlight-bg: rgba(230, 247, 255, 0.9);
-  --welcome-message-color: #000000; /* Added for text color */
+  --welcome-message-color: #000000;
   --profile-points-color: #888888;
   --profile-name-color: #000000;
   --profile-name-hover-color: #666666;
@@ -596,16 +476,33 @@ definePageMeta({
   --card-bg: rgba(50, 50, 50, 0.9);
   --card-text: #ffffff;
   --highlight-bg: rgba(30, 59, 73, 0.9);
-  --welcome-message-color: #ffffff; /* Added for text color */
+  --welcome-message-color: #ffffff;
   --profile-points-color: #aaaaaa;
   --profile-name-color: #ffffff;
   --profile-name-hover-color: #cccccc;
 }
 
 body.dark-mode .title {
-  color: #ffffff; /* Title color for dark mode */
+  color: #ffffff;
 }
 body:not(.dark-mode) .title {
-  color: #000000; /* Title color for light mode */
+  color: #000000;
+}
+
+.dark-mode {
+  color: #fff;
+}
+
+.dark-mode-text {
+  color: #fff;
+}
+
+.dark-mode-button {
+  background-color: #444;
+  color: #fff;
+}
+
+.leader-row.dark-mode {
+  border-bottom-color: #444;
 }
 </style>
