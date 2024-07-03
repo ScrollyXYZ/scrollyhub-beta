@@ -17,6 +17,7 @@
         <LeaderboardTop3 />
       </div>
       <div class="grid-item latest-quests">
+        <DailyClaim />
         <LatestQuests />
       </div>
     </div>
@@ -27,6 +28,7 @@
 import ProgressBarComponent from "~/components/quests/ProgressBarComponent.vue";
 import PointsDetailsComponent from "~/components/quests/PointsDetailsComponent.vue";
 import LatestQuests from "~/components/quests/LatestBadges.vue";
+import DailyClaim from "~/components/quests/DailyClaim.vue";
 import LeaderboardTop3 from "~/components/quests/DashboardLeaderboard.vue";
 import EmptyComponent from "~/components/quests/EmptyComponent.vue";
 import { useThemeStore } from "~/store/theme";
@@ -43,6 +45,7 @@ export default {
     LatestQuests,
     LeaderboardTop3,
     EmptyComponent,
+    DailyClaim,
   },
   setup() {
     const themeStore = useThemeStore();
@@ -121,11 +124,11 @@ definePageMeta({
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: 20px;
+  padding: 40px;
   background: rgba(255, 255, 255, 0.8);
-  border-radius: 15px;
+  border-radius: 27px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  width: 60%; /* Reduced width */
+  width: 90%;
   margin: 0 auto;
 }
 
@@ -141,12 +144,6 @@ definePageMeta({
   align-items: center;
   width: 65%;
   margin-right: 20px;
-}
-
-.empty-component {
-  width: 400px;
-  height: 500px;
-  margin-right: 20px; /* Space between the sections */
 }
 
 .content-separator {
@@ -179,10 +176,7 @@ definePageMeta({
 .latest-quests {
   position: relative;
   text-align: center;
-  margin: 20px 0;
   width: 100%;
-  padding: 15px;
-  border-radius: 10px;
 }
 
 .latest-quests h2 {
@@ -283,6 +277,10 @@ definePageMeta({
   .quests-grid {
     flex-direction: row;
     align-items: center;
+  }
+
+  .dashboard-page {
+    width: 100%;
   }
 }
 </style>
