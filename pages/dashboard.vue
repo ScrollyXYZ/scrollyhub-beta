@@ -17,6 +17,7 @@
         <LeaderboardTop3 />
       </div>
       <div class="grid-item latest-quests">
+        <DailyClaim />
         <LatestQuests />
       </div>
     </div>
@@ -27,6 +28,7 @@
 import ProgressBarComponent from "~/components/quests/ProgressBarComponent.vue";
 import PointsDetailsComponent from "~/components/quests/PointsDetailsComponent.vue";
 import LatestQuests from "~/components/quests/LatestBadges.vue";
+import DailyClaim from "~/components/quests/DailyClaim.vue";
 import LeaderboardTop3 from "~/components/quests/DashboardLeaderboard.vue";
 import EmptyComponent from "~/components/quests/EmptyComponent.vue";
 import { useThemeStore } from "~/store/theme";
@@ -43,6 +45,7 @@ export default {
     LatestQuests,
     LeaderboardTop3,
     EmptyComponent,
+    DailyClaim,
   },
   setup() {
     const themeStore = useThemeStore();
