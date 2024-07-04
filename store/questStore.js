@@ -94,10 +94,10 @@ export const useQuestStore = defineStore("questStore", {
             description: "Stake at least $10 on ETH-Scrolly pair on Zprotocol.",
             points: 200,
             validated: false,
-            tbd: true,
+            tbd: false,
             ended: false,
             image: "http://scrolly.xyz/img/quests/ScrollyDeFi.png",
-            contractAddress: "0xYourContractAddressForQuest5",
+            contractAddress: "0xd76Eb5383E4CdA4d933E0C3Cb0ff5c7fD6aA676f",
             functions: {
               isEligible: "isEligible",
               hasUserClaimed: "hasUserClaimed",
@@ -106,7 +106,7 @@ export const useQuestStore = defineStore("questStore", {
           },
           {
             id: 7,
-            title: "Scrolly Yield Farmer",
+            title: "Scrolly Yield Farmer (Soon)",
             description:
               "Farm on Zprotocol for 7 consecutive days. You will be eligible for extra $ZP rewards too",
             points: 400,
@@ -155,7 +155,7 @@ export const useQuestStore = defineStore("questStore", {
       }
       if (state.selectedCategory === "latest") {
         const allQuests = state.questCategories.flatMap(
-          (category) => category.quests
+          (category) => category.quests,
         );
         const latestQuests = allQuests.sort((a, b) => b.id - a.id).slice(0, 3);
         return [
@@ -166,7 +166,7 @@ export const useQuestStore = defineStore("questStore", {
         ];
       }
       return state.questCategories.filter(
-        (category) => category.category === state.selectedCategory
+        (category) => category.category === state.selectedCategory,
       );
     },
     getCompletedQuests: (state) => (quests) => {
@@ -212,12 +212,12 @@ export const useQuestStore = defineStore("questStore", {
         const contract = new ethers.Contract(
           "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
           ["function balanceOf(address owner) view returns (uint256)"],
-          provider
+          provider,
         );
         const balance = await contract.balanceOf(userAddress);
         let points = 169 * Math.min(balance.toNumber(), 3);
         const hubQuests = this.questCategories.find(
-          (category) => category.category === "Social Hub Quests"
+          (category) => category.category === "Social Hub Quests",
         );
         const quest = hubQuests.quests.find((q) => q.id === 1);
         quest.points = points;
@@ -245,11 +245,10 @@ export const useQuestStore = defineStore("questStore", {
                 [
                   `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              const eligible = await contract[quest.functions.checkEligibility](
-                userAddress
-              );
+              const eligible =
+                await contract[quest.functions.checkEligibility](userAddress);
               quest.validated = eligible;
               console.log(`Quest ${quest.id} eligibility: ${eligible}`);
             } else if (quest.functions) {
@@ -259,14 +258,12 @@ export const useQuestStore = defineStore("questStore", {
                   `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
                   `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              const hasClaimed = await contract[quest.functions.hasUserClaimed](
-                userAddress
-              );
-              const isEligible = await contract[quest.functions.isEligible](
-                userAddress
-              );
+              const hasClaimed =
+                await contract[quest.functions.hasUserClaimed](userAddress);
+              const isEligible =
+                await contract[quest.functions.isEligible](userAddress);
 
               quest.validated = hasClaimed;
               quest.eligible = isEligible;
@@ -301,13 +298,12 @@ export const useQuestStore = defineStore("questStore", {
             `function ${functions.hasUserClaimed}(address _user) external view returns (bool)`,
             `function ${functions.claim}(address _user) external`,
           ],
-          signer
+          signer,
         );
 
         try {
-          const hasClaimed = await contract[functions.hasUserClaimed](
-            userAddress
-          );
+          const hasClaimed =
+            await contract[functions.hasUserClaimed](userAddress);
           const isEligible = await contract[functions.isEligible](userAddress);
 
           if (hasClaimed) {
@@ -319,11 +315,11 @@ export const useQuestStore = defineStore("questStore", {
           }
           console.log(
             "Updated claimStatus in checkEligibilityAndClaimStatus:",
-            this.claimStatus
+            this.claimStatus,
           );
           console.log(
             "Updated eligibilityStatus in checkEligibilityAndClaimStatus:",
-            this.eligibilityStatus
+            this.eligibilityStatus,
           );
         } catch (error) {
           console.error("Error checking eligibility and claim status:", error);
@@ -344,14 +340,14 @@ export const useQuestStore = defineStore("questStore", {
         const contract = new ethers.Contract(
           contractAddress,
           [`function ${functions.claim}(address _user) external`],
-          signer
+          signer,
         );
 
         try {
           await contract[functions.claim](userAddress);
           this.claimStatus = true;
           this.showPopupMessage(
-            `Congratulations! You have successfully claimed ${points} Mappy Points!`
+            `Congratulations! You have successfully claimed ${points} Mappy Points!`,
           );
           setTimeout(async () => {
             await this.updateData(); // Refresh quest status
@@ -359,7 +355,7 @@ export const useQuestStore = defineStore("questStore", {
         } catch (error) {
           console.error("Error claiming reward:", error);
           this.showPopupMessage(
-            "There was an issue processing your claim. Please try again later."
+            "There was an issue processing your claim. Please try again later.",
           );
         }
       } else {
@@ -389,7 +385,7 @@ export const useQuestStore = defineStore("questStore", {
             const userAddress = this.userStore.getCurrentUserAddress;
             if (ethers.utils.isAddress(userAddress)) {
               const provider = new ethers.providers.Web3Provider(
-                window.ethereum
+                window.ethereum,
               );
               const contract = new ethers.Contract(
                 quest.contractAddress,
@@ -397,30 +393,28 @@ export const useQuestStore = defineStore("questStore", {
                   `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
                   `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              this.claimStatus = await contract[
-                quest.functions.checkEligibility
-              ](userAddress);
-              quest.validated = await contract[quest.functions.hasUserClaimed](
-                userAddress
-              );
+              this.claimStatus =
+                await contract[quest.functions.checkEligibility](userAddress);
+              quest.validated =
+                await contract[quest.functions.hasUserClaimed](userAddress);
             } else {
               console.error("Invalid user address:", userAddress);
             }
           } else {
             await this.checkEligibilityAndClaimStatus(
               quest.contractAddress,
-              quest.functions
+              quest.functions,
             );
           }
           console.log(
             "Updated claimStatus in showQuestDetails:",
-            this.claimStatus
+            this.claimStatus,
           );
           console.log(
             "Updated eligibilityStatus in showQuestDetails:",
-            this.eligibilityStatus
+            this.eligibilityStatus,
           );
           break;
         }
