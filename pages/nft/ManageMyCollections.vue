@@ -1,9 +1,4 @@
 <template>
-  <Head>
-    <Title>Manage my Collections | {{ $config.projectMetadataTitle }}</Title>
-    <!-- Meta tags -->
-  </Head>
-
   <div class="card border scroll-500">
     <div class="card-body">
       <p v-if="!hideBackButton" class="fs-3" @click="$router.back()">
@@ -61,12 +56,6 @@
           </div>
           <div class="col-md-3 text-end">
             <button
-              class="btn btn-outline-primary"
-              @click="openSettingsModal(nft)"
-            >
-              Manage NFT
-            </button>
-            <button
               class="btn btn-secondary mt-2"
               @click="refreshMetadata(nft)"
             >
@@ -105,238 +94,6 @@
           Load more
         </button>
       </div>
-
-      <!-- Settings Modal -->
-      <div
-        v-if="selectedNft"
-        class="modal fade"
-        id="settingsModal"
-        tabindex="-1"
-        aria-labelledby="settingsModalLabel"
-        aria-hidden="true"
-      >
-        <div class="modal-dialog modal-lg">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h3 class="modal-title" id="settingsModalLabel">
-                Manage NFT: {{ selectedNft.name }}
-              </h3>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
-              <ul class="nav nav-tabs" id="settingsTab" role="tablist">
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link active"
-                    id="description-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#description"
-                    type="button"
-                    role="tab"
-                    aria-controls="description"
-                    aria-selected="true"
-                  >
-                    Description
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="preview-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#preview"
-                    type="button"
-                    role="tab"
-                    aria-controls="preview"
-                    aria-selected="false"
-                  >
-                    Preview Image
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="images-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#images"
-                    type="button"
-                    role="tab"
-                    aria-controls="images"
-                    aria-selected="false"
-                  >
-                    Images
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="metadata-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#metadata"
-                    type="button"
-                    role="tab"
-                    aria-controls="metadata"
-                    aria-selected="false"
-                  >
-                    Metadata
-                  </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                  <button
-                    class="nav-link"
-                    id="about-tab"
-                    data-bs-toggle="tab"
-                    data-bs-target="#about"
-                    type="button"
-                    role="tab"
-                    aria-controls="about"
-                    aria-selected="false"
-                  >
-                    About
-                  </button>
-                </li>
-              </ul>
-              <div class="tab-content" id="settingsTabContent">
-                <div
-                  class="tab-pane fade show active"
-                  id="description"
-                  role="tabpanel"
-                  aria-labelledby="description-tab"
-                >
-                  <change-description-modal
-                    :cAddress="selectedNft.address"
-                    :cDescription="selectedNft.description"
-                    :mdAddress="selectedNft.mdAddress"
-                    @saveCollection="saveCollection"
-                  ></change-description-modal>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="preview"
-                  role="tabpanel"
-                  aria-labelledby="preview-tab"
-                >
-                  <change-collection-preview-modal
-                    :cAddress="selectedNft.address"
-                    :mdAddress="selectedNft.mdAddress"
-                    @saveCollection="saveCollection"
-                  ></change-collection-preview-modal>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="images"
-                  role="tabpanel"
-                  aria-labelledby="images-tab"
-                >
-                  <div class="row">
-                    <div class="col-md-6">
-                      <add-image-to-collection-modal
-                        :cAddress="selectedNft.address"
-                        :mdAddress="selectedNft.mdAddress"
-                        @saveCollection="saveCollection"
-                      ></add-image-to-collection-modal>
-                    </div>
-                    <div class="col-md-6">
-                      <remove-image-from-collection-modal
-                        :cAddress="selectedNft.address"
-                        :mdAddress="selectedNft.mdAddress"
-                        @saveCollection="saveCollection"
-                      ></remove-image-from-collection-modal>
-                    </div>
-                  </div>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="metadata"
-                  role="tabpanel"
-                  aria-labelledby="metadata-tab"
-                >
-                  <change-nft-type-modal
-                    :cAddress="selectedNft.address"
-                    :cType="selectedNft.type"
-                    :mdAddress="selectedNft.mdAddress"
-                    @saveCollection="saveCollection"
-                  ></change-nft-type-modal>
-                </div>
-                <div
-                  class="tab-pane fade"
-                  id="about"
-                  role="tabpanel"
-                  aria-labelledby="about-tab"
-                >
-                  <div class="mt-3">
-                    <p>
-                      <strong>About:</strong> Learn more about managing your NFT
-                      collections.
-                    </p>
-                    <p>
-                      <strong>Q1:</strong> How do I update the description of my
-                      NFT collection?
-                      <br />
-                      <strong>A:</strong> Go to the "Description" tab and use
-                      the provided form to update the collection's description.
-                    </p>
-                    <p>
-                      <strong>Q2:</strong> How do I change the preview image of
-                      my NFT collection?
-                      <br />
-                      <strong>A:</strong> Go to the "Preview Image" tab and
-                      upload or link to the new image you want to use as the
-                      preview.
-                    </p>
-                    <p>
-                      <strong>Q3:</strong> How can I add or remove images from
-                      my NFT collection?
-                      <br />
-                      <strong>A:</strong> Use the "Images" tab to add new images
-                      or remove existing ones from your collection.
-                    </p>
-                    <p>
-                      <strong>Q4:</strong> What is metadata and how do I update
-                      it?
-                      <br />
-                      <strong>A:</strong> Metadata provides details about each
-                      NFT. Use the "Metadata" tab to update the metadata URL or
-                      type.
-                    </p>
-                  </div>
-                </div>
-              </div>
-              <div class="tab-pane fade show active mt-3">
-                <div v-if="tabDetails.description">
-                  <p class="mt-3">
-                    <strong>Description:</strong> {{ tabDetails.description }}
-                  </p>
-                </div>
-                <div v-if="tabDetails.preview">
-                  <p class="mt-3">
-                    <strong>Preview Image:</strong> Update the collection's
-                    preview image.
-                  </p>
-                </div>
-                <div v-if="tabDetails.images">
-                  <p class="mt-3">
-                    <strong>Images:</strong> Add or remove images in the
-                    collection.
-                  </p>
-                </div>
-                <div v-if="tabDetails.metadata">
-                  <p class="mt-3">
-                    <strong>Metadata:</strong> Modify the metadata URL for the
-                    collection.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- End Settings Modal -->
     </div>
   </div>
 </template>
@@ -346,21 +103,11 @@ import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import { fetchCollection, storeCollection } from "~/utils/storageUtils";
-import ChangeDescriptionModal from "~/components/nft/collection/ChangeDescriptionModal.vue";
-import ChangeCollectionPreviewModal from "~/components/nft/collection/ChangeCollectionPreviewModal.vue";
-import AddImageToCollectionModal from "~/components/nft/collection/AddImageToCollectionModal.vue";
-import RemoveImageFromCollectionModal from "~/components/nft/collection/RemoveImageFromCollectionModal.vue";
-import ChangeNftTypeModal from "~/components/nft/collection/ChangeNftTypeModal.vue";
 import Image from "~/components/Image.vue";
 
 export default {
-  name: "MyCreatedNfts",
+  name: "ManageMyCollections",
   components: {
-    ChangeDescriptionModal,
-    ChangeCollectionPreviewModal,
-    AddImageToCollectionModal,
-    RemoveImageFromCollectionModal,
-    ChangeNftTypeModal,
     Image,
   },
   props: ["hideBackButton"],
@@ -371,17 +118,28 @@ export default {
       allNftsIndexEnd: 0,
       createdNfts: [],
       waitingData: false,
-      selectedNft: null,
-      tabDetails: {
-        description: "Update the description for the collection.",
-        preview: "Update the collection's preview image.",
-        images: "Add or remove images in the collection.",
-        metadata: "Modify the metadata URL for the collection.",
-      },
     };
   },
   mounted() {
-    if (this.$config.nftLaunchpadBondingAddress) {
+    this.$watch(
+      () => this.isActivated,
+      (newVal, oldVal) => {
+        if (newVal) {
+          this.fetchCreatedNfts();
+        }
+      },
+    );
+
+    this.$watch(
+      () => this.address,
+      (newVal, oldVal) => {
+        if (newVal !== oldVal) {
+          this.fetchCreatedNfts();
+        }
+      },
+    );
+
+    if (this.$config.nftLaunchpadBondingAddress && this.isActivated) {
       this.fetchCreatedNfts();
     }
   },
@@ -391,80 +149,90 @@ export default {
     },
   },
   methods: {
+    async fetchCollectionsFromAPI() {
+      const url = `https://apicreator.scrolly.xyz/collections/${this.address}`;
+      console.log(`Fetching collections from API: ${url}`); // Debug log
+      try {
+        const response = await fetch(url, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        });
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        console.log(`API response:`, data); // Debug log
+        return data.contract_addresses || [];
+      } catch (error) {
+        console.error("Error fetching collections from API:", error);
+        console.error("API URL:", url);
+        return [];
+      }
+    },
     async fetchCreatedNfts() {
+      console.log(`Current address: ${this.address}`); // Debug log
+      if (!this.address) {
+        console.warn("No address found."); // Debug log
+        return;
+      }
       this.waitingData = true;
       let provider = this.$getFallbackProvider(this.$config.supportedChainId);
       if (this.isActivated && this.chainId === this.$config.supportedChainId) {
         provider = this.signer;
       }
-      const launchpadInterface = new ethers.utils.Interface([
-        "function getNftContracts(uint256 fromIndex, uint256 toIndex) external view returns(address[] memory)",
-        "function getNftContractsArrayLength() external view returns(uint256)",
-      ]);
-      const launchpadContract = new ethers.Contract(
-        this.$config.nftLaunchpadBondingAddress,
-        launchpadInterface,
-        provider,
-      );
-      if (Number(this.allNftsArrayLength) === 0) {
-        this.allNftsArrayLength =
-          await launchpadContract.getNftContractsArrayLength();
-      }
-      const allNfts = await launchpadContract.getNftContracts(
-        0,
-        this.allNftsArrayLength - 1,
-      );
+
+      // Fetch collection from API
+      const nftAddresses = await this.fetchCollectionsFromAPI();
+      console.log(`NFT addresses:`, nftAddresses); // Debug log
+
       const createdNfts = [];
-      for (const nftAddress of allNfts) {
-        const nftInterface = new ethers.utils.Interface([
-          "function owner() external view returns (address)",
-          "function collectionPreview() public view returns (string memory)",
-          "function totalSupply() public view returns (uint256)",
-          "function name() public view returns (string memory)",
-          "function pricingType() public view returns (string memory)",
-        ]);
-        const nftContract = new ethers.Contract(
-          nftAddress,
-          nftInterface,
-          provider,
-        );
-        const owner = await nftContract.owner();
-        if (owner.toLowerCase() === this.address.toLowerCase()) {
-          const collection = fetchCollection(window, nftAddress) || {};
-          if (!collection.name) {
-            collection.name = await nftContract.name();
+      for (const nftAddress of nftAddresses) {
+        try {
+          const nftInterface = new ethers.utils.Interface([
+            "function owner() external view returns (address)",
+            "function collectionPreview() public view returns (string memory)",
+            "function totalSupply() public view returns (uint256)",
+            "function name() public view returns (string memory)",
+            "function pricingType() public view returns (string memory)",
+          ]);
+          const nftContract = new ethers.Contract(
+            nftAddress,
+            nftInterface,
+            provider,
+          );
+
+          const owner = await nftContract.owner();
+          if (owner.toLowerCase() === this.address.toLowerCase()) {
+            const collection = fetchCollection(window, nftAddress) || {};
+            if (!collection.name) {
+              collection.name = await nftContract.name();
+            }
+            if (!collection.image) {
+              collection.image = await nftContract.collectionPreview();
+            }
+            if (!collection.pricingType) {
+              collection.pricingType = await nftContract.pricingType();
+            }
+            const totalSupply = await nftContract.totalSupply();
+            storeCollection(window, nftAddress, collection);
+            createdNfts.push({
+              address: nftAddress,
+              image: collection.image,
+              name: collection.name,
+              totalSupply: totalSupply.toString(),
+              isBonding: collection.pricingType.includes("bonding"),
+            });
           }
-          if (!collection.image) {
-            collection.image = await nftContract.collectionPreview();
-          }
-          if (!collection.pricingType) {
-            collection.pricingType = await nftContract.pricingType();
-          }
-          const totalSupply = await nftContract.totalSupply();
-          storeCollection(window, nftAddress, collection);
-          createdNfts.push({
-            address: nftAddress,
-            image: collection.image,
-            name: collection.name,
-            totalSupply: totalSupply.toString(),
-            isBonding: collection.pricingType.includes("bonding"),
-            description: collection.description || "",
-            mdAddress: collection.mdAddress || "",
-            type: collection.type || 0,
-            waitingRefresh: false,
-          });
+        } catch (error) {
+          console.error(`Error processing NFT ${nftAddress}:`, error);
         }
       }
+      console.log(`Created NFTs:`, createdNfts); // Debug log
       this.createdNfts = createdNfts;
       this.waitingData = false;
-    },
-    openSettingsModal(nft) {
-      this.selectedNft = nft;
-      const modal = new bootstrap.Modal(
-        document.getElementById("settingsModal"),
-      );
-      modal.show();
-      console.log("Opened modal for NFT:", nft);
     },
     async refreshMetadata(nft) {
       nft.waitingRefresh = true;
@@ -558,15 +326,6 @@ export default {
   opacity: 1;
 }
 
-.nav-tabs .nav-link {
-  border-radius: 15px 15px 0 0;
-}
-
-.nav-tabs .nav-link.active {
-  background-color: var(--bs-primary);
-  color: white;
-}
-
 .btn-outline-primary {
   border-color: var(--bs-primary);
   color: var(--bs-primary);
@@ -587,12 +346,5 @@ export default {
   white-space: nowrap;
   vertical-align: baseline;
   border-radius: 0.375rem;
-}
-
-.tab-content {
-  padding: 1rem;
-  border: 1px solid #ddd;
-  border-top: 0;
-  border-radius: 0 0 15px 15px;
 }
 </style>
