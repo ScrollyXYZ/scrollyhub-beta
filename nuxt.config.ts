@@ -48,7 +48,7 @@ export default defineNuxtConfig({
         apiBaseUrl: "https://api.scrolly.xyz/api/badge/",
         badgeContractAddress: "0x79b4f7492328D0Cc4ED0Ddaee08Cd42f0F36A4CC",
         defaultBadgeImage: "/skelly/sticker.svg",
-        graphqlUrl: "https://scroll-sepolia.easscan.org/graphql",
+        graphqlUrl: "https://scroll.easscan.org/graphql",
         profileRegistryAddress: "0xB23AF8707c442f59BDfC368612Bd8DbCca8a7a5a",
       },
       blockExplorerBaseUrl: "https://scrollscan.com",
