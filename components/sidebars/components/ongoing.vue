@@ -66,11 +66,11 @@ export default {
     const slides = ref([
       {
         title: "",
-        img: "http://scrolly.xyz/online/contest1.png",
+        img: "http://scrolly.xyz/onboarding/playlotto.png",
         alt: "Wallet Icon",
         description: "",
         buttonText: "Participate",
-        link: "/post?id=kjzl6cwe1jw14bjnkujvj2b27uatvu8gt9avvyfv237arfsf85o6tc2b8oup3hc",
+        link: "https://lotto.scrolly.xyz",
       },
       {
         title: "",

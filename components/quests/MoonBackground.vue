@@ -6,18 +6,6 @@
       alt="Background"
       class="background-image"
     />
-    <video
-      ref="backgroundVideo"
-      autoplay
-      muted
-      loop
-      playsinline
-      class="background-video"
-      @canplaythrough="onVideoLoad"
-    >
-      <source src="@/assets/video/backgroundquest.mp4" type="video/mp4" />
-      Your browser doesn't support video format
-    </video>
     <div class="overlay" v-if="isDarkMode"></div>
   </div>
 </template>
@@ -43,10 +31,11 @@ export default {
     },
   },
   mounted() {
-    this.$refs.backgroundVideo.playbackRate = 1;
+    // Removed the video playbackRate setting as there is no video anymore
   },
 };
 </script>
+
 <style scoped>
 .background-container {
   position: fixed;
@@ -70,17 +59,6 @@ export default {
   object-fit: cover;
   z-index: -2;
   display: block;
-}
-
-.background-video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: translate(-50%, -50%);
-  z-index: -3;
 }
 
 .overlay {

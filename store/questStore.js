@@ -106,18 +106,19 @@ export const useQuestStore = defineStore("questStore", {
           },
           {
             id: 7,
-            title: "Scrolly Yield Farmer (Soon)",
+            title: "Scrolly Yield Farmer",
             description:
-              "Farm on Zprotocol for 7 consecutive days. You will be eligible for extra $ZP rewards too",
-            points: 400,
+              "Farm on Zprotocol for 7 consecutive days and win 100 MP each day by claiming it daily. Additionally, you will be eligible for extra $ZP rewards.",
+            points: 700,
             validated: false,
-            tbd: true,
+            tbd: false,
             ended: false,
             image: "http://scrolly.xyz/img/quests/ScrollyYield.png",
-            contractAddress: "0xYourContractAddressForQuest5",
+            contractAddress: "0x8C9103EC43Ae6FAF11a4Ce98Ce6F3442A0C4C944",
             functions: {
               isEligible: "isEligible",
               hasUserClaimed: "hasUserClaimed",
+              claimInfo: "claimInfo",
               claim: "claim",
             },
           },
@@ -135,7 +136,7 @@ export const useQuestStore = defineStore("questStore", {
             points: 50,
             validated: false,
             tbd: false,
-            ended: false, // Marked as ended
+            ended: true, // Marked as ended
             image: "http://scrolly.xyz/img/quests/ScrollyMemeConstest.png",
             contractAddress: "0x166E1FB48160D066C4724191463F4d3b298B3bbb",
             functions: {
@@ -145,8 +146,11 @@ export const useQuestStore = defineStore("questStore", {
           // add other quests here
         ],
       },
-      // add other categories here
     ],
+    claimInfo: {
+      lastClaimTime: 0,
+      claimCount: 0,
+    },
   }),
   getters: {
     filteredCategories(state) {
@@ -177,6 +181,29 @@ export const useQuestStore = defineStore("questStore", {
     async initializeQuests(userStore) {
       this.userStore = userStore;
       await this.updateData();
+
+      // Fetch claim info for quest ID 7
+      const quest7 = this.questCategories
+        .find((category) => category.quests.some((quest) => quest.id === 7))
+        ?.quests.find((quest) => quest.id === 7);
+
+      if (quest7) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          quest7.contractAddress,
+          ["function claimInfo(address) view returns (uint256, uint256)"],
+          provider,
+        );
+
+        const [lastClaimTime, claimCount] = await contract.claimInfo(
+          this.userStore.getCurrentUserAddress,
+        );
+        quest7.lastClaimTime = lastClaimTime;
+        quest7.claimCount = claimCount;
+        if (claimCount >= 7) {
+          quest7.validated = true;
+        }
+      }
     },
     async updateData() {
       if (!this.userStore) {
@@ -186,6 +213,29 @@ export const useQuestStore = defineStore("questStore", {
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
       await this.checkQuestConditions();
+
+      // Fetch claim info for quest ID 7 during update
+      const quest7 = this.questCategories
+        .find((category) => category.quests.some((quest) => quest.id === 7))
+        ?.quests.find((quest) => quest.id === 7);
+
+      if (quest7) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          quest7.contractAddress,
+          ["function claimInfo(address) view returns (uint256, uint256)"],
+          provider,
+        );
+
+        const [lastClaimTime, claimCount] = await contract.claimInfo(
+          this.userStore.getCurrentUserAddress,
+        );
+        quest7.lastClaimTime = lastClaimTime;
+        quest7.claimCount = claimCount;
+        if (claimCount >= 7) {
+          quest7.validated = true;
+        }
+      }
     },
     async fetchActivityPoints() {
       if (!this.userStore) {
@@ -251,6 +301,30 @@ export const useQuestStore = defineStore("questStore", {
                 await contract[quest.functions.checkEligibility](userAddress);
               quest.validated = eligible;
               console.log(`Quest ${quest.id} eligibility: ${eligible}`);
+            } else if (quest.id === 7) {
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
+                  `function ${quest.functions.claimInfo}(address _user) external view returns (uint256, uint256)`,
+                ],
+                provider,
+              );
+              const [lastClaimTime, claimCount] =
+                await contract[quest.functions.claimInfo](userAddress);
+              const isEligible =
+                await contract[quest.functions.isEligible](userAddress);
+
+              quest.validated = claimCount >= 7;
+              quest.eligible = isEligible;
+
+              this.claimInfo = { lastClaimTime, claimCount };
+              this.claimStatus = claimCount > 0;
+              this.eligibilityStatus = isEligible;
+
+              console.log(`Quest ${quest.id} lastClaimTime: ${lastClaimTime}`);
+              console.log(`Quest ${quest.id} claimCount: ${claimCount}`);
+              console.log(`Quest ${quest.id} isEligible: ${isEligible}`);
             } else if (quest.functions) {
               const contract = new ethers.Contract(
                 quest.contractAddress,
@@ -343,8 +417,22 @@ export const useQuestStore = defineStore("questStore", {
           signer,
         );
 
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
+
+        if (
+          this.claimInfo.claimCount >= 7 ||
+          timeSinceLastClaim < 86400 ||
+          !this.eligibilityStatus
+        ) {
+          this.showPopupMessage("You are not eligible to claim at this time.");
+          return;
+        }
+
         try {
           await contract[functions.claim](userAddress);
+          this.claimInfo.lastClaimTime = currentTime;
+          this.claimInfo.claimCount += 1;
           this.claimStatus = true;
           this.showPopupMessage(
             `Congratulations! You have successfully claimed ${points} Mappy Points!`,

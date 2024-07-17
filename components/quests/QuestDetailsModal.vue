@@ -21,14 +21,21 @@
         </p>
         <p>Max points: {{ quest.points }} MP</p>
         <p>Description: {{ quest.description }}</p>
-        <div v-if="quest.contractAddress && !quest.validated && !quest.ended">
-          <p v-if="loadingStatus">Loading status...</p>
+        <div v-if="quest.id === 7">
+          <p>Days claimed: {{ quest.claimCount }} / 7</p>
+          <p v-if="timeRemaining > 0">
+            Next claim available in: {{ formattedTimeRemaining }}
+          </p>
+          <div v-if="loadingStatus">Loading status...</div>
           <div v-else>
-            <p v-if="quest.claimStatus">
-              You have already claimed this reward.
+            <p v-if="quest.claimCount >= 7">
+              You have completed this quest by claiming 7 days!
+            </p>
+            <p v-else-if="quest.claimStatus && timeRemaining > 0">
+              You have claimed today. Come back after the cooldown period.
             </p>
             <p v-else-if="quest.eligible">
-              You are eligible to claim your reward!
+              You are eligible to claim your reward today!
             </p>
             <p v-else>You are not eligible to claim this reward yet.</p>
           </div>
@@ -44,12 +51,21 @@
       <div class="button-group">
         <button
           v-if="
-            !loadingStatus && !quest.validated && quest.eligible && !quest.ended
+            !loadingStatus &&
+            !quest.validated &&
+            quest.eligible &&
+            !quest.ended &&
+            (quest.id !== 7 || quest.claimCount < 7)
           "
-          class="quest-dm-claim-button"
+          :class="{
+            'quest-dm-claim-button': true,
+            disabled: timeRemaining > 0,
+          }"
+          :disabled="timeRemaining > 0"
           @click="claim"
         >
-          Claim Reward
+          <span v-if="timeRemaining > 0">{{ formattedTimeRemaining }}</span>
+          <span v-else>Claim Reward</span>
         </button>
         <button @click="close" class="quest-dm-modal-close-button">
           Close
@@ -60,7 +76,7 @@
 </template>
 
 <script>
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 import { useQuestStore } from "~/store/questStore";
 import { useThemeStore } from "~/store/theme";
 
@@ -80,16 +96,38 @@ export default {
     const questStore = useQuestStore();
     const isDarkMode = computed(() => themeStore.getIsDarkMode);
     const loadingStatus = ref(true);
+    const timeRemaining = ref(0);
 
-    // Simulate loading state for the eligibility check
-    setTimeout(() => {
+    const calculateTimeRemaining = () => {
+      if (props.quest.id === 7 && props.quest.lastClaimTime) {
+        const currentTime = Math.floor(Date.now() / 1000); // Get current time in seconds
+        const nextClaimTime = parseInt(props.quest.lastClaimTime) + 86400; // Add 24 hours to the last claim time
+        const remainingTime = nextClaimTime - currentTime;
+        if (remainingTime > 0) {
+          timeRemaining.value = remainingTime;
+        } else {
+          timeRemaining.value = 0;
+        }
+      }
+    };
+
+    const formattedTimeRemaining = computed(() => {
+      const hours = Math.floor(timeRemaining.value / 3600);
+      const minutes = Math.floor((timeRemaining.value % 3600) / 60);
+      return `${hours}h ${minutes}m`;
+    });
+
+    watchEffect(() => {
+      calculateTimeRemaining();
       loadingStatus.value = false;
-    }, 1000); // Replace with actual async call
+    });
 
     return {
       isDarkMode,
       questStore,
       loadingStatus,
+      timeRemaining,
+      formattedTimeRemaining,
     };
   },
   computed: {
@@ -201,21 +239,21 @@ export default {
 }
 
 .quest-dm-modal-close-button.light-mode {
-  background-color: #888888; /* Gris */
+  background-color: #888888; /* Grey */
   color: #ffffff;
 }
 
 .quest-dm-modal-close-button.light-mode:hover {
-  background-color: #aaaaaa; /* Gris clair */
+  background-color: #aaaaaa; /* Light grey */
 }
 
 .quest-dm-modal-close-button.dark-mode {
-  background-color: #888888; /* Gris */
+  background-color: #888888; /* Grey */
   color: #ffffff;
 }
 
 .quest-dm-modal-close-button.dark-mode:hover {
-  background-color: #aaaaaa; /* Gris clair */
+  background-color: #aaaaaa; /* Light grey */
 }
 
 .quest-dm-claim-button {
@@ -227,7 +265,12 @@ export default {
   cursor: pointer;
 }
 
-.quest-dm-claim-button:hover {
+.quest-dm-claim-button.disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+.quest-dm-claim-button:hover:not(.disabled) {
   background-color: #45a049;
 }
 
@@ -241,7 +284,7 @@ export default {
 /* Responsive Styles for Mobile */
 @media (max-width: 767px) {
   .quest-dm-modal-content {
-    width: 90%; /* Augmente la largeur pour les écrans mobiles */
+    width: 90%; /* Increase width for mobile screens */
   }
   .quest-dm-modal-close-button,
   .quest-dm-claim-button {

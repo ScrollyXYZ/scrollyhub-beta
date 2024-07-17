@@ -5,8 +5,15 @@
     @click="quest.tbd ? null : showDetails(quest)"
   >
     <div class="quest-card-inner">
-      <div class="quest-card-image">
-        <img :src="quest.image" alt="Quest Image" />
+      <div class="quest-card-image-container">
+        <img :src="quest.image" alt="Quest Image" class="quest-card-image" />
+        <div v-if="quest.id === 7" class="quest-progress-overlay">
+          <div
+            v-for="i in 7"
+            :key="i"
+            :class="['quest-progress-part', { hidden: i <= quest.claimCount }]"
+          ></div>
+        </div>
       </div>
       <div class="quest-card-info">
         <h3 class="quest-card-title">{{ quest.title }}</h3>
@@ -17,6 +24,15 @@
             class="quest-card-mappy-icon"
           />
           <span class="quest-card-points-text">{{ quest.points }} MP</span>
+        </div>
+        <div
+          v-if="quest.id === 7 && quest.claimCount !== undefined"
+          class="quest-progress"
+        >
+          <p>{{ quest.claimCount }} / 7 days claimed</p>
+          <p v-if="timeRemaining > 0">
+            Next claim in: {{ timeRemaining }} hours
+          </p>
         </div>
       </div>
     </div>
@@ -39,6 +55,11 @@ export default {
       default: false,
     },
   },
+  data() {
+    return {
+      timeRemaining: 0,
+    };
+  },
   computed: {
     ...mapState(useQuestStore, ["eligibilityStatus", "claimStatus"]),
     isEligible() {
@@ -49,7 +70,10 @@ export default {
       );
     },
     hasUserClaimed() {
-      return this.quest.validated;
+      return (
+        this.quest.validated ||
+        (this.quest.claimCount && this.quest.claimCount >= 7)
+      );
     },
     questStatusClasses() {
       return {
@@ -64,6 +88,31 @@ export default {
   methods: {
     showDetails(quest) {
       this.$emit("showDetails", quest);
+    },
+    calculateTimeRemaining() {
+      const currentTime = Math.floor(Date.now() / 1000);
+      const nextClaimTime = this.quest.lastClaimTime + 86400;
+      const remainingTime = nextClaimTime - currentTime;
+      if (remainingTime > 0) {
+        this.timeRemaining = Math.ceil(remainingTime / 3600); // Convert seconds to hours
+        console.log(
+          `Time remaining for next claim: ${this.timeRemaining} hours`,
+        );
+      } else {
+        this.timeRemaining = 0;
+      }
+    },
+  },
+  mounted() {
+    this.calculateTimeRemaining();
+  },
+  watch: {
+    quest: {
+      handler(newQuest) {
+        this.calculateTimeRemaining();
+      },
+      deep: true,
+      immediate: true,
     },
   },
 };
@@ -101,9 +150,32 @@ export default {
   text-align: center;
 }
 
-.quest-card-image img {
+.quest-card-image-container {
+  position: relative;
+}
+
+.quest-card-image {
   width: 100%;
   height: auto;
+}
+
+.quest-progress-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  grid-template-rows: 1fr;
+}
+
+.quest-progress-part {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.quest-progress-part.hidden {
+  background: transparent;
 }
 
 .quest-card-info {
@@ -122,6 +194,7 @@ export default {
 
 .quest-card:hover .quest-card-info {
   opacity: 1;
+  z-index: 5;
 }
 
 .quest-card-title {
