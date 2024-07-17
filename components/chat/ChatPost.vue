@@ -18,14 +18,13 @@
         <div class="col-12 post-sizing">
           <!-- Post author and timestamp -->
           <p class="card-subtitle mb-2 text-muted">
-            <UserLabel :address="authorAddress" :domain="authorDomain">
-              <NuxtLink
-                class="link-without-color hover-color"
-                :to="'/profile/?id=' + String(showDomainOrFullAddress)"
-              >
-                {{ showDomainOrAddressOrAnon }}
-              </NuxtLink>
-            </UserLabel>
+            <!--<UserLabel :address="authorAddress" :domain="authorDomain"> -->
+            <NuxtLink
+              class="link-without-color hover-color"
+              :to="'/profile/?id=' + String(showDomainOrFullAddress)"
+            >
+              {{ showDomainOrAddressOrAnon }}
+            </NuxtLink>
             <span v-if="post.timestamp">
               ·
               <NuxtLink
@@ -339,7 +338,6 @@ import ProfileImage from "~/components/profile/ProfileImage.vue";
 import IggyPostMint from "~/components/minted-posts/IggyPostMint.vue";
 import MintedPostImage from "~/components/minted-posts/MintedPostImage.vue";
 import ChatQuote from "~/components/chat/ChatQuote.vue";
-import UserLabel from "~/components/UserLabel.vue"; // Import the new component
 import { getDomainName } from "~/utils/domainUtils";
 import {
   getTextWithoutBlankCharacters,
@@ -370,7 +368,6 @@ export default {
     ProfileImage,
     TokenTipModal,
     Image,
-    UserLabel,
   },
 
   data() {
