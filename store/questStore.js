@@ -90,8 +90,9 @@ export const useQuestStore = defineStore("questStore", {
         quests: [
           {
             id: 5,
-            title: "Scrolly Staker on Zprotocol",
-            description: "Stake at least $10 on ETH-Scrolly pair on Zprotocol.",
+            title: "Scrolly Providor on Zprotocol",
+            description:
+              "Provide at least $10 on ETH-Scrolly pair on Zprotocol.",
             points: 200,
             validated: false,
             tbd: false,
@@ -108,7 +109,7 @@ export const useQuestStore = defineStore("questStore", {
             id: 7,
             title: "Scrolly Yield Farmer",
             description:
-              "Farm on Zprotocol for 7 consecutive days and win 100 MP each day by claiming it daily. Additionally, you will be eligible for extra $ZP rewards.",
+              "Farm on the Earn Section of Zprotocol for 7 consecutive days and win 100 MP each day by claiming it daily. Additionally, you will be eligible for extra $ZP rewards.",
             points: 700,
             validated: false,
             tbd: false,

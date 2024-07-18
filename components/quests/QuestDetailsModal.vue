@@ -40,13 +40,46 @@
             <p v-else>You are not eligible to claim this reward yet.</p>
           </div>
         </div>
-        <NuxtLink
-          v-if="quest.id === 1"
-          to="https://sns.scrolly.xyz/#/"
-          target="_blank"
-        >
-          Mint your domain
-        </NuxtLink>
+        <div v-if="quest.id === 1">
+          <button
+            class="nuxt-link-button"
+            :class="{ 'dark-mode': isDarkMode, 'light-mode': !isDarkMode }"
+          >
+            <NuxtLink to="https://sns.scrolly.xyz/#/" target="_blank"
+              >Mint my Scrolly Domains</NuxtLink
+            >
+          </button>
+        </div>
+        <div v-if="quest.id === 5">
+          <button
+            class="nuxt-link-button"
+            :class="{ 'dark-mode': isDarkMode, 'light-mode': !isDarkMode }"
+          >
+            <NuxtLink
+              to="https://app.zprotocol.xyz/liquidity/add/0x5300000000000000000000000000000000000004/0xb65aD8d81d1E4Cb2975352338805AF6e39BA8Be8"
+              target="_blank"
+              >Add Liquidity on Zprotocol</NuxtLink
+            >
+          </button>
+        </div>
+        <div v-if="quest.id === 4">
+          <button
+            class="nuxt-link-button"
+            :class="{ 'dark-mode': isDarkMode, 'light-mode': !isDarkMode }"
+          >
+            <NuxtLink to="/nft/create">Create my collection</NuxtLink>
+          </button>
+        </div>
+        <div v-if="quest.id === 7">
+          <button
+            class="nuxt-link-button"
+            :class="{ 'dark-mode': isDarkMode, 'light-mode': !isDarkMode }"
+          >
+            <NuxtLink to="https://app.zprotocol.xyz/earn/pool/9" target="_blank"
+              >Access to the Scrolly Pool
+            </NuxtLink>
+          </button>
+        </div>
       </div>
       <div class="button-group">
         <button
@@ -279,6 +312,37 @@ export default {
   justify-content: center;
   gap: 10px;
   margin-top: 20px;
+}
+
+.nuxt-link-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-bottom: 10px;
+}
+
+.nuxt-link-button.light-mode {
+  background-color: #007bff;
+}
+
+.nuxt-link-button.dark-mode {
+  background-color: #375a7f;
+}
+
+.nuxt-link-button a {
+  color: white;
+  text-decoration: none;
+}
+
+.nuxt-link-button.light-mode:hover {
+  background-color: #0056b3;
+}
+
+.nuxt-link-button.dark-mode:hover {
+  background-color: #23395d;
 }
 
 /* Responsive Styles for Mobile */
