@@ -15,16 +15,14 @@
       <div class="col-10 col-md-11 post-sizing">
         <!-- post author and timestamp -->
         <p class="card-subtitle mb-1 text-muted">
-          <UserLabel :address="authorAddress" :domain="authorDomain">
-            <NuxtLink
-              v-if="authorDomain"
-              class="link-without-color hover-color"
-              :to="'/profile/?id=' + authorDomain"
-            >
-              {{ showDomainOrAddressOrAnon }}
-            </NuxtLink>
-            <span v-if="!authorDomain">{{ showDomainOrAddressOrAnon }}</span>
-          </UserLabel>
+          <NuxtLink
+            v-if="authorDomain"
+            class="link-without-color hover-color"
+            :to="'/profile/?id=' + authorDomain"
+          >
+            {{ showDomainOrAddressOrAnon }}
+          </NuxtLink>
+          <span v-if="!authorDomain">{{ showDomainOrAddressOrAnon }}</span>
         </p>
 
         <!-- post text -->
@@ -64,7 +62,6 @@ import sanitizeHtml from "sanitize-html";
 import { useEthers, shortenAddress } from "vue-dapp";
 import { useUserStore } from "~/store/user";
 import ProfileImage from "~/components/profile/ProfileImage.vue";
-import UserLabel from "~/components/UserLabel.vue";
 import { getDomainName } from "~/utils/domainUtils";
 import { fetchUsername, storeUsername } from "~/utils/storageUtils";
 import {
@@ -81,7 +78,6 @@ export default {
 
   components: {
     ProfileImage,
-    UserLabel,
   },
 
   data() {

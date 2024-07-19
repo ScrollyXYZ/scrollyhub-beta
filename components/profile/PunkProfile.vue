@@ -275,7 +275,6 @@
         storageType="ipfs"
         :componentId="$.uid"
         :maxFileSize="$config.fileUploadSizeLimit"
-        :walletAddress="uAddress"
       />
       <!-- END Change Image Modal -->
     </div>
@@ -338,6 +337,7 @@
       </div>
     </div>
   </div>
+  <ChangeUsernameModal :address="uAddress" />
 </template>
 
 <script>
@@ -353,6 +353,7 @@ import ChatFeed from "../chat/ChatFeed.vue";
 import { getActivityPoints } from "~/utils/balanceUtils";
 import { getDomainName, getDomainHolder } from "~/utils/domainUtils";
 import { fetchUsername, storeUsername } from "~/utils/storageUtils";
+import ChangeUsernameModal from "~/components/names/ChangeUsernameModal.vue";
 import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
@@ -388,6 +389,7 @@ export default {
     ProfileImage,
     UserCollections,
     UserMintedPosts,
+    ChangeUsernameModal,
   },
 
   mounted() {
@@ -867,7 +869,6 @@ export default {
 .profile-back-button {
   display: none;
 }
-
 @media (max-width: 768px) {
   .profile-back-button {
     display: block;

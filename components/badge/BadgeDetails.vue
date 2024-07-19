@@ -18,7 +18,8 @@
 
       <p class="card-text">{{ badgeMetadata.description }}</p>
 
-      <button
+      <!--
+<button
         v-if="!isAttached"
         class="btn btn-primary mt-2"
         @click="attach"
@@ -36,6 +37,7 @@
       <div class="d-flex justify-content-center" v-if="isAttached">
         <i class="bi bi-patch-check-fill"></i>
       </div>
+      -->
     </div>
   </div>
 </template>
