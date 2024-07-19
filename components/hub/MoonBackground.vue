@@ -2,7 +2,7 @@
   <div class="background-container">
     <img
       ref="backgroundImage"
-      src="@/css/clouds/1500x500.jpg"
+      src="/css/clouds/1500x500.jpg"
       alt="Background"
       class="background-image"
     />
