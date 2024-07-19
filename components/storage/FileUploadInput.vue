@@ -20,10 +20,6 @@
     ></span>
     Upload
   </button>
-
-  <div v-if="fileTooBig" class="alert alert-danger mt-3" role="alert">
-    File is too big (max size is {{ maxFileSize / 1024 / 1024 }} MB).
-  </div>
 </template>
 
 <script>
@@ -75,8 +71,6 @@ export default {
       const result = await imagekit.upload({
         file: this.file,
         fileName: this.newFileName,
-        tags: [this.$config.projectName, this.$config.projectUrl],
-        token: authParams.data.token,
         signature: authParams.data.signature,
         expire: authParams.data.expire,
       });

@@ -426,12 +426,12 @@ a:hover {
 .navbar-brand:focus {
   color: var(--bs-primary);
 }
-/* Style spécifique pour la nouvelle catégorie SpecialLink dans la barre de navigation */
+
 .navbar .navbar-nav .special-link {
-  font-family: "GlitterySnowfall", Arial, sans-serif; /* Même police que les autres éléments de la navbar */
-  font-size: 1rem; /* Taille de police standard pour la navbar */
-  text-decoration: none; /* Pas de soulignement pour garder la netteté */
-  transition: color 0.3s ease; /* Transition douce pour les survols */
+  font-family: "GlitterySnowfall", Arial, sans-serif;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: color 0.3s ease;
   color: var(--bs-primary);
   font-family: "GlitterySnowfall", Arial, sans-serif;
   font-size: 1.9rem;

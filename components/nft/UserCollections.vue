@@ -47,6 +47,8 @@
 
 <script>
 import { ethers } from "ethers";
+import axios from "axios";
+import { useEthers } from "vue-dapp";
 import { fetchCollection, storeCollection } from "~/utils/storageUtils";
 import Image from "~/components/Image.vue";
 
@@ -61,60 +63,68 @@ export default {
       nfts: [],
       waitingData: false,
       retryNfts: [],
+      apiKey: "sqbpcbCNJHIZMXeDMGCS5mEc", 
     };
   },
   mounted() {
-    this.fetchUserNfts();
+    if (this.isActivated) {
+      this.fetchUserNfts();
+    }
   },
   methods: {
     async fetchUserNfts() {
       try {
         this.waitingData = true;
-        const provider = this.$getFallbackProvider(
-          this.$config.supportedChainId,
+
+        // Étape 1: Récupérer les adresses des contrats détenus par l'utilisateur via NFTScan
+        const nftScanResponse = await axios.get(
+          `https://scrollapi.nftscan.com/api/v2/collections/own/${this.address}?erc_type=erc721`,
+          {
+            headers: {
+              "X-API-KEY": this.apiKey,
+            },
+          },
+        );
+        const ownedContracts = nftScanResponse.data.data.map(
+          (asset) => asset.contract_address,
         );
 
-        const launchpadInterface = new ethers.utils.Interface([
-          "function getNftContracts(uint256 fromIndex, uint256 toIndex) external view returns(address[] memory)",
-          "function getNftContractsArrayLength() external view returns(uint256)",
-        ]);
-
-        const launchpadContract = new ethers.Contract(
-          this.$config.nftLaunchpadBondingAddress,
-          launchpadInterface,
-          provider,
-        );
-
-        const allNftsArrayLength =
-          await launchpadContract.getNftContractsArrayLength();
-        const allNfts = await launchpadContract.getNftContracts(
-          0,
-          allNftsArrayLength - 1,
-        );
+        // Étape 2: Vérifier si chaque contrat est whitelisté et obtenir les détails
         const ownedNfts = [];
-
-        for (const nftAddress of allNfts) {
-          const nftInterface = new ethers.utils.Interface([
-            "function balanceOf(address owner) external view returns (uint256)",
-          ]);
-
-          const nftContract = new ethers.Contract(
-            nftAddress,
-            nftInterface,
-            provider,
-          );
-          const balance = await nftContract.balanceOf(this.address);
-
-          if (balance > 0) {
-            ownedNfts.push(nftAddress);
+        for (const contractAddress of ownedContracts) {
+          const isWhitelisted =
+            await this.checkContractWhitelist(contractAddress);
+          if (isWhitelisted) {
+            ownedNfts.push(contractAddress);
+          } else {
+            console.log(`Contract ${contractAddress} is not whitelisted`);
           }
         }
 
+        // Étape 3: Analyser les NFT whitelistés
+        const provider = this.$getFallbackProvider(
+          this.$config.supportedChainId,
+        );
         await this.parseNftsArray(ownedNfts, this.nfts, provider);
+
         this.waitingData = false;
       } catch (error) {
         console.error("Error fetching NFTs:", error);
         this.waitingData = false;
+      }
+    },
+    async checkContractWhitelist(contractAddress) {
+      try {
+        const response = await axios.get(
+          `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+        );
+        return response.data.exists;
+      } catch (error) {
+        console.error(
+          `Error checking whitelist for contract: ${contractAddress}`,
+          error,
+        );
+        return false;
       }
     },
     async parseNftsArray(inputArray, outputArray, provider) {
@@ -189,6 +199,10 @@ export default {
         });
       }, 3000); // Retry after 3 seconds
     },
+  },
+  setup() {
+    const { address, chainId, isActivated, signer } = useEthers();
+    return { address, chainId, isActivated, signer };
   },
 };
 </script>

@@ -90,14 +90,15 @@ export const useQuestStore = defineStore("questStore", {
         quests: [
           {
             id: 5,
-            title: "Scrolly Staker on Zprotocol",
-            description: "Stake at least $10 on ETH-Scrolly pair on Zprotocol.",
+            title: "Scrolly Providor on Zprotocol",
+            description:
+              "Provide at least $10 on ETH-Scrolly pair on Zprotocol.",
             points: 200,
             validated: false,
-            tbd: true,
+            tbd: false,
             ended: false,
             image: "http://scrolly.xyz/img/quests/ScrollyDeFi.png",
-            contractAddress: "0xYourContractAddressForQuest5",
+            contractAddress: "0xd76Eb5383E4CdA4d933E0C3Cb0ff5c7fD6aA676f",
             functions: {
               isEligible: "isEligible",
               hasUserClaimed: "hasUserClaimed",
@@ -108,16 +109,17 @@ export const useQuestStore = defineStore("questStore", {
             id: 7,
             title: "Scrolly Yield Farmer",
             description:
-              "Farm on Zprotocol for 7 consecutive days. You will be eligible for extra $ZP rewards too",
-            points: 400,
+              "Farm on Zprotocol for 7 consecutive days and win 100 MP each day by claiming it daily. Additionally, you will be eligible for extra $ZP rewards.",
+            points: 700,
             validated: false,
-            tbd: true,
+            tbd: false,
             ended: false,
             image: "http://scrolly.xyz/img/quests/ScrollyYield.png",
-            contractAddress: "0xYourContractAddressForQuest5",
+            contractAddress: "0x8C9103EC43Ae6FAF11a4Ce98Ce6F3442A0C4C944",
             functions: {
               isEligible: "isEligible",
               hasUserClaimed: "hasUserClaimed",
+              claimInfo: "claimInfo",
               claim: "claim",
             },
           },
@@ -135,7 +137,7 @@ export const useQuestStore = defineStore("questStore", {
             points: 50,
             validated: false,
             tbd: false,
-            ended: false, // Marked as ended
+            ended: true, // Marked as ended
             image: "http://scrolly.xyz/img/quests/ScrollyMemeConstest.png",
             contractAddress: "0x166E1FB48160D066C4724191463F4d3b298B3bbb",
             functions: {
@@ -145,8 +147,11 @@ export const useQuestStore = defineStore("questStore", {
           // add other quests here
         ],
       },
-      // add other categories here
     ],
+    claimInfo: {
+      lastClaimTime: 0,
+      claimCount: 0,
+    },
   }),
   getters: {
     filteredCategories(state) {
@@ -155,7 +160,7 @@ export const useQuestStore = defineStore("questStore", {
       }
       if (state.selectedCategory === "latest") {
         const allQuests = state.questCategories.flatMap(
-          (category) => category.quests
+          (category) => category.quests,
         );
         const latestQuests = allQuests.sort((a, b) => b.id - a.id).slice(0, 3);
         return [
@@ -166,7 +171,7 @@ export const useQuestStore = defineStore("questStore", {
         ];
       }
       return state.questCategories.filter(
-        (category) => category.category === state.selectedCategory
+        (category) => category.category === state.selectedCategory,
       );
     },
     getCompletedQuests: (state) => (quests) => {
@@ -177,6 +182,29 @@ export const useQuestStore = defineStore("questStore", {
     async initializeQuests(userStore) {
       this.userStore = userStore;
       await this.updateData();
+
+      // Fetch claim info for quest ID 7
+      const quest7 = this.questCategories
+        .find((category) => category.quests.some((quest) => quest.id === 7))
+        ?.quests.find((quest) => quest.id === 7);
+
+      if (quest7) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          quest7.contractAddress,
+          ["function claimInfo(address) view returns (uint256, uint256)"],
+          provider,
+        );
+
+        const [lastClaimTime, claimCount] = await contract.claimInfo(
+          this.userStore.getCurrentUserAddress,
+        );
+        quest7.lastClaimTime = lastClaimTime;
+        quest7.claimCount = claimCount;
+        if (claimCount >= 7) {
+          quest7.validated = true;
+        }
+      }
     },
     async updateData() {
       if (!this.userStore) {
@@ -186,6 +214,29 @@ export const useQuestStore = defineStore("questStore", {
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
       await this.checkQuestConditions();
+
+      // Fetch claim info for quest ID 7 during update
+      const quest7 = this.questCategories
+        .find((category) => category.quests.some((quest) => quest.id === 7))
+        ?.quests.find((quest) => quest.id === 7);
+
+      if (quest7) {
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const contract = new ethers.Contract(
+          quest7.contractAddress,
+          ["function claimInfo(address) view returns (uint256, uint256)"],
+          provider,
+        );
+
+        const [lastClaimTime, claimCount] = await contract.claimInfo(
+          this.userStore.getCurrentUserAddress,
+        );
+        quest7.lastClaimTime = lastClaimTime;
+        quest7.claimCount = claimCount;
+        if (claimCount >= 7) {
+          quest7.validated = true;
+        }
+      }
     },
     async fetchActivityPoints() {
       if (!this.userStore) {
@@ -212,12 +263,12 @@ export const useQuestStore = defineStore("questStore", {
         const contract = new ethers.Contract(
           "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876",
           ["function balanceOf(address owner) view returns (uint256)"],
-          provider
+          provider,
         );
         const balance = await contract.balanceOf(userAddress);
         let points = 169 * Math.min(balance.toNumber(), 3);
         const hubQuests = this.questCategories.find(
-          (category) => category.category === "Social Hub Quests"
+          (category) => category.category === "Social Hub Quests",
         );
         const quest = hubQuests.quests.find((q) => q.id === 1);
         quest.points = points;
@@ -245,13 +296,36 @@ export const useQuestStore = defineStore("questStore", {
                 [
                   `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              const eligible = await contract[quest.functions.checkEligibility](
-                userAddress
-              );
+              const eligible =
+                await contract[quest.functions.checkEligibility](userAddress);
               quest.validated = eligible;
               console.log(`Quest ${quest.id} eligibility: ${eligible}`);
+            } else if (quest.id === 7) {
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
+                  `function ${quest.functions.claimInfo}(address _user) external view returns (uint256, uint256)`,
+                ],
+                provider,
+              );
+              const [lastClaimTime, claimCount] =
+                await contract[quest.functions.claimInfo](userAddress);
+              const isEligible =
+                await contract[quest.functions.isEligible](userAddress);
+
+              quest.validated = claimCount >= 7;
+              quest.eligible = isEligible;
+
+              this.claimInfo = { lastClaimTime, claimCount };
+              this.claimStatus = claimCount > 0;
+              this.eligibilityStatus = isEligible;
+
+              console.log(`Quest ${quest.id} lastClaimTime: ${lastClaimTime}`);
+              console.log(`Quest ${quest.id} claimCount: ${claimCount}`);
+              console.log(`Quest ${quest.id} isEligible: ${isEligible}`);
             } else if (quest.functions) {
               const contract = new ethers.Contract(
                 quest.contractAddress,
@@ -259,14 +333,12 @@ export const useQuestStore = defineStore("questStore", {
                   `function ${quest.functions.isEligible}(address _user) external view returns (bool)`,
                   `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              const hasClaimed = await contract[quest.functions.hasUserClaimed](
-                userAddress
-              );
-              const isEligible = await contract[quest.functions.isEligible](
-                userAddress
-              );
+              const hasClaimed =
+                await contract[quest.functions.hasUserClaimed](userAddress);
+              const isEligible =
+                await contract[quest.functions.isEligible](userAddress);
 
               quest.validated = hasClaimed;
               quest.eligible = isEligible;
@@ -301,13 +373,12 @@ export const useQuestStore = defineStore("questStore", {
             `function ${functions.hasUserClaimed}(address _user) external view returns (bool)`,
             `function ${functions.claim}(address _user) external`,
           ],
-          signer
+          signer,
         );
 
         try {
-          const hasClaimed = await contract[functions.hasUserClaimed](
-            userAddress
-          );
+          const hasClaimed =
+            await contract[functions.hasUserClaimed](userAddress);
           const isEligible = await contract[functions.isEligible](userAddress);
 
           if (hasClaimed) {
@@ -319,11 +390,11 @@ export const useQuestStore = defineStore("questStore", {
           }
           console.log(
             "Updated claimStatus in checkEligibilityAndClaimStatus:",
-            this.claimStatus
+            this.claimStatus,
           );
           console.log(
             "Updated eligibilityStatus in checkEligibilityAndClaimStatus:",
-            this.eligibilityStatus
+            this.eligibilityStatus,
           );
         } catch (error) {
           console.error("Error checking eligibility and claim status:", error);
@@ -344,14 +415,28 @@ export const useQuestStore = defineStore("questStore", {
         const contract = new ethers.Contract(
           contractAddress,
           [`function ${functions.claim}(address _user) external`],
-          signer
+          signer,
         );
+
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
+
+        if (
+          this.claimInfo.claimCount >= 7 ||
+          timeSinceLastClaim < 86400 ||
+          !this.eligibilityStatus
+        ) {
+          this.showPopupMessage("You are not eligible to claim at this time.");
+          return;
+        }
 
         try {
           await contract[functions.claim](userAddress);
+          this.claimInfo.lastClaimTime = currentTime;
+          this.claimInfo.claimCount += 1;
           this.claimStatus = true;
           this.showPopupMessage(
-            `Congratulations! You have successfully claimed ${points} Mappy Points!`
+            `Congratulations! You have successfully claimed ${points} Mappy Points!`,
           );
           setTimeout(async () => {
             await this.updateData(); // Refresh quest status
@@ -359,7 +444,7 @@ export const useQuestStore = defineStore("questStore", {
         } catch (error) {
           console.error("Error claiming reward:", error);
           this.showPopupMessage(
-            "There was an issue processing your claim. Please try again later."
+            "There was an issue processing your claim. Please try again later.",
           );
         }
       } else {
@@ -389,7 +474,7 @@ export const useQuestStore = defineStore("questStore", {
             const userAddress = this.userStore.getCurrentUserAddress;
             if (ethers.utils.isAddress(userAddress)) {
               const provider = new ethers.providers.Web3Provider(
-                window.ethereum
+                window.ethereum,
               );
               const contract = new ethers.Contract(
                 quest.contractAddress,
@@ -397,30 +482,28 @@ export const useQuestStore = defineStore("questStore", {
                   `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
                   `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
                 ],
-                provider
+                provider,
               );
-              this.claimStatus = await contract[
-                quest.functions.checkEligibility
-              ](userAddress);
-              quest.validated = await contract[quest.functions.hasUserClaimed](
-                userAddress
-              );
+              this.claimStatus =
+                await contract[quest.functions.checkEligibility](userAddress);
+              quest.validated =
+                await contract[quest.functions.hasUserClaimed](userAddress);
             } else {
               console.error("Invalid user address:", userAddress);
             }
           } else {
             await this.checkEligibilityAndClaimStatus(
               quest.contractAddress,
-              quest.functions
+              quest.functions,
             );
           }
           console.log(
             "Updated claimStatus in showQuestDetails:",
-            this.claimStatus
+            this.claimStatus,
           );
           console.log(
             "Updated eligibilityStatus in showQuestDetails:",
-            this.eligibilityStatus
+            this.eligibilityStatus,
           );
           break;
         }

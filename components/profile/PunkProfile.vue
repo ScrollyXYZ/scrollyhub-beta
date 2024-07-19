@@ -275,6 +275,7 @@
         storageType="ipfs"
         :componentId="$.uid"
         :maxFileSize="$config.fileUploadSizeLimit"
+        :walletAddress="uAddress"
       />
       <!-- END Change Image Modal -->
     </div>
@@ -730,7 +731,6 @@ export default {
 </script>
 
 <style scoped>
-
 .profile-image-column {
   text-align: center;
 }

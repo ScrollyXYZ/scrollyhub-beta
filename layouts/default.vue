@@ -1,17 +1,15 @@
 <template>
-  <div class="default-layout">
+  <div :class="['quests-default-layout', { 'dark-mode': isDarkMode }]">
     <Head>
       <Title>{{ $config.projectMetadataTitle }}</Title>
       <Meta name="description" :content="$config.projectDescription" />
       <Link rel="icon" type="image/x-icon" :href="$config.favicon" />
-
       <Meta property="og:title" :content="$config.projectMetadataTitle" />
       <Meta property="og:description" :content="$config.projectDescription" />
       <Meta
         property="og:image"
         :content="$config.projectUrl + $config.previewImage"
       />
-
       <Meta name="twitter:card" content="summary_large_image" />
       <Meta name="twitter:site" :content="$config.projectTwitter" />
       <Meta name="twitter:creator" :content="$config.projectTwitter" />
@@ -22,28 +20,44 @@
         :content="$config.projectUrl + $config.previewImage"
       />
     </Head>
-
-    <NavbarDesktop v-if="!isMobile" />
-    <NavbarMobile v-if="isMobile" :lSidebar="lSidebar" :rSidebar="rSidebar" />
-
     <!-- Main content with sidebars -->
-    <div class="container-fluid page-container">
-      <div class="row flex-nowrap">
-        <SidebarLeft :lSidebar="lSidebar" :isMobile="isMobile" />
-
-        <main
-          class="col col-lg-4 ps-md-2 pt-2 main-containter"
-          v-show="sidebarStore.showMainContent"
-        >
-          <slot></slot>
-        </main>
-
-        <SidebarRight :rSidebar="rSidebar" :isMobile="isMobile" />
-      </div>
+    <div class="quests-page-container">
+      <SidebarQuest
+        ref="sidebarRef"
+        :isMobile="isMobile"
+        :open="layoutSidebarStore.leftSidebarOpen"
+        class="sidebar-quest"
+      />
+      <button id="toggle-sidebar-button" @click="toggleSidebar" v-if="isMobile">
+        ☰
+      </button>
+      <button
+        id="toggle-right-sidebar-button"
+        @click="toggleRightSidebar"
+        v-if="showRightSidebarButton"
+      >
+        ➔
+      </button>
+      <MoonBackground :isDarkMode="isDarkMode" />
+      <main
+        class="quests-main-container"
+        v-show="layoutSidebarStore.showMainContent"
+      >
+        <Header />
+        <slot></slot>
+        <Footer />
+      </main>
       <BadgeSticker
         v-show="badgeIsEligible"
         class="fixed-bottom"
         style="margin-right: 0; margin-left: auto"
+      />
+      <SidebarRight
+        ref="rightSidebarRef"
+        :isMobile="isMobile"
+        :rSidebar="layoutSidebarStore.rightSidebarOpen"
+        @closeSidebar="closeRightSidebar"
+        class="sidebar-right"
       />
     </div>
   </div>
@@ -169,18 +183,8 @@
         </div>
       </div>
     </div>
-    <!-- END Connect Wallet modal -->
-
-    <ChatSettingsModal />
-
-    <ChangeUsernameModal />
-
-    <FindUserModal />
-
-    <ReferralModal />
-
-    <VerifyAccountOwnership />
   </div>
+  <!-- END Connect Wallet modal -->
   <!-- Do not delete: ugly hack to make "global" work with Vite -->
   <component :is="'script'"> var global = global || window; </component>
 </template>
@@ -195,12 +199,9 @@ import {
   useWallet,
 } from "vue-dapp";
 import { useNotificationsStore } from "~/store/notifications";
-import { useSidebarStore } from "~/store/sidebars";
-import { useSiteStore } from "~/store/site";
 import { useUserStore } from "~/store/user";
-import NavbarDesktop from "~/components/navbars/NavbarDesktop.vue";
-import NavbarMobile from "~/components/navbars/NavbarMobile.vue";
-import SidebarLeft from "~/components/sidebars/SidebarLeft.vue";
+import { useSiteStore } from "~/store/site";
+import SidebarQuest from "~/components/sidebars/SidebarNft.vue";
 import SidebarRight from "~/components/sidebars/SidebarRight.vue";
 import ChatSettingsModal from "~/components/ChatSettingsModal.vue";
 import { getActivityPoints } from "~/utils/balanceUtils";
@@ -208,9 +209,15 @@ import { getDomainHolder, getDomainName } from "~/utils/domainUtils";
 import { storeReferrer, storeUsername } from "~/utils/storageUtils";
 import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
 import BadgeSticker from "~/components/badge/BadgeSticker.vue";
+import Header from "~/components/hub/Header.vue";
+import Footer from "~/components/hub/Footer.vue";
 import ReferralModal from "~/components/referrals/ReferralModal.vue";
 import ChangeUsernameModal from "~/components/names/ChangeUsernameModal.vue";
 import FindUserModal from "~/components/search/FindUserModal.vue";
+import MoonBackground from "~/components/hub/MoonBackground.vue";
+import { useThemeStore } from "~/store/theme";
+import { useLayoutSidebarStore } from "~/store/layoutSidebarStore";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 
 export default {
   data() {
@@ -218,55 +225,32 @@ export default {
       badgeIsEligible: false,
       breakpoint: 1000,
       isMounted: false,
-      lSidebar: null,
       referrer: null,
-      rSidebar: null,
       width: null,
     };
   },
-
   components: {
     BadgeSticker,
     ChangeUsernameModal,
     ChatSettingsModal,
     FindUserModal,
-    NavbarDesktop,
-    NavbarMobile,
     ReferralModal,
-    SidebarLeft,
+    SidebarQuest,
     SidebarRight,
     VerifyAccountOwnership,
+    MoonBackground,
+    Header,
+    Footer,
   },
-
   mounted() {
     this.isMounted = true;
-
-    // set color mode
     document.documentElement.setAttribute(
       "data-bs-theme",
       this.siteStore.getColorMode,
     );
-
-    // set sidebar collapse
-    this.lSidebar = new bootstrap.Collapse("#sidebar1", { toggle: false });
-    this.rSidebar = new bootstrap.Collapse("#sidebar2", { toggle: false });
     this.width = window.innerWidth;
+    this.updateSidebarState();
 
-    if (this.width < this.breakpoint) {
-      this.sidebarStore.setLeftSidebar(false);
-      this.sidebarStore.setRightSidebar(false);
-      this.lSidebar.hide();
-      this.rSidebar.hide();
-    } else {
-      this.lSidebar.show();
-      //this.rSidebar.show();
-      this.sidebarStore.setLeftSidebar(true);
-      this.sidebarStore.setRightSidebar(true);
-    }
-
-    window.addEventListener("resize", this.onWidthChange);
-
-    // connect to wallet if user was connected before
     if (!this.isActivated) {
       if (localStorage.getItem("connected") == "metamask") {
         this.connectMetaMask();
@@ -274,60 +258,54 @@ export default {
         this.connectCoinbase();
       }
     }
-
-    // enable popovers everywhere
     new bootstrap.Popover(document.body, {
       selector: "[data-bs-toggle='popover']",
     });
-    // check badge eligibility
     this.badgeCheckEligibility();
-
-    // check if file upload is enabled
     this.siteStore.setFileUploadEnabled(this.$config.fileUploadEnabled);
-
-    // check if referrer in the URL
     this.referrer = this.$route.query.ref;
     if (this.referrer) {
       this.parseReferrer();
     }
-  },
 
+    window.addEventListener("resize", this.onWidthChange);
+  },
   unmounted() {
-    window.removeEventListener("resize", onWidthChange);
+    window.removeEventListener("resize", this.onWidthChange);
   },
-
   computed: {
     isConnectedToOrbis() {
       return this.userStore.getIsConnectedToOrbis;
     },
-
     isMobile() {
-      if (this.width < this.breakpoint) {
-        return true;
-      }
-      return false;
+      return this.width < this.breakpoint;
+    },
+    isTablet() {
+      return this.width >= this.breakpoint && this.width < 1024;
     },
     isSupportedChain() {
-      if (this.chainId === this.$config.supportedChainId) {
-        return true;
-      } else {
-        return false;
-      }
+      return this.chainId === this.$config.supportedChainId;
     },
     orbisAddress() {
-      // address which is signed with Orbis
       if (this.userStore.getDidParent) {
-        // did parent example: did:pkh:eip155:137:0xb29050965a5ac70ab487aa47546cdcbc97dae45d
-        // get the last item (address) from did parent
         return this.userStore.getDidParent.split(":").pop();
       }
     },
+    isDarkMode() {
+      const themeStore = useThemeStore();
+      return themeStore.getIsDarkMode;
+    },
+    showRightSidebarButton() {
+      return (
+        (this.width < 1450 && !this.layoutSidebarStore.rightSidebarOpen) ||
+        this.isTablet
+      );
+    },
   },
-
   methods: {
     getActivityPoints,
     getDomainHolder,
-    getDomainName, // imported function from utils/domainUtils.js
+    getDomainName,
     async badgeCheckEligibility() {
       if (
         this.$config.badge.isLive &&
@@ -338,7 +316,6 @@ export default {
         try {
           const response = await axios.get(checkUrl);
           if (response.data.eligibility) {
-            // check if badge already minted
             const intrfc = [
               "function hasBadge(address _user) external view returns (bool)",
             ];
@@ -349,76 +326,60 @@ export default {
             );
             try {
               const hasBadge = await contract.hasBadge(this.address);
-              console.log("hasBadge:", hasBadge);
-              if (Boolean(hasBadge)) {
-                return (this.badgeIsEligible = false);
-              } else {
-                return (this.badgeIsEligible = true);
-              }
+              this.badgeIsEligible = !hasBadge;
             } catch (error) {
               console.error(error);
-              return (this.badgeIsEligible = false);
+              this.badgeIsEligible = false;
             }
           } else {
-            return (this.badgeIsEligible = false);
+            this.badgeIsEligible = false;
           }
         } catch (error) {
           console.error(error);
-          return (this.badgeIsEligible = false);
+          this.badgeIsEligible = false;
         }
       }
     },
     async connectCoinbase() {
       await this.connectWith(this.coinbaseConnector);
-      localStorage.setItem("connected", "coinbase"); // store in local storage to autoconnect next time
+      localStorage.setItem("connected", "coinbase");
       document.getElementById("closeConnectModal").click();
     },
-
     async connectMetaMask() {
       await this.connectWith(this.mmConnector);
-      localStorage.setItem("connected", "metamask"); // store in local storage to autoconnect next time
+      localStorage.setItem("connected", "metamask");
       document.getElementById("closeConnectModal").click();
     },
-
     async fetchActivityPoints() {
       if (this.$config.activityPointsAddress) {
         const activityPoints = await this.getActivityPoints(
           this.address,
           this.signer,
         );
-
         this.userStore.setCurrentUserActivityPoints(activityPoints);
       }
     },
-
     async fetchChatTokenBalance() {
       if (this.$config.chatTokenAddress) {
         const chatTokenInterface = new ethers.utils.Interface([
           "function balanceOf(address owner) view returns (uint256)",
         ]);
-
         const chatTokenContract = new ethers.Contract(
           this.$config.chatTokenAddress,
           chatTokenInterface,
           this.signer,
         );
-
         const balance = await chatTokenContract.balanceOf(this.address);
-
         this.userStore.setChatTokenBalanceWei(balance);
       }
     },
-
     async fetchOrbisNotifications() {
       if (this.userStore.getIsConnectedToOrbis) {
         this.notificationsStore.setLoadingNotifications(true);
-
-        // fetch new notifications count
         let { data, error, status } = await this.$orbis.getNotificationsCount({
           type: "social",
           context: this.$config.chatChannels.general,
         });
-
         if (status === 200 && data?.count_new_notifications) {
           this.notificationsStore.setUnreadNotificationsCount(
             data.count_new_notifications,
@@ -426,8 +387,6 @@ export default {
         } else if (error) {
           console.log("New notifications count error", error);
         }
-
-        // fetch notifications
         let {
           data: notifications,
           error: notificationsError,
@@ -436,32 +395,25 @@ export default {
           type: "social",
           context: this.$config.chatChannels.general,
         });
-
         if (notificationsStatus === 200 && notifications) {
-          const newNotifications = notifications.filter(function (item) {
+          const newNotifications = notifications.filter((item) => {
             return item.status === "new";
           });
-
           this.notificationsStore.setNotifications(newNotifications);
         } else if (notificationsError) {
           console.log("Notifications fetching error", notificationsError);
         }
-
         this.notificationsStore.setLoadingNotifications(false);
       }
     },
-
     async fetchOrbisProfile() {
       if (this.isActivated) {
         let { data, error } = await this.$orbis.getDids(this.address);
-
         if (data[0].did) {
           const profile = await this.$orbis.getProfile(data[0].did);
-
           if (profile && profile.data.details.profile) {
             this.userStore.setOrbisImage(profile.data.details.profile.pfp);
           }
-
           if (profile) {
             this.userStore.setFollowers(profile.data.count_followers);
             this.userStore.setFollowing(profile.data.count_following);
@@ -469,28 +421,22 @@ export default {
               profile.data.last_activity_timestamp,
             );
           }
-
-          // fetch notifications
           this.fetchOrbisNotifications();
         }
       }
     },
-
     async fetchUserDomain() {
       if (
         this.chainId === this.$config.supportedChainId &&
         this.address != this.userStore.getCurrentUserAddress
       ) {
         this.userStore.setCurrentUserAddress(this.address);
-
         let userDomain;
-
         if (this.signer) {
           userDomain = await this.getDomainName(this.address, this.signer);
         } else {
           userDomain = await this.getDomainName(this.address);
         }
-
         if (userDomain) {
           this.userStore.setDefaultDomain(userDomain + this.$config.tldName);
           storeUsername(
@@ -501,26 +447,40 @@ export default {
         } else {
           this.userStore.setDefaultDomain(null);
         }
-
         this.fetchActivityPoints();
         this.fetchChatTokenBalance();
       }
     },
-
     async getOrbisDids() {
       const isConn = await this.$orbis.isConnected();
       this.userStore.setIsConnectedToOrbis(isConn);
-
       if (this.$orbis.session) {
         this.userStore.setDid(this.$orbis.session.did._id);
         this.userStore.setDidParent(this.$orbis.session.did._parentId);
       }
     },
-
     onWidthChange() {
-      this.width = window.innerWidth;
+      if (typeof window !== "undefined") {
+        this.width = window.innerWidth;
+        this.updateSidebarState();
+      }
     },
+    updateSidebarState() {
+      const isTablet = this.width >= this.breakpoint && this.width < 1024;
+      if (this.isMobile || isTablet || this.width < 1450) {
+        this.layoutSidebarStore.setShowMainContent(true);
+        this.layoutSidebarStore.rightSidebarOpen = false;
+      } else {
+        this.layoutSidebarStore.setShowMainContent(true);
+        this.layoutSidebarStore.rightSidebarOpen = true;
+      }
 
+      if (this.isMobile || isTablet) {
+        this.layoutSidebarStore.leftSidebarOpen = false;
+      } else {
+        this.layoutSidebarStore.leftSidebarOpen = true;
+      }
+    },
     async orbisLogout() {
       await this.$orbis.logout();
       this.userStore.setIsConnectedToOrbis(false);
@@ -528,51 +488,57 @@ export default {
       this.userStore.setDidParent(null);
       this.userStore.setOrbisImage(null);
     },
-
     async parseReferrer() {
-      // check if referrer is a domain name
       if (!this.referrer.startsWith("0x")) {
         let domainName = this.referrer;
-
         if (this.referrer.includes(this.$config.tldName)) {
-          // get the domain name without extension
           domainName = this.referrer.split(".")[0];
         }
-
-        // fetch the domain holder address
         this.referrer = await this.getDomainHolder(domainName);
       }
-
       if (this.address) {
         if (
           String(this.address).toLowerCase() ===
           String(this.referrer).toLowerCase()
         ) {
-          return; // cannot refer yourself
+          return;
         }
       }
-
-      // check if referrer is a valid address and not a zero address
       if (
         ethers.utils.isAddress(this.referrer) &&
         this.referrer != ethers.constants.AddressZero
       ) {
-        // store into local storage as referrer
         storeReferrer(window, this.referrer);
       }
     },
+    toggleSidebar() {
+      this.layoutSidebarStore.toggleLeftSidebar();
+      this.layoutSidebarStore.setShowMainContent(
+        !this.layoutSidebarStore.leftSidebarOpen,
+      );
+    },
+    toggleRightSidebar() {
+      this.layoutSidebarStore.toggleRightSidebar();
+      this.layoutSidebarStore.setShowMainContent(
+        !this.layoutSidebarStore.rightSidebarOpen,
+      );
+    },
+    closeRightSidebar() {
+      this.layoutSidebarStore.setShowMainContent(true);
+      this.layoutSidebarStore.rightSidebarOpen = false;
+    },
   },
-
   setup() {
+    const themeStore = useThemeStore();
+    const isDarkMode = computed(() => themeStore.getIsDarkMode);
+
     const config = useRuntimeConfig();
     const notificationsStore = useNotificationsStore();
-    const sidebarStore = useSidebarStore();
     const siteStore = useSiteStore();
     const userStore = useUserStore();
+    const layoutSidebarStore = useLayoutSidebarStore();
     const { address, chainId, isActivated, signer } = useEthers();
     const { connectWith } = useWallet();
-
-    //const localStorageConnected = useLocalStorage('connected', null); // when localStorageConnected.value is updated, localStorage is updated too
 
     const coinbaseConnector = new CoinbaseWalletConnector({
       appName: config.projectName,
@@ -581,6 +547,22 @@ export default {
 
     const mmConnector = new MetaMaskConnector({
       appUrl: config.projectUrl,
+    });
+
+    const isMobile = ref(false);
+
+    onMounted(() => {
+      isMobile.value = window.innerWidth < 768;
+
+      window.addEventListener("resize", () => {
+        isMobile.value = window.innerWidth < 768;
+      });
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("resize", () => {
+        isMobile.value = window.innerWidth < 768;
+      });
     });
 
     return {
@@ -592,15 +574,15 @@ export default {
       mmConnector,
       signer,
       notificationsStore,
-      sidebarStore,
       siteStore,
       userStore,
+      layoutSidebarStore,
+      isDarkMode,
+      isMobile,
     };
   },
-
   watch: {
     address(newVal, oldVal) {
-      // if address changes, clear local & session storage (needs further testing)
       if (
         newVal.startsWith("0x") &&
         oldVal.startsWith("0x") &&
@@ -608,24 +590,19 @@ export default {
       ) {
         this.orbisLogout();
       }
-
       if (newVal) {
         this.fetchUserDomain();
         this.badgeCheckEligibility();
       }
     },
-
     chainId(newVal, oldVal) {
       if (newVal) {
         this.fetchUserDomain();
         this.badgeCheckEligibility();
       }
     },
-
     isActivated(newVal, oldVal) {
       if (oldVal === true && newVal === false) {
-        // if user disconnects, clear the local storage
-        console.log("user disconnected");
         localStorage.setItem("connected", "");
         this.orbisLogout();
       } else {
@@ -634,50 +611,144 @@ export default {
         }
       }
     },
-
     isConnectedToOrbis(newVal, oldVal) {
       if (newVal && oldVal === false) {
         this.fetchOrbisProfile();
       }
     },
-
     orbisAddress(newVal, oldVal) {
       if (newVal && this.address) {
         if (
           String(newVal).toLowerCase() != String(this.address).toLowerCase()
         ) {
-          console.log(
-            "Logging out of Orbis because the address in signed Orbis credentials does not matched the current user's address.",
-          );
           this.orbisLogout();
         }
       }
     },
-
     width(newVal, oldVal) {
-      if (newVal > this.breakpoint) {
-        this.lSidebar.show();
-        this.rSidebar.show();
-        this.sidebarStore.setLeftSidebar(true);
-        this.sidebarStore.setMainContent(true);
-        this.sidebarStore.setRightSidebar(true);
-      } else {
-        this.lSidebar.hide();
-        this.rSidebar.hide();
-        this.sidebarStore.setLeftSidebar(false);
-        this.sidebarStore.setMainContent(true);
-        this.sidebarStore.setRightSidebar(false);
-      }
+      this.updateSidebarState();
     },
   },
 };
 </script>
+
 <style scoped>
-.default-layout {
+.quests-default-layout {
   position: relative;
   height: 100%;
   width: 100%;
-  background: url("/css/clouds/1500x500.jpg") no-repeat center center fixed;
-  background-size: cover;
+}
+
+.quests-page-container {
+  position: relative;
+}
+
+.sidebar-quest {
+  float: left;
+  width: 250px;
+  height: 100%;
+  margin-right: 20px; /* Add margin for spacing */
+}
+
+.sidebar-right {
+  float: right;
+  width: 300px;
+  height: 100%;
+  margin-left: 20px; /* Add margin for spacing */
+  position: fixed;
+  top: 0;
+  right: -300px; /* Hide the sidebar initially */
+  transition: right 0.3s ease;
+}
+
+.sidebar-right.open {
+  right: 0; /* Slide the sidebar into view */
+}
+
+.quests-main-container {
+  margin-left: 270px; /* Adjust for left sidebar width + margin */
+  margin-right: 320px; /* Adjust for right sidebar width + margin */
+  padding: 2rem;
+  z-index: 1;
+  border-radius: 1rem;
+  background-color: transparent;
+  color: inherit;
+}
+
+#toggle-sidebar-button {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#toggle-sidebar-button:hover {
+  background-color: #0056b3;
+}
+
+#toggle-right-sidebar-button {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 1000;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+#toggle-right-sidebar-button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 1450px) {
+  .quests-main-container {
+    margin-right: 20px; /* Adjust for smaller screens */
+  }
+
+  .sidebar-right {
+    display: none;
+  }
+
+  #toggle-right-sidebar-button {
+    display: block;
+  }
+}
+
+@media (max-width: 768px) {
+  .quests-main-container {
+    margin-left: 20px; /* Adjust for mobile screens */
+  }
+
+  .sidebar-quest {
+    display: none;
+  }
+
+  #toggle-sidebar-button {
+    display: block;
+  }
+
+  .sidebar-right {
+    display: block;
+  }
+
+  #toggle-right-sidebar-button {
+    display: block;
+  }
+}
+
+.dark-mode .quests-main-container {
+  background-color: transparent;
+  color: inherit;
 }
 </style>

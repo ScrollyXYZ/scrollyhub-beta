@@ -1,3 +1,4 @@
+// user.ts
 import { defineStore } from "pinia";
 import { ethers, BigNumber } from "ethers";
 import { useQuestStore } from "~/store/questStore";
@@ -20,6 +21,8 @@ export const useUserStore = defineStore({
       lpTokenBalanceWei: BigInt(0),
       orbisImage: null as string | null,
       stakeTokenBalanceWei: BigInt(0), // receipt token from the staking contract (aka governance token)
+      userRank: null as string | null,
+      userTitle: null as string | null,
     };
   },
 
@@ -80,6 +83,14 @@ export const useUserStore = defineStore({
 
     getStakeTokenBalanceWei(state) {
       return ethers.BigNumber.from(state.stakeTokenBalanceWei);
+    },
+
+    getUserRank(state) {
+      return state.userRank;
+    },
+
+    getUserTitle(state) {
+      return state.userTitle;
     },
   },
 
@@ -146,6 +157,14 @@ export const useUserStore = defineStore({
 
     setStakeTokenBalanceWei(balance: BigNumber) {
       this.stakeTokenBalanceWei = balance.toBigInt();
+    },
+
+    setUserRank(rank: string) {
+      this.userRank = rank;
+    },
+
+    setUserTitle(title: string) {
+      this.userTitle = title;
     },
 
     async login(userAddress: string) {

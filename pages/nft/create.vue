@@ -5,14 +5,12 @@
       property="og:title"
       :content="'Create NFT Collection | ' + $config.projectMetadataTitle"
     />
-
     <Meta
       name="description"
       :content="
         'Create your very own NFT collection on ' + $config.projectName + '!'
       "
     />
-
     <Meta
       property="og:image"
       :content="$config.projectUrl + $config.previewImageNftCreate"
@@ -23,7 +21,6 @@
         'Create your very own NFT collection on ' + $config.projectName + '!'
       "
     />
-
     <Meta
       name="twitter:image"
       :content="$config.projectUrl + $config.previewImageNftCreate"
@@ -36,190 +33,149 @@
     />
   </Head>
 
-  <div class="card border scroll-500">
+  <div class="create-collection-card">
     <div class="card-body">
-      <p class="fs-3">
-        <i
-          class="bi bi-arrow-left-circle cursor-pointer"
-          @click="$router.back()"
-        ></i>
+      <p class="back-icon" @click="$router.back()">
+        <i class="bi bi-arrow-left-circle"></i>
       </p>
 
-      <h3 class="mb-4 mt-3">Create NFT Collection</h3>
+      <h3 class="title">Create NFT Collection</h3>
 
-      <div class="d-flex justify-content-center mb-3" v-if="waitingData">
-        <span
-          class="spinner-border spinner-border-lg"
-          role="status"
-          aria-hidden="true"
-        ></span>
+      <div class="loading" v-if="waitingData">
+        <span class="spinner-border" role="status" aria-hidden="true"></span>
       </div>
 
-      <p class="mb-4" v-if="createPrice">
+      <p class="price-info" v-if="createPrice">
         Price for creating a collection is {{ createPrice }}
         {{ $config.tokenSymbol }}.
       </p>
 
-      <!-- Collection Name -->
-      <div class="mb-4">
-        <label for="cName" class="form-label">Collection Name</label>
-        <input
-          type="text"
-          class="form-control"
-          id="cName"
-          aria-describedby="cNameHelp"
-          placeholder="e.g. Crypto Punks"
-          v-model="cName"
-        />
-        <div id="cNameHelp" class="form-text">
-          This is not a token name, but the whole collection name.
-        </div>
-      </div>
-
-      <!-- Symbol -->
-      <div class="mb-4">
-        <label for="cSymbol" class="form-label">Collection Symbol</label>
-        <input
-          type="text"
-          class="form-control"
-          id="cSymbol"
-          aria-describedby="cSymbolHelp"
-          placeholder="e.g. PUNKS"
-          v-model="cSymbol"
-        />
-        <div id="cSymbolHelp" class="form-text">
-          Collection symbol (required by the ERC-721 smart contract, but not
-          really important).
-        </div>
-      </div>
-
-      <!-- Image -->
-      <div class="mb-2">
-        <label for="cImage" class="form-label"
-          >Collection Image (can be changed later)</label
-        >
-        <div class="input-group" aria-describedby="cImageHelp" id="cImage">
-          <input
-            v-model="cImage"
-            type="text"
-            class="form-control"
-            placeholder="Enter image URL or click the upload button"
-          />
-
-          <button
-            v-if="isActivated && $config.fileUploadEnabled !== ''"
-            class="btn btn-outline-secondary rounded-end-2"
-            data-bs-toggle="modal"
-            :data-bs-target="'#fileUploadModal' + $.uid"
+      <div class="form-group image-section">
+        <!-- Image -->
+        <div class="image-upload">
+          <label for="cImage" class="form-label"
+            >Collection Image (can be changed later)</label
           >
-            <i class="bi bi-file-earmark-image-fill"></i>
-            Upload
-          </button>
+          <div class="image-preview-container" @click="openModal">
+            <div class="image-wrapper">
+              <div
+                v-if="loadingImage"
+                class="spinner-border spinner-border-sm"
+                role="status"
+              ></div>
+              <img
+                v-if="cImage && !loadingImage"
+                :src="getDisplayUrl(cImage)"
+                alt="Collection Image"
+                class="preview-image"
+              />
+              <div v-if="!cImage || loadingImage" class="default-image">
+                <i class="bi bi-image"></i>
+              </div>
+            </div>
+          </div>
         </div>
-        <div id="cImageHelp" class="form-text">
-          Even if you want a generative PFP collection, put a single preview
-          image for now and you will change it to a metadata link later.
-        </div>
-      </div>
 
-      <div v-if="cImage" class="mb-4">
-        <Image
-          :url="cImage"
-          alt="Image"
-          cls="img-thumbnail img-fluid"
-          style="max-width: 100px"
-        />
-        <br />
-        <small
-          >If image didn't appear above, then something is wrong with the link
-          you added (wait until the loading indicator completes). If you have an
-          IPFS link, it also helps to cut/paste the same link a couple of
-          times.</small
-        >
+        <div class="collection-details">
+          <!-- Collection Name -->
+          <div class="form-group">
+            <label for="cName" class="form-label">Collection Name</label>
+            <input
+              type="text"
+              class="form-control"
+              id="cName"
+              aria-describedby="cNameHelp"
+              placeholder="e.g. Crypto Punks"
+              v-model="cName"
+            />
+            <div id="cNameHelp" class="form-text">
+              This is not a token name, but the whole collection name.
+            </div>
+          </div>
+
+          <!-- Symbol -->
+          <div class="form-group">
+            <label for="cSymbol" class="form-label">Collection Symbol</label>
+            <input
+              type="text"
+              class="form-control"
+              id="cSymbol"
+              aria-describedby="cSymbolHelp"
+              placeholder="e.g. PUNKS"
+              v-model="cSymbol"
+            />
+            <div id="cSymbolHelp" class="form-text">
+              Collection symbol (required by the ERC-721 smart contract, but not
+              really important).
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Description -->
-      <div class="mb-4">
+      <div class="form-group">
         <label for="cDescription" class="form-label"
           >Collection Description (can be changed later)</label
         >
-        <input
-          type="text"
+        <textarea
           class="form-control"
           id="cDescription"
           aria-describedby="cDescriptionHelp"
           placeholder="Keep it short and sweet."
           v-model="cDescription"
-        />
+          rows="3"
+        ></textarea>
         <div id="cDescriptionHelp" class="form-text">
           Too long description means higher gas cost for storing it.
         </div>
       </div>
 
-      <!-- NFT Name
-      <div class="mb-4">
-        <label for="nftName" class="form-label"
-          >NFT Name (can be changed later)</label
-        >
-        <input
-          type="text"
-          class="form-control"
-          id="cDescription"
-          aria-describedby="nftNameHelp"
-          placeholder="Short, will show up next to each NFT, e.g. Punk"
-          v-model="nftName"
-        />
-        <div v-if="nftName" id="nftNameHelp" class="form-text">
-          The first minted NFTs will be {{ nftName }} #1, {{ nftName }} #2,
-          {{ nftName }} #3 etc.
+      <!-- Unique ID and Bonding Curve Ratio -->
+      <div class="form-group grid-container">
+        <div>
+          <label for="uniqueId" class="form-label"
+            >Unique ID (store it - just in case)</label
+          >
+          <input
+            type="text"
+            class="form-control"
+            id="uniqueId"
+            aria-describedby="uniqueIdHelp"
+            disabled
+            readonly
+            v-model="uniqueId"
+          />
+          <div id="uniqueIdHelp" class="form-text">
+            This is just in case the frontend will not show you the NFT
+            collection address and you'll need to find it manually.
+          </div>
         </div>
-      </div>  -->
 
-      <!-- Unique ID -->
-      <div class="mb-4">
-        <label for="uniqueId" class="form-label"
-          >Unique ID (store it - just in case)</label
-        >
-        <input
-          type="text"
-          class="form-control"
-          id="uniqueId"
-          aria-describedby="uniqueIdHelp"
-          disabled
-          readonly
-          v-model="uniqueId"
-        />
-        <div id="uniqueIdHelp" class="form-text">
-          This is just in case the frontend will not show you the NFT collection
-          address and you'll need to find it manually.
-        </div>
-      </div>
-
-      <!-- Ratio -->
-      <div class="mb-4">
-        <label for="ratio" class="form-label">Bonding Curve Ratio</label>
-        <input
-          type="text"
-          class="form-control"
-          id="ratio"
-          aria-describedby="ratioHelp"
-          v-model="ratio"
-        />
-        <div id="ratioHelp" class="form-text">
-          Price for mint #1 will be
-          {{ getLessDecimals(calculatePrice(2, ratio)) }}
-          {{ $config.tokenSymbol }}, for mint #5 will be
-          {{ getLessDecimals(calculatePrice(5, ratio)) }}
-          {{ $config.tokenSymbol }}, for mint #15 will be
-          {{ getLessDecimals(calculatePrice(15, ratio)) }}
-          {{ $config.tokenSymbol }}, for mint #30 will be
-          {{ getLessDecimals(calculatePrice(30, ratio)) }}
-          {{ $config.tokenSymbol }}, etc.
+        <div>
+          <label for="ratio" class="form-label">Bonding Curve Ratio</label>
+          <input
+            type="text"
+            class="form-control"
+            id="ratio"
+            aria-describedby="ratioHelp"
+            v-model="ratio"
+          />
+          <div id="ratioHelp" class="form-text">
+            Price for mint #1 will be
+            {{ getLessDecimals(calculatePrice(2, ratio)) }}
+            {{ $config.tokenSymbol }}, for mint #5 will be
+            {{ getLessDecimals(calculatePrice(5, ratio)) }}
+            {{ $config.tokenSymbol }}, for mint #15 will be
+            {{ getLessDecimals(calculatePrice(15, ratio)) }}
+            {{ $config.tokenSymbol }}, for mint #30 will be
+            {{ getLessDecimals(calculatePrice(30, ratio)) }}
+            {{ $config.tokenSymbol }}, etc.
+          </div>
         </div>
       </div>
 
       <!-- Buttons div -->
-      <div class="d-flex justify-content-center mt-5 mb-5">
+      <div class="buttons-container">
         <!-- Create Collection button -->
         <button
           :disabled="waitingCreate || !fieldsValid"
@@ -261,8 +217,10 @@
         title="Upload your NFT image"
         infoText="Upload the NFT image."
         storageType="ipfs"
-        :componentId="$.uid"
+        :componentId="componentId"
         :maxFileSize="$config.fileUploadSizeLimit"
+        :isOpen="isModalOpen"
+        @close="closeModal"
       />
       <!-- END Upload Image Modal -->
     </div>
@@ -271,12 +229,13 @@
 
 <script>
 import { ethers } from "ethers";
+import { ref } from "vue";
 import { useEthers } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
 import ConnectWalletButton from "~/components/ConnectWalletButton.vue";
 import Image from "~/components/Image.vue";
 import WaitingToast from "~/components/WaitingToast";
-import FileUploadModal from "~/components/storage/FileUploadModal.vue";
+import FileUploadModal from "~/components/storage/FileUploadModalNft.vue";
 import { useUserStore } from "~/store/user";
 import { getLessDecimals } from "~/utils/numberUtils";
 import { fetchReferrer } from "~/utils/storageUtils";
@@ -298,6 +257,9 @@ export default {
       uniqueId: null,
       waitingCreate: false,
       waitingData: false,
+      componentId: null,
+      loadingImage: false,
+      loadError: false,
     };
   },
 
@@ -307,10 +269,43 @@ export default {
     WaitingToast,
   },
 
+  setup() {
+    const { address, chainId, isActivated, signer } = useEthers();
+    const userStore = useUserStore();
+    const toast = useToast();
+    const isModalOpen = ref(false);
+
+    const openModal = () => {
+      isModalOpen.value = true;
+    };
+
+    const closeModal = () => {
+      isModalOpen.value = false;
+    };
+
+    const removeImage = () => {
+      cImage.value = null;
+    };
+
+    return {
+      address,
+      chainId,
+      isActivated,
+      signer,
+      toast,
+      userStore,
+      isModalOpen,
+      openModal,
+      closeModal,
+      removeImage,
+    };
+  },
+
   mounted() {
     this.isMounted = true;
     this.ratio = this.$config.nftDefaultRatio;
     this.fetchData();
+    this.componentId = this.$.uid;
   },
 
   computed: {
@@ -372,10 +367,7 @@ export default {
     async createCollection() {
       this.waitingCreate = true;
 
-      //return this.$router.push({ path: '/nft/collection', query: { id: this.address } });
-
       if (this.signer) {
-        // create launchpad contract object
         const launchpadInterface = new ethers.utils.Interface([
           `function launch(
               address contractOwner_,
@@ -399,16 +391,16 @@ export default {
 
         try {
           const tx = await launchpadContract.launch(
-            this.address, // contract owner
-            fetchReferrer(window), // referrer
-            this.cleanDescription, // collection description
-            this.cImage, // collection image
-            this.cName, // NFT name
-            this.cName, // collection name
-            this.cSymbol, // collection symbol
-            this.uniqueId, // unique ID to easily find the NFT contract address
-            ethers.utils.parseEther(String(this.ratio)), // bonding curve ratio
-            { value: this.createPriceWei }, // price for creating collection
+            this.address,
+            fetchReferrer(window),
+            this.cleanDescription,
+            this.cImage,
+            this.cName,
+            this.cName,
+            this.cSymbol,
+            this.uniqueId,
+            ethers.utils.parseEther(String(this.ratio)),
+            { value: this.createPriceWei },
           );
 
           const toastWait = this.toast(
@@ -446,7 +438,6 @@ export default {
                   .focus(),
             });
 
-            // after successful launch, fetch the collection address and redirect to the collection page
             const nftContractAddress =
               await launchpadContract.getNftContractAddress(this.uniqueId);
 
@@ -486,15 +477,12 @@ export default {
     async fetchData() {
       this.waitingData = true;
 
-      // fetch provider from hardcoded RPCs
       let provider = this.$getFallbackProvider(this.$config.supportedChainId);
 
       if (this.isActivated && this.chainId === this.$config.supportedChainId) {
-        // fetch provider from user's MetaMask
         provider = this.signer;
       }
 
-      // create launchpad contract object
       const launchpadInterface = new ethers.utils.Interface([
         "function paused() public view returns(bool)",
         "function isUniqueIdAvailable(string calldata _uniqueId) public view returns(bool)",
@@ -507,11 +495,8 @@ export default {
         provider,
       );
 
-      // check if paused
       this.launchpadPaused = await launchpadContract.paused();
 
-      // generate unique ID and check if it's already been used
-      // Math.random().toString(36).slice(2);
       this.uniqueId = Math.random().toString(36).slice(2);
 
       const isUniqueIdAvailable = await launchpadContract.isUniqueIdAvailable(
@@ -522,14 +507,41 @@ export default {
         this.uniqueId = Math.random().toString(36).slice(10);
       }
 
-      // get price for creating collection
       this.createPriceWei = await launchpadContract.price();
 
       this.waitingData = false;
     },
 
+    getDisplayUrl(url) {
+      if (url.startsWith("ipfs://")) {
+        return `https://ipfs.io/ipfs/${url.slice(7)}`;
+      }
+      return url;
+    },
+
+    async retryLoadImage(url, retries = 3) {
+      this.loadingImage = true;
+      this.loadError = false;
+      for (let i = 0; i < retries; i++) {
+        try {
+          const response = await fetch(url);
+          if (response.ok) {
+            this.loadingImage = false;
+            this.loadError = false;
+            return;
+          }
+        } catch (error) {
+          console.error("Failed to load image, retrying...", error);
+        }
+      }
+      this.loadingImage = false;
+      this.loadError = true;
+      console.error("Failed to load image after multiple attempts.");
+    },
+
     insertImage(imageUrl) {
       this.cImage = imageUrl.replace("?.img", "");
+      this.retryLoadImage(this.getDisplayUrl(this.cImage));
     },
 
     async makeOrbisPost(nftContractAddress) {
@@ -566,7 +578,6 @@ export default {
             },
           };
 
-          // post on Orbis (shoot and forget)
           await this.$orbis.createPost(options);
         } catch (e) {
           console.log(e);
@@ -574,13 +585,178 @@ export default {
       }
     },
   },
-
-  setup() {
-    const { address, chainId, isActivated, signer } = useEthers();
-    const userStore = useUserStore();
-    const toast = useToast();
-
-    return { address, chainId, isActivated, signer, toast, userStore };
-  },
 };
+definePageMeta({
+  layout: "nft",
+});
 </script>
+
+<style scoped>
+.create-collection-card {
+  max-width: 800px;
+  margin: 0 auto;
+  border-radius: 15px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.card-body {
+  padding: 20px;
+}
+
+.back-icon {
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: none; /* Hide in PC view */
+}
+
+@media (max-width: 768px) {
+  .back-icon {
+    display: block; /* Show in mobile view */
+  }
+}
+
+.title {
+  margin-bottom: 20px;
+  margin-top: 20px;
+  text-align: center;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.price-info {
+  margin-bottom: 20px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-label {
+  font-weight: bold;
+}
+
+.form-control {
+  border-radius: 10px;
+  padding: 10px;
+  border: 1px solid #ced4da;
+}
+
+.form-text {
+  color: #6c757d;
+}
+
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.image-section {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .image-section {
+    grid-template-columns: 1fr;
+  }
+}
+
+.image-preview-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 10px;
+  position: relative;
+}
+
+.image-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  border: 2px solid white;
+  cursor: pointer;
+}
+
+.preview-image {
+  max-width: 100%;
+  max-height: 100%;
+  border-radius: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.preview-image:hover {
+  opacity: 0.8;
+}
+
+.default-image {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.default-image i {
+  font-size: 3rem;
+  color: #6c757d;
+}
+
+.delete-button,
+.refresh-button {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+  position: absolute;
+}
+
+.delete-button {
+  top: 10px;
+  right: 10px;
+  color: #dc3545;
+}
+
+.refresh-button {
+  bottom: 10px;
+  right: 10px;
+  color: #007bff;
+}
+
+.delete-button:hover,
+.refresh-button:hover {
+  transform: scale(1.2);
+}
+
+.buttons-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 30px;
+  margin-bottom: 30px;
+}
+
+.grid-container {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-container {
+    grid-template-columns: 1fr;
+  }
+}
+</style>

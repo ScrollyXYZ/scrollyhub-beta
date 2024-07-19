@@ -41,6 +41,9 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       activityPointsAddress: "0x9904CE72Cd7427F59bBe53bc69211081159fcf0a",
+      r2BaseUrl:
+        process.env.R2_BASE_URL ||
+        "https://pub-b9e67dec718f4331ae64c41411e0ba73.r2.dev",
       airdropApAddress: "", // chat token claim for APs
       airdropClaimDomainsAddress: "", // chat token claim for domain holders
       badge: {
@@ -48,7 +51,7 @@ export default defineNuxtConfig({
         apiBaseUrl: "https://api.scrolly.xyz/api/badge/",
         badgeContractAddress: "0x79b4f7492328D0Cc4ED0Ddaee08Cd42f0F36A4CC",
         defaultBadgeImage: "/skelly/sticker.svg",
-        graphqlUrl: "https://scroll-sepolia.easscan.org/graphql",
+        graphqlUrl: "https://scroll.easscan.org/graphql",
         profileRegistryAddress: "0xB23AF8707c442f59BDfC368612Bd8DbCca8a7a5a",
       },
       blockExplorerBaseUrl: "https://scrollscan.com",
@@ -117,7 +120,7 @@ export default defineNuxtConfig({
       previewImagePostNft: "/img/covers/cover-post-nft.png",
       previewImageProfile: "/img/covers/cover-profile.png",
       previewImageStake: "/img/covers/cover-stake.png",
-      previewVoting: "/img/covers/cover-vote.png",
+      previewImageVoting: "/img/covers/cover-vote.png",
       profileMintedPostIdsMax: 36, // max number of minted post ids to show in the profile page
       projectMetadataTitle:
         "Scrolly Hub | A Web3 Happy Place For The Scrolly Community",
@@ -181,6 +184,13 @@ export default defineNuxtConfig({
           NodeModulesPolyfillPlugin(),
         ],
         target: "es2020",
+      },
+    },
+    vue: {
+      template: {
+        compilerOptions: {
+          isCustomElement: (tag) => tag.startsWith("swiper"),
+        },
       },
     },
   },

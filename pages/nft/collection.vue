@@ -27,19 +27,19 @@
     />
   </Head>
 
-  <div class="card border">
-    <div class="card-body">
-      <p class="fs-3">
+  <div class="collection-container">
+    <div class="collection-card">
+      <p class="back-button">
         <i
           @click="$router.push({ path: '/nft' })"
           class="bi bi-arrow-left-circle cursor-pointer"
         ></i>
       </p>
 
-      <h3 class="mb-3 mt-3" v-if="!cName">NFT Collection Details</h3>
-      <h3 class="mb-3 mt-3" v-if="cName">{{ cName }}</h3>
+      <h3 class="collection-title" v-if="!cName">NFT Collection Details</h3>
+      <h3 class="collection-title" v-if="cName">{{ cName }}</h3>
 
-      <div class="d-flex justify-content-center mb-3" v-if="waitingData">
+      <div class="loading-spinner" v-if="waitingData">
         <span
           class="spinner-border spinner-border-lg"
           role="status"
@@ -49,17 +49,21 @@
 
       <div class="row">
         <div class="col-md-5 text-center mb-3">
-          <Image
-            :url="cImage"
-            v-if="cImage"
-            :cls="'img-fluid img-thumbnail rounded col-12'"
-            :alt="cName"
-            :key="cImage"
-          />
+          <div class="nft-image-container">
+            <div class="svg-background">
+              <Image
+                :url="cImage"
+                v-if="cImage"
+                cls="nft-image"
+                :alt="cName"
+                :key="cImage"
+              />
+            </div>
+          </div>
 
-          <div class="dropdown mt-3">
+          <div class="actions-dropdown mt-3">
             <button
-              class="btn btn-outline-primary btn-sm dropdown-toggle"
+              class="btn custom-btn btn-sm dropdown-toggle"
               type="button"
               data-bs-toggle="dropdown"
               aria-expanded="false"
@@ -87,27 +91,27 @@
         </div>
 
         <div class="col-md-7">
-          <div class="mt-1 mb-4 muted-text" style="font-size: 14px">
-            <p class="me-4">
+          <div class="collection-details mt-1 mb-4">
+            <div class="detail-item">
               <i class="bi bi-file-earmark-text-fill me-1"></i>
-              {{ cDescription }}
-            </p>
-            <p class="me-4">
+              <span class="detail-label">Description:</span> {{ cDescription }}
+            </div>
+            <div class="detail-item">
               <i class="bi bi-coin me-1"></i>
-              Buy/Sell price: {{ formatPrice(priceBuyWei) }}
-              {{ $config.tokenSymbol }} / {{ formatPrice(priceSellWei) }}
-              {{ $config.tokenSymbol }}
-            </p>
-            <p class="me-4">
+              <span class="detail-label">Buy/Sell price:</span>
+              {{ formatPrice(priceBuyWei) }} {{ $config.tokenSymbol }} /
+              {{ formatPrice(priceSellWei) }} {{ $config.tokenSymbol }}
+            </div>
+            <div class="detail-item">
               <i class="bi bi-file-earmark-binary me-1"></i>
-              {{ cSupply }} NFTs minted
-            </p>
-            <p class="me-4">
+              <span class="detail-label">NFTs minted:</span> {{ cSupply }}
+            </div>
+            <div class="detail-item">
               <i class="bi bi-box-arrow-up-right me-2"></i>
               <a
                 :href="$config.blockExplorerBaseUrl + '/address/' + cAddress"
                 target="_blank"
-                style="text-decoration: none"
+                class="collection-link"
               >
                 {{ shortenAddress(cAddress) }}
               </a>
@@ -115,33 +119,34 @@
                 by
                 <NuxtLink
                   :to="'/profile/?id=' + String(getUsernameOrFullAddress)"
+                  class="collection-link"
                   >{{ getUsernameOrShortAddress }}</NuxtLink
                 >
               </span>
-            </p>
-            <p class="me-4">
+            </div>
+            <div class="detail-item">
               <i class="bi bi-box-arrow-up-right me-2"></i>
               <a
                 :href="$config.marketplaceNftCollectionBaseUrl + cAddress"
                 target="_blank"
-                style="text-decoration: none"
+                class="collection-link"
               >
                 See on NFT marketplace
               </a>
-            </p>
+            </div>
           </div>
 
           <div class="row mb-3">
             <div v-if="!isActivated" class="d-grid gap-2 col">
               <ConnectWalletButton
-                class="btn btn-primary"
+                class="btn custom-btn connect-wallet-btn"
                 btnText="Connect wallet"
               />
             </div>
             <div v-if="isActivated" class="d-grid gap-2 col">
               <button
                 @click="buyNft"
-                class="btn btn-primary"
+                class="btn custom-btn action-btn"
                 type="button"
                 :disabled="waitingData || waitingBuy"
               >
@@ -157,7 +162,7 @@
             <div v-if="isActivated" class="d-grid gap-2 col">
               <button
                 @click="sellNft"
-                class="btn btn-primary"
+                class="btn custom-btn action-btn"
                 type="button"
                 :disabled="
                   waitingData ||
@@ -189,7 +194,7 @@
     </div>
   </div>
 
-  <div v-if="!userTokenId" class="card border mt-3 scroll-500">
+  <div v-if="!userTokenId" class="collection-card mt-3">
     <div class="card-body">
       <h5 class="mb-2 mt-3 text-center">Buy an NFT to see the chat</h5>
       <div class="d-flex justify-content-center">
@@ -923,13 +928,168 @@ export default {
     return { address, chainId, isActivated, shortenAddress, signer, toast };
   },
 };
+definePageMeta({
+  layout: "nft",
+});
 </script>
 
 <style scoped>
-.tab-content {
-  padding: 1rem;
+.collection-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px;
+  background: rgba(255, 255, 255, 0.8);
+  border-radius: 27px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: 90%;
+  margin: 0 auto;
+}
+
+.collection-card {
   border: 1px solid #ddd;
-  border-top: 0;
-  border-radius: 0 0 15px 15px;
+  border-radius: 15px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+  overflow: hidden;
+  background: white;
+  width: 100%;
+}
+
+.collection-card .card-body {
+  padding: 20px;
+}
+
+.back-button {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.collection-title {
+  font-size: 1.75rem;
+  margin-bottom: 15px;
+}
+
+.loading-spinner {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+
+.nft-image-container {
+  position: relative;
+  width: 100%;
+  padding-top: 100%;
+}
+
+.svg-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: #fcf1c4; /* Background color from Figma */
+  border: 1px solid #000000; /* Border color from Figma */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow */
+  border-radius: 15px; /* Border radius */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden; /* Ensure content stays within the SVG container */
+}
+
+.nft-image {
+  width: auto;
+  height: auto;
+  max-width: 80%;
+  max-height: 80%;
+  margin: 10%;
+  object-fit: fill;
+}
+
+.actions-dropdown {
+  margin-top: 15px;
+}
+
+.collection-details {
+  font-size: 14px;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.detail-label {
+  font-weight: bold;
+  margin-right: 5px;
+}
+
+.collection-link {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.collection-link:hover {
+  color: #0056b3;
+}
+
+.btn.custom-btn {
+  background-color: #007bff;
+  border-color: #007bff;
+  color: #fff;
+  font-weight: bold;
+  transition:
+    background-color 0.3s ease-in-out,
+    transform 0.3s ease-in-out;
+}
+
+.btn.custom-btn:hover {
+  background-color: #0056b3;
+  border-color: #0056b3;
+  transform: translateY(-2px);
+}
+
+.connect-wallet-btn {
+  font-weight: bold;
+}
+
+.action-btn {
+  font-weight: bold;
+}
+
+.dark-mode .collection-container {
+  background: rgba(51, 51, 51, 0.8);
+  color: #fff;
+}
+
+.dark-mode .collection-card {
+  background: rgba(51, 51, 51, 0.8);
+  color: #fff;
+}
+
+.dark-mode .collection-title,
+.dark-mode .collection-details p,
+.dark-mode .collection-details small em {
+  color: #fff;
+}
+
+.dark-mode .collection-link {
+  color: #0056b3;
+}
+
+.dark-mode .collection-link:hover {
+  color: #007bff;
+}
+
+.dark-mode .btn.custom-btn {
+  background-color: #0056b3;
+  border-color: #0056b3;
+}
+
+.dark-mode .btn.custom-btn:hover {
+  background-color: #007bff;
+  border-color: #007bff;
 }
 </style>

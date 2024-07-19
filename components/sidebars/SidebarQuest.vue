@@ -42,7 +42,7 @@
               >
                 <i class="bi bi-person-check-fill"></i> Verify Ownership
               </span>
-              <div class="quest-user-title">{{ userTitle }}</div>
+              <div class="quest-user-title">{{ userStore.getUserTitle }}</div>
               <div class="quest-progress-bar">
                 <div
                   class="quest-progress"
@@ -50,7 +50,7 @@
                 ></div>
               </div>
               <div class="quest-user-rank">
-                Rank: {{ userRank }}
+                Rank: {{ userStore.getUserRank }}
                 <i
                   class="fas fa-info-circle quest-tooltip-icon"
                   title="Ranks are updated automatically every 24 hours."
@@ -152,8 +152,8 @@ export default {
     const questStore = useQuestStore();
     const themeStore = useThemeStore();
     const router = useRouter();
-    const userRank = ref(null);
-    const userTitle = ref(null);
+    const userRank = ref(userStore.getUserRank);
+    const userTitle = ref(userStore.getUserTitle);
     const profileImageKey = ref(Date.now());
     const wrongChain = ref(false);
     const isDarkMode = ref(themeStore.getIsDarkMode);
@@ -163,23 +163,23 @@ export default {
     };
 
     const fetchUserRank = async () => {
-      if (isActivated.value && address.value) {
+      if (isActivated.value && address.value && !userStore.getUserRank) {
         try {
           const response = await fetch(
-            `https://leaderboard-scrolly.vercel.app/rank/${address.value}`
+            `https://leaderboard-scrolly.vercel.app/rank/${address.value}`,
           );
           const data = await response.json();
           if (data.rank) {
-            userRank.value = data.rank;
-            userTitle.value = data.title;
+            userStore.setUserRank(data.rank);
+            userStore.setUserTitle(data.title);
           } else {
-            userRank.value = "";
-            userTitle.value = "";
+            userStore.setUserRank("");
+            userStore.setUserTitle("");
           }
         } catch (error) {
           console.error("Failed to fetch user rank:", error);
-          userRank.value = "Error fetching rank";
-          userTitle.value = "Error fetching title";
+          userStore.setUserRank("Error fetching rank");
+          userStore.setUserTitle("Error fetching title");
         }
       }
     };
@@ -212,7 +212,7 @@ export default {
 
     const progress = computed(() => {
       const nextGrade = grades.find(
-        (grade) => questStore.activityPoints < grade.points
+        (grade) => questStore.activityPoints < grade.points,
       );
       if (!nextGrade) return 100;
       const prevPoints = currentGrade.value.points;
@@ -248,7 +248,7 @@ export default {
 
     const openConnectModal = () => {
       const modal = new bootstrap.Modal(
-        document.getElementById("connectModal")
+        document.getElementById("connectModal"),
       );
       modal.show();
     };
@@ -294,8 +294,8 @@ export default {
     const logout = async () => {
       await disconnect();
       userStore.setCurrentUserAddress(null);
-      userRank.value = null;
-      userTitle.value = null;
+      userStore.setUserRank(null);
+      userStore.setUserTitle(null);
     };
 
     const toggleDarkMode = () => {
@@ -358,6 +358,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .quest-sidebar-nav {
   position: fixed;
@@ -542,7 +543,9 @@ export default {
   margin-bottom: 5px;
   text-align: center;
   color: #000;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
   border-radius: 5px;
 }
 
@@ -589,7 +592,9 @@ NuxtLink {
   background: rgba(255, 255, 255, 0.3);
   margin-bottom: 5px;
   border-radius: 5px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
 }
 
 NuxtLink:hover {
@@ -618,7 +623,9 @@ NuxtLink:hover {
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+  transition:
+    background-color 0.3s ease,
+    transform 0.3s ease;
 }
 
 .quest-btn-connect:hover {

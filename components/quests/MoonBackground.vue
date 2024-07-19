@@ -15,8 +15,8 @@
       class="background-video"
       @canplaythrough="onVideoLoad"
     >
-      <source src="@/assets/video/backgroundquest.mp4" type="video/mp4" />
-      Your browser doesn't support video format
+      <source :src="fullVideoUrl" type="video/mp4" />
+      Your browser doesn't support video format.
     </video>
     <div class="overlay" v-if="isDarkMode"></div>
   </div>
@@ -34,12 +34,21 @@ export default {
   data() {
     return {
       videoLoaded: false,
+      baseVideoUrl: useRuntimeConfig().public.r2BaseUrl,
+      videoPath: "/backgroundquest.mp4",
     };
+  },
+  computed: {
+    fullVideoUrl() {
+      return `${this.baseVideoUrl}${this.videoPath}`;
+    },
   },
   methods: {
     onVideoLoad() {
       this.videoLoaded = true;
-      this.$refs.backgroundImage.style.display = "none";
+      if (this.$refs.backgroundImage) {
+        this.$refs.backgroundImage.style.display = "none";
+      }
     },
   },
   mounted() {
@@ -47,6 +56,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .background-container {
   position: fixed;
@@ -60,7 +70,6 @@ export default {
   overflow: hidden;
   z-index: -1;
 }
-
 .background-image {
   position: absolute;
   top: 0;
@@ -71,7 +80,6 @@ export default {
   z-index: -2;
   display: block;
 }
-
 .background-video {
   position: absolute;
   top: 50%;
@@ -82,7 +90,6 @@ export default {
   transform: translate(-50%, -50%);
   z-index: -3;
 }
-
 .overlay {
   position: absolute;
   top: 0;

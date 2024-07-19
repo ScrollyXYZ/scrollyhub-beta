@@ -139,19 +139,6 @@
   background-color: var(--bs-mode) !important;
 }
 
-[data-bs-theme="dark"] .modal-content {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  color: var(--bs-modal-color);
-  pointer-events: auto;
-  background-color: var(--bs-mode);
-  background-clip: padding-box;
-  border: var(--bs-modal-border-width) solid var(--bs-modal-border-color);
-  border-radius: var(--bs-modal-border-radius);
-  outline: 0;
-}
 
 [data-bs-theme="dark"] .highlight[data-v-11163183] {
   background-color: #2b3d47eb !important;

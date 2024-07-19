@@ -936,7 +936,7 @@ export default {
 <style scoped>
 .post-wrapper {
   display: flex;
-  align-items: start; /* Align items at the top */
+  align-items: flex-start; /* Align items at the top */
   gap: 15px; /* Space between elements */
 }
 
