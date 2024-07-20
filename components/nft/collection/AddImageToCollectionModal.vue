@@ -5,7 +5,7 @@
       <p>Upload additional image (and then click Submit below):</p>
       <FileUploadInput
         btnCls="btn btn-primary"
-        storageType="ipfs"
+        storageType="imagekit"
         :maxFileSize="$config.fileUploadSizeLimit"
         @processUploadedFileUrl="insertImageLink"
       />
