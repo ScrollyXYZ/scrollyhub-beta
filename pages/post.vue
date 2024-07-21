@@ -1,21 +1,47 @@
 <template>
-<div>
-  <Head>
-    <Meta name="description" :content="'Check out this chat post on ' + $config.projectName + '!'" />
+  <div>
+    <Head>
+      <Meta
+        name="description"
+        :content="'Check out this chat post on ' + $config.projectName + '!'"
+      />
+      <Meta
+        property="og:image"
+        :content="$config.projectUrl + $config.previewImagePost"
+      />
+      <Meta
+        property="og:description"
+        :content="'Check out this chat post on ' + $config.projectName + '!'"
+      />
+      <Meta
+        name="twitter:image"
+        :content="$config.projectUrl + $config.previewImagePost"
+      />
+      <Meta
+        name="twitter:description"
+        :content="'Check out this chat post on ' + $config.projectName + '!'"
+      />
+    </Head>
 
-    <Meta property="og:image" :content="$config.projectUrl+$config.previewImagePost" />
-    <Meta property="og:description" :content="'Check out this chat post on ' + $config.projectName + '!'" />
+    <button @click="goBack" class="back-button">
+      <i class="fas fa-arrow-left"></i>
+    </button>
 
-    <Meta name="twitter:image" :content="$config.projectUrl+$config.previewImagePost" />
-    <Meta name="twitter:description" :content="'Check out this chat post on ' + $config.projectName + '!'" />
-  </Head>
-
-  <ChatPost class="m-4" v-if="masterPost" :post="masterPost" :orbisContext="getOrbisContext" />
-
-  <ChatPost v-if="post" :post="post" :orbisContext="getOrbisContext" />
-
-  <ChatFeed v-if="post" :id="post.stream_id" :master="post.master" :masterPost="post" :orbisContext="getOrbisContext" />
-</div>
+    <ChatPost
+      class="m-4"
+      v-if="masterPost"
+      :post="masterPost"
+      :orbisContext="getOrbisContext"
+    />
+    <ChatPost v-if="post" :post="post" :orbisContext="getOrbisContext" />
+    <ChatFeed
+      v-if="post"
+      :id="post.stream_id"
+      :master="post.master"
+      :masterPost="post"
+      :orbisContext="getOrbisContext"
+    />
+  </div>
 </template>
 
 <script>
@@ -29,13 +55,13 @@ export default {
       hasMaster: false,
       masterPost: null,
       post: null,
-      replyNotMaster: false
-    }
+      replyNotMaster: false,
+    };
   },
 
   components: {
     ChatFeed,
-    ChatPost
+    ChatPost,
   },
 
   created() {
@@ -58,7 +84,7 @@ export default {
         }
       }
     },
-    
+
     getPostAuthor() {
       if (this.post) {
         return this.post.creator_details.metadata.address;
@@ -69,7 +95,7 @@ export default {
 
     getQueryId() {
       return this.route.query.id;
-    }
+    },
   },
 
   methods: {
@@ -85,9 +111,9 @@ export default {
 
       if (error) {
         console.log("Orbis error");
-        console.log(error)
-        this.toast("Orbis error", {type: "error"});
-        this.toast(error, {type: "error"});
+        console.log(error);
+        this.toast("Orbis error", { type: "error" });
+        this.toast(error, { type: "error" });
       } else {
         if (this.post.master) {
           // fetch master post
@@ -103,13 +129,17 @@ export default {
 
           if (error) {
             console.log("Orbis error");
-            console.log(error)
-            this.toast("Orbis error", {type: "error"});
-            this.toast(error, {type: "error"});
+            console.log(error);
+            this.toast("Orbis error", { type: "error" });
+            this.toast(error, { type: "error" });
           }
         }
       }
-    }
+    },
+
+    goBack() {
+      this.$router.go(-1);
+    },
   },
 
   setup() {
@@ -118,15 +148,26 @@ export default {
 
     return {
       route,
-      toast
-    }
+      toast,
+    };
   },
 
   watch: {
     getQueryId(val, oldVal) {
       // refresh post object if id in query has changed
       this.getPostObject();
-    }
+    },
   },
-}
+};
 </script>
+
+<style scoped>
+.back-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: white;
+  font-size: 1.5rem;
+  margin: 1rem;
+}
+</style>

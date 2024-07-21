@@ -111,6 +111,13 @@
           {{ notificationsStore.getUnreadNotificationsCount }}
         </span>
       </NuxtLink>
+      <button
+        class="hub-mobile-nav-button"
+        :class="{ 'hub-active': showSearch }"
+        @click="toggleSearch"
+      >
+        🔍
+      </button>
     </div>
     <div v-if="isModalOpen" class="hub-modal">
       <div class="hub-modal-content">
