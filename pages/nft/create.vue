@@ -63,9 +63,9 @@
                 class="spinner-border spinner-border-sm"
                 role="status"
               ></div>
-              <img
+              <Image
                 v-if="cImage && !loadingImage"
-                :src="getDisplayUrl(cImage)"
+                :url="cImage"
                 alt="Collection Image"
                 class="preview-image"
               />
@@ -267,6 +267,7 @@ export default {
     ConnectWalletButton,
     FileUploadModal,
     WaitingToast,
+    Image,
   },
 
   setup() {
@@ -311,7 +312,6 @@ export default {
   computed: {
     cleanDescription() {
       if (!this.cDescription) return null;
-
       return this.cDescription.replace(/"/g, "'"); // replace double quotes with single quotes
     },
 
@@ -353,7 +353,6 @@ export default {
   methods: {
     calculatePrice(nftId, ratio) {
       const supply = Number(nftId) - 1;
-
       return (
         ((((supply * (supply + 1) * (2 * supply + 1) -
           (supply - 1) * supply * (2 * (supply - 1) + 1)) *
@@ -495,28 +494,33 @@ export default {
         provider,
       );
 
-      this.launchpadPaused = await launchpadContract.paused();
+      try {
+        console.log("Fetching paused status...");
+        this.launchpadPaused = await launchpadContract.paused();
+        console.log("Paused status:", this.launchpadPaused);
 
-      this.uniqueId = Math.random().toString(36).slice(2);
+        console.log("Generating unique ID...");
+        this.uniqueId = Math.random().toString(36).slice(2);
 
-      const isUniqueIdAvailable = await launchpadContract.isUniqueIdAvailable(
-        this.uniqueId,
-      );
+        const isUniqueIdAvailable = await launchpadContract.isUniqueIdAvailable(
+          this.uniqueId,
+        );
+        console.log("Unique ID available:", isUniqueIdAvailable);
 
-      if (!isUniqueIdAvailable) {
-        this.uniqueId = Math.random().toString(36).slice(10);
+        if (!isUniqueIdAvailable) {
+          this.uniqueId = Math.random().toString(36).slice(10);
+        }
+
+        console.log("Fetching create price...");
+        this.createPriceWei = await launchpadContract.price();
+        console.log("Create price (Wei):", this.createPriceWei);
+
+        this.waitingData = false;
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        this.toast("Error fetching data. Please try again.", { type: "error" });
+        this.waitingData = false;
       }
-
-      this.createPriceWei = await launchpadContract.price();
-
-      this.waitingData = false;
-    },
-
-    getDisplayUrl(url) {
-      if (url.startsWith("ipfs://")) {
-        return `https://ipfs.io/ipfs/${url.slice(7)}`;
-      }
-      return url;
     },
 
     async retryLoadImage(url, retries = 3) {
@@ -541,7 +545,7 @@ export default {
 
     insertImage(imageUrl) {
       this.cImage = imageUrl.replace("?.img", "");
-      this.retryLoadImage(this.getDisplayUrl(this.cImage));
+      this.retryLoadImage(this.cImage);
     },
 
     async makeOrbisPost(nftContractAddress) {

@@ -5,7 +5,6 @@
     class="form-control form-control-lg mb-3"
     :id="'file-input-' + componentId"
   />
-
   <button
     type="button"
     :class="btnCls"
