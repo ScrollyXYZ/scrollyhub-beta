@@ -72,6 +72,7 @@
             <div v-if="wrongChain" class="alert alert-warning mt-3">
               <strong>Warning!</strong> You are connected to the wrong network.
               Please switch to Scroll.
+              <SwitchChainButton />
             </div>
 
             <hr class="quest-separator" />
@@ -80,44 +81,37 @@
             <NuxtLink
               to="/"
               class="list-group-item cursor-pointer quest-hover-color"
-              :class="{ 'quest-active': $route.path === '/dashboard' }"
+              :class="{ 'quest-active': $route.path === '/' }"
             >
-              <i class="fas fa-home"></i><span>Social Hub</span>
+              <i class="fas fa-home"></i><span> Social Hub</span>
             </NuxtLink>
             <NuxtLink
               to="/nft"
               class="list-group-item cursor-pointer quest-hover-color"
-              :class="{ 'quest-active': $route.path === '/quest' }"
+              :class="{ 'quest-active': $route.path === '/nft' }"
             >
-              <i class="fas fa-tasks"></i><span> Nft Launchpad</span>
+              <i class="fas fa-gem"></i><span> NFT Launchpad</span>
             </NuxtLink>
             <NuxtLink
               to="/elector"
               class="list-group-item cursor-pointer quest-hover-color"
-              :class="{ 'quest-active': $route.path === '/leaderboard' }"
+              :class="{ 'quest-active': $route.path === '/elector' }"
             >
-              <i class="fas fa-trophy"></i><span> Vote</span>
+              <i class="fas fa-vote-yea"></i><span> Vote</span>
             </NuxtLink>
             <NuxtLink
               to="/quest"
               class="list-group-item cursor-pointer quest-hover-color"
               :class="{ 'quest-active': $route.path === '/quest' }"
             >
-              <i class="fas fa-info-circle"></i><span> Quests</span>
+              <i class="fas fa-tasks"></i><span> Quests</span>
             </NuxtLink>
             <NuxtLink
               to="/swap"
               class="list-group-item cursor-pointer quest-hover-color"
               :class="{ 'quest-active': $route.path === '/swap' }"
             >
-              <i class="fas fa-info-circle"></i><span> Swap</span>
-            </NuxtLink>
-            <NuxtLink
-              to="/"
-              @click.native="refreshLayout"
-              class="list-group-item cursor-pointer quest-hover-color"
-            >
-              <i class="fas fa-arrow-left"></i><span> Social Hub</span>
+              <i class="fas fa-exchange-alt"></i><span> Swap</span>
             </NuxtLink>
           </div>
         </div>
@@ -151,10 +145,16 @@ import { getActivityPoints } from "~/utils/balanceUtils";
 import { useThemeStore } from "~/store/theme";
 import SocialLinks from "~/components/assets/SocialLinks.vue";
 import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
+import SwitchChainButton from "~/components/SwitchChainButton.vue";
 
 export default {
   name: "SidebarQuest",
-  components: { ProfileImage, SocialLinks, VerifyAccountOwnership }, // Add the component
+  components: {
+    ProfileImage,
+    SocialLinks,
+    VerifyAccountOwnership,
+    SwitchChainButton,
+  }, // Add the component
   props: ["lSidebar", "isMobile", "open"],
   emits: ["pointerenter", "pointerleave"],
   setup(props) {
