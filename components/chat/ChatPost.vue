@@ -62,8 +62,8 @@
           </div>
 
           <!-- link preview -->
-          <div v-if="linkPreview?.title" class="row mt-3 mb-3">
-            <div class="card col-md-6">
+          <div v-if="linkPreview?.title" class="">
+            <div class="card">
               <a
                 target="_blank"
                 :href="linkPreview.url"
@@ -86,7 +86,7 @@
           <!-- New NFT collection created -->
           <div
             v-if="customDataType === 'nftCollectionCreated' && collection"
-            class="row mt-3 mb-3"
+            class=""
           >
             <div class="card col-md-6">
               <NuxtLink
@@ -951,7 +951,13 @@ export default {
   height: auto; /* Maintain aspect ratio */
   border-radius: 50%; /* Optional: makes the image circular */
 }
-
+.card-img-size {
+  max-height: 300px; /* Remplace 300px par la taille maximale souhaitée */
+  max-width: 100%; /* La largeur maximale à 100% pour s'adapter à l'écran */
+  width: auto; /* Maintenir le rapport d'aspect de l'image */
+  height: auto; /* Maintenir le rapport d'aspect de l'image */
+  object-fit: cover; /* S'assurer que l'image couvre bien l'espace */
+}
 .card {
   border-radius: 30px; /* Larger radius for more pronounced rounded corners */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
