@@ -67,9 +67,13 @@
               Connect Wallet
             </button>
           </div>
-          <div v-if="wrongChain" class="alert alert-warning mt-3">
+          <div
+            v-if="wrongChain && isActivated"
+            class="alert alert-warning mt-3"
+          >
             <strong>Warning!</strong> You are connected to the wrong network.
             Please switch to Scroll.
+            <SwitchChainButton />
           </div>
 
           <hr class="quest-separator" />
@@ -106,7 +110,6 @@
 
           <NuxtLink
             to="/"
-            @click.native="refreshLayout"
             class="list-group-item cursor-pointer quest-hover-color"
           >
             <i class="fas fa-arrow-left"></i><span> Back to the Map</span>
@@ -119,6 +122,7 @@
   <!-- Verify Account Ownership Modal -->
   <VerifyAccountOwnership />
 </template>
+
 <script>
 import { computed, ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
@@ -137,10 +141,16 @@ import { getActivityPoints } from "~/utils/balanceUtils";
 import { useThemeStore } from "~/store/theme";
 import SocialLinks from "~/components/assets/SocialLinks.vue";
 import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
+import SwitchChainButton from "~/components/SwitchChainButton.vue";
 
 export default {
   name: "SidebarQuest",
-  components: { ProfileImage, SocialLinks, VerifyAccountOwnership }, // Add the component
+  components: {
+    ProfileImage,
+    SocialLinks,
+    VerifyAccountOwnership,
+    SwitchChainButton,
+  },
   props: ["lSidebar", "isMobile", "open"],
   setup(props) {
     const { address, isActivated, chainId } = useEthers();

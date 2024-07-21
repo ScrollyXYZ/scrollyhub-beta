@@ -69,7 +69,10 @@
                 Connect Wallet
               </button>
             </div>
-            <div v-if="wrongChain" class="alert alert-warning mt-3">
+            <div
+              v-if="wrongChain && isActivated"
+              class="alert alert-warning mt-3"
+            >
               <strong>Warning!</strong> You are connected to the wrong network.
               Please switch to Scroll.
               <SwitchChainButton />
