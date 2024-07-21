@@ -24,7 +24,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/equilibre-memes"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="
                 $route.path.startsWith('/equilibre-memes') ? 'hub-active' : ''
               "
@@ -35,7 +35,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/memes-images"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="
                 $route.path.startsWith('/memes-images') ? 'hub-active' : ''
               "
@@ -46,7 +46,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/shill"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="$route.path.startsWith('/shill') ? 'hub-active' : ''"
             >
               🚀 Shill & discuss projects
@@ -55,7 +55,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/notifications"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="
                 $route.path.startsWith('/notifications') ? 'hub-active' : ''
               "
@@ -102,7 +102,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="$route.path === '/' ? 'hub-active' : ''"
               @click="closeModal"
             >
@@ -112,7 +112,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/equilibre-memes"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="
                 $route.path.startsWith('/equilibre-memes') ? 'hub-active' : ''
               "
@@ -124,7 +124,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/memes-images"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="
                 $route.path.startsWith('/memes-images') ? 'hub-active' : ''
               "
@@ -136,7 +136,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/shill"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-bg-light hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
               :class="$route.path.startsWith('/shill') ? 'hub-active' : ''"
               @click="closeModal"
             >
@@ -178,6 +178,7 @@ export default {
         "/memes-images",
         "/shill",
         "/memes-contest",
+        "/notifications",
       ];
       return paths.includes(route.path);
     });
@@ -201,13 +202,6 @@ export default {
   width: 100%;
   margin: 0 auto;
   padding: 1em;
-  background-color: #f8f9fa; /* light mode background */
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.dark-mode .hub-social-nav-container {
-  background-color: #2c2c2c; /* dark mode background */
 }
 
 .hub-selection-header {
@@ -218,21 +212,21 @@ export default {
 .hub-welcome-message {
   margin: 0;
   font-size: 1.5em;
-  color: #000; /* light mode text color */
+  color: #ffffff; 
 }
 
 .dark-mode .hub-welcome-message {
-  color: #ddd; /* dark mode text color */
+  color: #ddd;
 }
 
 .hub-selection-header p {
   margin: 0;
   font-size: 1em;
-  color: #6c757d; /* light mode text color */
+  color: #6c757d; 
 }
 
 .dark-mode .hub-selection-header p {
-  color: #bbb; /* dark mode text color */
+  color: #bbb; 
 }
 
 .hub-nav-bar {
@@ -261,32 +255,38 @@ export default {
   display: flex;
   align-items: center;
   font-size: 1.1em;
-  background-color: #fff; /* light mode item background */
-  color: #000; /* light mode item text color */
+  background-color: #fff; 
+  color: #000; 
 }
 
 .hub-list-group-item:hover {
-  background-color: #e9ecef; /* light mode hover background */
+  background-color: #e9ecef; 
 }
 
 .dark-mode .hub-list-group-item {
-  background-color: #444; /* dark mode item background */
-  color: #fff; /* dark mode item text color */
+  background-color: #444; 
+  color: #fff; 
 }
 
 .dark-mode .hub-list-group-item:hover {
-  background-color: #555; /* dark mode hover background */
+  background-color: #555; 
 }
 
 .hub-active {
-  background-color: #007bff; /* light mode active background */
-  color: #fff !important; /* light mode active text color */
+  background-color: #007bff;
+  color: #fff !important;
   font-weight: bold;
 }
 
 .dark-mode .hub-active {
-  background-color: #0056b3; /* dark mode active background */
-  color: #fff !important; /* dark mode active text color */
+  background-color: #007bff; 
+  color: #fff !important; 
+  font-weight: bold;
+}
+
+.dark-mode .hub-active {
+  background-color: #0056b3; 
+  color: #fff !important; 
   font-weight: bold;
 }
 
@@ -296,14 +296,6 @@ export default {
 
 .hub-hover-color {
   transition: background-color 0.3s ease;
-}
-
-.hub-bg-light {
-  background-color: #fff; /* light mode item background */
-}
-
-.dark-mode .hub-bg-light {
-  background-color: #444; /* dark mode item background */
 }
 
 .hub-border-0 {
@@ -331,19 +323,19 @@ export default {
 }
 
 .hub-modal-content {
-  background-color: #fefefe; /* light mode modal background */
+  background-color: #e9ecef; 
   margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
   max-width: 500px;
   border-radius: 8px;
-  color: #000; /* light mode modal text color */
+  color: #000; 
 }
 
 .dark-mode .hub-modal-content {
-  background-color: #333; /* dark mode modal background */
-  color: #fff; /* dark mode modal text color */
+  background-color: #333; 
+  color: #fff; 
 }
 
 .hub-modal-close {
@@ -363,11 +355,11 @@ export default {
 .hub-modal-title {
   font-size: 1.5em;
   margin-bottom: 1em;
-  color: #000; /* light mode modal title color */
+  color: #000; 
 }
 
 .dark-mode .hub-modal-title {
-  color: #ddd; /* dark mode modal title color */
+  color: #ddd; 
 }
 
 /* Mobile Navigation */
@@ -379,7 +371,7 @@ export default {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #f8f9fa; /* light mode mobile nav background */
+  background: #f8f9fa; 
   border-top: 1px solid #ccc;
   padding: 20px 0;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
@@ -387,7 +379,7 @@ export default {
 }
 
 .dark-mode .hub-mobile-nav {
-  background: #2c2c2c; /* dark mode mobile nav background */
+  background: #2c2c2c; 
   border-top: 1px solid #555;
 }
 
@@ -400,11 +392,11 @@ export default {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  color: #000; /* light mode mobile button text color */
+  color: #000; 
 }
 
 .dark-mode .hub-mobile-nav-button {
-  color: #fff; /* dark mode mobile button text color */
+  color: #fff;
 }
 
 .hub-mobile-nav-button span {

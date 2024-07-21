@@ -29,12 +29,6 @@
 
   <div class="collection-container">
     <div class="collection-card">
-      <p class="back-button">
-        <i
-          @click="$router.push({ path: '/nft' })"
-          class="bi bi-arrow-left-circle cursor-pointer"
-        ></i>
-      </p>
 
       <h3 class="collection-title" v-if="!cName">NFT Collection Details</h3>
       <h3 class="collection-title" v-if="cName">{{ cName }}</h3>
@@ -92,6 +86,12 @@
 
         <div class="col-md-7">
           <div class="collection-details mt-1 mb-4">
+            <p class="back-button">
+                <i
+                  @click="$router.push({ path: '/nft' })"
+                  class="bi bi-arrow-left-circle cursor-pointer"
+                ></i>
+              </p>
             <div class="detail-item">
               <i class="bi bi-file-earmark-text-fill me-1"></i>
               <span class="detail-label">Description:</span> {{ cDescription }}
@@ -116,7 +116,7 @@
                 {{ shortenAddress(cAddress) }}
               </a>
               <span v-if="getUsernameOrShortAddress">
-                by
+                &nbsp;by
                 <NuxtLink
                   :to="'/profile/?id=' + String(getUsernameOrFullAddress)"
                   class="collection-link"
@@ -184,7 +184,7 @@
           </div>
 
           <small v-if="isActivated">
-            <em
+            <em style="color: white;"
               >(Price may still change after pressing the button, so make sure
               to check the {{ $config.tokenSymbol }} amount in wallet.)</em
             >
@@ -939,7 +939,7 @@ definePageMeta({
   flex-direction: column;
   align-items: center;
   padding: 40px;
-  background: rgba(255, 255, 255, 0.8);
+  background: rgba(0, 0, 0, 0);
   border-radius: 27px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   width: 90%;
@@ -950,10 +950,10 @@ definePageMeta({
   border: 1px solid #ddd;
   border-radius: 15px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
   overflow: hidden;
-  background: white;
+  background: rgba(0, 0, 0, 0.3);;
   width: 100%;
+  padding: 20px 40px 20px 40px;
 }
 
 .collection-card .card-body {
@@ -961,13 +961,18 @@ definePageMeta({
 }
 
 .back-button {
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
+  color: white;
+  margin: 20px 0 20px 0;
 }
 
 .collection-title {
-  font-size: 1.75rem;
-  margin-bottom: 15px;
+  font-size: 2.5rem;
+  margin: 20px;
+  text-align: center;
+  font-weight: bold;
+  color: #fff;
 }
 
 .loading-spinner {
@@ -980,6 +985,8 @@ definePageMeta({
   position: relative;
   width: 100%;
   padding-top: 100%;
+  border: 6px solid white;
+  border-radius: 17px;
 }
 
 .svg-background {
@@ -1012,18 +1019,19 @@ definePageMeta({
 }
 
 .collection-details {
-  font-size: 14px;
+  font-size: 1.25rem;
+  color: #fff;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
 
 .detail-label {
-  font-weight: bold;
   margin-right: 5px;
+  margin-left: 5px;
 }
 
 .collection-link {
@@ -1059,16 +1067,6 @@ definePageMeta({
   font-weight: bold;
 }
 
-.dark-mode .collection-container {
-  background: rgba(51, 51, 51, 0.8);
-  color: #fff;
-}
-
-.dark-mode .collection-card {
-  background: rgba(51, 51, 51, 0.8);
-  color: #fff;
-}
-
 .dark-mode .collection-title,
 .dark-mode .collection-details p,
 .dark-mode .collection-details small em {
@@ -1092,4 +1090,7 @@ definePageMeta({
   background-color: #007bff;
   border-color: #007bff;
 }
+
+p {color: #fff;}
+h5 {color: #fff;}
 </style>

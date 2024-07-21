@@ -83,36 +83,35 @@ export default {
 </script>
 
 <style scoped>
-@import "animate.css"; /* Import Animate.css */
+@import "animate.css"; 
 
 .nft-hs-header-container {
   display: flex;
-  flex-direction: column;
+  justify-content: space-between;
   align-items: center;
   padding: 10px;
-  background: transparent;
-  box-shadow: none;
   margin-bottom: 20px;
 }
 
 .nft-hs-header-content {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
   width: 100%;
-  max-width: 1200px;
 }
 
 .nft-hs-header-brand {
   font-weight: bold;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   text-decoration: none;
   color: white;
+  text-align: left;
 }
 
 .nft-hs-header-links {
   display: flex;
   gap: 15px;
+  margin-left: auto;
 }
 
 .nft-hs-header-link {
@@ -133,6 +132,7 @@ export default {
 .emoji {
   display: inline-block;
   transition: transform 0.5s ease;
+  font-size: 1.5em;
 }
 
 .text {
@@ -143,6 +143,7 @@ export default {
     transform 0.5s ease,
     opacity 0.5s ease;
   white-space: nowrap;
+  color: white;
 }
 
 .nft-hs-header-link:hover .emoji {

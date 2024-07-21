@@ -680,17 +680,14 @@ export default {
   top: 10px;
   left: 10px;
   z-index: 1000;
-  background-color: #007bff;
+  font-size: 1.5rem;
+  background-color: #007bff00;
   color: white;
   border: none;
   padding: 10px;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s ease;
-}
-
-#toggle-sidebar-button:hover {
-  background-color: #0056b3;
 }
 
 #toggle-right-sidebar-button {
@@ -698,17 +695,14 @@ export default {
   top: 10px;
   right: 10px;
   z-index: 1000;
-  background-color: #007bff;
+  background-color: #007bff00;
+  font-size: 1.5rem;
   color: white;
   border: none;
   padding: 10px;
   cursor: pointer;
   border-radius: 5px;
   transition: background-color 0.3s ease;
-}
-
-#toggle-right-sidebar-button:hover {
-  background-color: #0056b3;
 }
 
 @media (max-width: 1450px) {

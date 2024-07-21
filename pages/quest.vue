@@ -430,7 +430,7 @@ definePageMeta({
 
 /* Dark Mode Styles */
 .dark-mode .quest-page-custom {
-  background-color:;
+  background-color: None;
   color: #fff;
 }
 

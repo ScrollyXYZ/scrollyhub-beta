@@ -176,20 +176,15 @@ export default {
 
 #close-right-sidebar-button {
   position: absolute;
-  top: 10px;
-  left: 10px;
   z-index: 1001;
-  background-color: #007bff;
+  background-color: #ffffffef;
   color: white;
   border: none;
   padding: 10px;
   cursor: pointer;
-  border-radius: 5px;
+  border-radius: 100%;
   transition: background-color 0.3s ease;
-}
-
-#close-right-sidebar-button:hover {
-  background-color: #0056b3;
+  font-size: 0.75rem;
 }
 
 /* Add styles for the sidebar content */
