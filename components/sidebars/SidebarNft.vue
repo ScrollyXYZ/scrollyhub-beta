@@ -321,12 +321,6 @@ export default {
       isDarkMode.value = themeStore.getIsDarkMode;
     };
 
-    const refreshLayout = () => {
-      router.push("/").then(() => {
-        window.location.reload();
-      });
-    };
-
     watch(isActivated, (newVal) => {
       if (newVal) {
         fetchActivityPoints();
@@ -370,7 +364,6 @@ export default {
       profileImageKey,
       wrongChain,
       toggleDarkMode,
-      refreshLayout,
       isDarkMode,
     };
   },
