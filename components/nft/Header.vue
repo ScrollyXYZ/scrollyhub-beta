@@ -83,7 +83,7 @@ export default {
 </script>
 
 <style scoped>
-@import "animate.css"; 
+@import "animate.css";
 
 .nft-hs-header-container {
   display: flex;
@@ -112,6 +112,9 @@ export default {
   display: flex;
   gap: 15px;
   margin-left: auto;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 30px;
+  padding: 5px;
 }
 
 .nft-hs-header-link {
@@ -133,11 +136,11 @@ export default {
   display: inline-block;
   transition: transform 0.5s ease;
   font-size: 1.5em;
+  margin-right: 10px;
 }
 
 .text {
   display: inline-block;
-  opacity: 0;
   transform: translateX(-10px);
   transition:
     transform 0.5s ease,
@@ -250,7 +253,7 @@ export default {
   color: #aaa !important; /* Light gray color on hover */
 }
 
-@media (min-width: 992px) {
+@media (min-width: 1199px) {
   .nft-hs-header-mobile-nav {
     display: none;
   }
