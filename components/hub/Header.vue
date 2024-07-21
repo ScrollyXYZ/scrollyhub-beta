@@ -5,76 +5,94 @@
       'light-mode': !isDarkMode,
     }"
   >
-    <div v-if="showTopMenu" class="hub-social-nav-container">
-      <div class="hub-selection-header">
-        <div class="hub-welcome-message">💬 Welcome to the Hub</div>
-        <p>Select a discussion room:</p>
-      </div>
-      <div class="hub-nav-bar d-none d-xl-flex">
-        <ul class="hub-nav">
-          <li class="hub-nav-item">
-            <NuxtLink
-              to="/"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
-              :class="$route.path === '/' ? 'hub-active' : ''"
-            >
-              🗨️ General discussion
-            </NuxtLink>
-          </li>
-          <li class="hub-nav-item">
-            <NuxtLink
-              to="/equilibre-memes"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
-              :class="
-                $route.path.startsWith('/equilibre-memes') ? 'hub-active' : ''
-              "
-            >
-              🎉 Equilibre meme contest
-            </NuxtLink>
-          </li>
-          <li class="hub-nav-item">
-            <NuxtLink
-              to="/memes-images"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
-              :class="
-                $route.path.startsWith('/memes-images') ? 'hub-active' : ''
-              "
-            >
-              📸 Share images & NFTs
-            </NuxtLink>
-          </li>
-          <li class="hub-nav-item">
-            <NuxtLink
-              to="/shill"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
-              :class="$route.path.startsWith('/shill') ? 'hub-active' : ''"
-            >
-              🚀 Shill & discuss projects
-            </NuxtLink>
-          </li>
-          <li class="hub-nav-item">
-            <NuxtLink
-              to="/notifications"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
-              :class="
-                $route.path.startsWith('/notifications') ? 'hub-active' : ''
-              "
-            >
-              🔔
-              <span
-                class="hub-badge"
-                v-if="
-                  !notificationsStore.getLoadingNotifications &&
-                  notificationsStore.getUnreadNotificationsCount > 0
+    <div class="hub-header" :class="{ 'hide-welcome': hideWelcomeMessage }">
+      <div v-if="showTopMenu" class="hub-social-nav-container">
+        <div class="hub-selection-header">
+          <div class="hub-welcome-message">💬 Welcome to the Hub</div>
+          <p>Select a discussion room:</p>
+        </div>
+
+        <div class="hub-nav-bar d-none d-xl-flex">
+          <ul class="hub-nav">
+            <li class="hub-nav-item">
+              <NuxtLink
+                to="/"
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="$route.path === '/' ? 'hub-active' : ''"
+              >
+                🗨️ General discussion
+              </NuxtLink>
+            </li>
+            <li class="hub-nav-item">
+              <NuxtLink
+                to="/equilibre-memes"
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="
+                  $route.path.startsWith('/equilibre-memes') ? 'hub-active' : ''
                 "
               >
-                {{ notificationsStore.getUnreadNotificationsCount }}
-              </span>
-            </NuxtLink>
-          </li>
-        </ul>
+                🎉 Equilibre meme contest
+              </NuxtLink>
+            </li>
+            <li class="hub-nav-item">
+              <NuxtLink
+                to="/memes-images"
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="
+                  $route.path.startsWith('/memes-images') ? 'hub-active' : ''
+                "
+              >
+                📸 Share images & NFTs
+              </NuxtLink>
+            </li>
+            <li class="hub-nav-item">
+              <NuxtLink
+                to="/shill"
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="$route.path.startsWith('/shill') ? 'hub-active' : ''"
+              >
+                🚀 Shill & discuss projects
+              </NuxtLink>
+            </li>
+            <li class="hub-nav-item">
+              <NuxtLink
+                to="/notifications"
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="
+                  $route.path.startsWith('/notifications') ? 'hub-active' : ''
+                "
+              >
+                🔔
+                <span
+                  class="hub-badge"
+                  v-if="
+                    !notificationsStore.getLoadingNotifications &&
+                    notificationsStore.getUnreadNotificationsCount > 0
+                  "
+                >
+                  {{ notificationsStore.getUnreadNotificationsCount }}
+                </span>
+              </NuxtLink>
+            </li>
+            <li class="hub-nav-item">
+              <button
+                class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
+                :class="{ 'hub-active': showSearch }"
+                @click="toggleSearch"
+              >
+                🔍 Search
+              </button>
+            </li>
+          </ul>
+        </div>
       </div>
     </div>
+
+    <!-- Search -->
+    <div v-if="showSearch">
+      <SearchPosts />
+    </div>
+
     <!-- Mobile Navigation -->
     <div v-if="showTopMenu" class="hub-mobile-nav d-xl-none">
       <button @click="openModal" class="hub-mobile-nav-button">
@@ -102,7 +120,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
               :class="$route.path === '/' ? 'hub-active' : ''"
               @click="closeModal"
             >
@@ -112,7 +130,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/equilibre-memes"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
               :class="
                 $route.path.startsWith('/equilibre-memes') ? 'hub-active' : ''
               "
@@ -124,7 +142,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/memes-images"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
               :class="
                 $route.path.startsWith('/memes-images') ? 'hub-active' : ''
               "
@@ -136,7 +154,7 @@
           <li class="hub-nav-item">
             <NuxtLink
               to="/shill"
-              class="hub-list-group-item hub-cursor-pointer hub-hover-color  hub-border-0"
+              class="hub-list-group-item hub-cursor-pointer hub-hover-color hub-border-0"
               :class="$route.path.startsWith('/shill') ? 'hub-active' : ''"
               @click="closeModal"
             >
@@ -150,18 +168,28 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onUnmounted } from "vue";
 import { useRoute } from "vue-router";
 import { useNotificationsStore } from "~/store/notifications";
 import { useThemeStore } from "~/store/theme";
+import SearchPosts from "~/components/search/SearchPosts.vue";
 
 export default {
   name: "HubSocialNav",
+  components: {
+    SearchPosts,
+  },
   setup() {
     const notificationsStore = useNotificationsStore();
     const themeStore = useThemeStore();
     const isModalOpen = ref(false);
     const route = useRoute();
+    const hideWelcomeMessage = ref(false);
+    const showSearch = ref(false);
+
+    const handleScroll = () => {
+      hideWelcomeMessage.value = window.scrollY > 50;
+    };
 
     const openModal = () => {
       isModalOpen.value = true;
@@ -169,6 +197,10 @@ export default {
 
     const closeModal = () => {
       isModalOpen.value = false;
+    };
+
+    const toggleSearch = () => {
+      showSearch.value = !showSearch.value;
     };
 
     const showTopMenu = computed(() => {
@@ -179,11 +211,20 @@ export default {
         "/shill",
         "/memes-contest",
         "/notifications",
+        "/search-posts",
       ];
       return paths.includes(route.path);
     });
 
     const isDarkMode = computed(() => themeStore.getIsDarkMode);
+
+    onMounted(() => {
+      window.addEventListener("scroll", handleScroll);
+    });
+
+    onUnmounted(() => {
+      window.removeEventListener("scroll", handleScroll);
+    });
 
     return {
       notificationsStore,
@@ -193,11 +234,27 @@ export default {
       showTopMenu,
       route,
       isDarkMode,
+      hideWelcomeMessage,
+      showSearch,
+      toggleSearch,
     };
   },
 };
 </script>
+
 <style scoped>
+.hub-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background-color: inherit;
+  padding: 1em;
+}
+
+.hub-header.hide-welcome .hub-selection-header {
+  display: none;
+}
+
 .hub-social-nav-container {
   width: 100%;
   margin: 0 auto;
@@ -212,7 +269,7 @@ export default {
 .hub-welcome-message {
   margin: 0;
   font-size: 1.5em;
-  color: #ffffff; 
+  color: #ffffff;
 }
 
 .dark-mode .hub-welcome-message {
@@ -222,11 +279,11 @@ export default {
 .hub-selection-header p {
   margin: 0;
   font-size: 1em;
-  color: #6c757d; 
+  color: #6c757d;
 }
 
 .dark-mode .hub-selection-header p {
-  color: #bbb; 
+  color: #bbb;
 }
 
 .hub-nav-bar {
@@ -255,21 +312,21 @@ export default {
   display: flex;
   align-items: center;
   font-size: 1.1em;
-  background-color: #fff; 
-  color: #000; 
+  background-color: #fff;
+  color: #000;
 }
 
 .hub-list-group-item:hover {
-  background-color: #e9ecef; 
+  background-color: #e9ecef;
 }
 
 .dark-mode .hub-list-group-item {
-  background-color: #444; 
-  color: #fff; 
+  background-color: #444;
+  color: #fff;
 }
 
 .dark-mode .hub-list-group-item:hover {
-  background-color: #555; 
+  background-color: #555;
 }
 
 .hub-active {
@@ -279,14 +336,14 @@ export default {
 }
 
 .dark-mode .hub-active {
-  background-color: #007bff; 
-  color: #fff !important; 
+  background-color: #007bff;
+  color: #fff !important;
   font-weight: bold;
 }
 
 .dark-mode .hub-active {
-  background-color: #0056b3; 
-  color: #fff !important; 
+  background-color: #0056b3;
+  color: #fff !important;
   font-weight: bold;
 }
 
@@ -323,19 +380,19 @@ export default {
 }
 
 .hub-modal-content {
-  background-color: #e9ecef; 
+  background-color: #e9ecef;
   margin: 15% auto;
   padding: 20px;
   border: 1px solid #888;
   width: 80%;
   max-width: 500px;
   border-radius: 8px;
-  color: #000; 
+  color: #000;
 }
 
 .dark-mode .hub-modal-content {
-  background-color: #333; 
-  color: #fff; 
+  background-color: #333;
+  color: #fff;
 }
 
 .hub-modal-close {
@@ -355,11 +412,11 @@ export default {
 .hub-modal-title {
   font-size: 1.5em;
   margin-bottom: 1em;
-  color: #000; 
+  color: #000;
 }
 
 .dark-mode .hub-modal-title {
-  color: #ddd; 
+  color: #ddd;
 }
 
 /* Mobile Navigation */
@@ -371,7 +428,7 @@ export default {
   bottom: 0;
   left: 0;
   width: 100%;
-  background: #f8f9fa; 
+  background: #f8f9fa;
   border-top: 1px solid #ccc;
   padding: 20px 0;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
@@ -379,7 +436,7 @@ export default {
 }
 
 .dark-mode .hub-mobile-nav {
-  background: #2c2c2c; 
+  background: #2c2c2c;
   border-top: 1px solid #555;
 }
 
@@ -392,7 +449,7 @@ export default {
   border: none;
   cursor: pointer;
   text-decoration: none;
-  color: #000; 
+  color: #000;
 }
 
 .dark-mode .hub-mobile-nav-button {
