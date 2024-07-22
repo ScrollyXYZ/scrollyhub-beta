@@ -26,7 +26,7 @@
               </p>
               <p class="me-4">
                 <i class="bi bi-file-earmark-text-fill me-1"></i
-                >{{ nft.cDescription }}
+                ><span v-html="nft.cDescription"></span>
               </p>
             </div>
           </div>
@@ -57,19 +57,19 @@
 import { ethers } from "ethers";
 import { useEthers, shortenAddress } from "vue-dapp";
 import { useToast } from "vue-toastification/dist/index.mjs";
+import sanitizeHtml from "sanitize-html";
 import Image from "~/components/Image.vue";
-import { fetchCollection, storeCollection } from "~/utils/storageUtils";
-import WaitingToast from "~/components/WaitingToast.vue"; // Import the WaitingToast component
+import WaitingToast from "~/components/WaitingToast.vue";
 
 export default {
   name: "NftCollection",
   components: {
     Image,
-    WaitingToast, // Declare the WaitingToast component
+    WaitingToast,
   },
   data() {
     return {
-      nfts: [], // Store multiple NFT details
+      nfts: [],
       loading: true,
       waitingBuy: false,
       tokenSymbol: "ETH",
@@ -77,7 +77,7 @@ export default {
   },
   mounted() {
     if (window.ethereum) {
-      this.preloadNftContracts(3); // Load 3 NFTs initially
+      this.preloadNftContracts(3);
     } else {
       console.error("MetaMask is not installed");
     }
@@ -135,9 +135,12 @@ export default {
       );
 
       const cImage = await metadataContract.getCollectionPreviewImage(cAddress);
-      const cDescription =
+      let cDescription =
         await metadataContract.getCollectionDescription(cAddress);
       const cName = await nftContract.name();
+
+      // Sanitize the description
+      cDescription = sanitizeHtml(cDescription);
 
       return {
         cAddress,
@@ -198,7 +201,7 @@ export default {
             type: "info",
             onClick: () =>
               window
-                .open(`https://etherscan.io/tx/${tx.hash}`, "_blank")
+                .open(`https://scrollscan.com/tx/${tx.hash}`, "_blank")
                 .focus(),
           },
         );
@@ -211,17 +214,18 @@ export default {
             type: "success",
             onClick: () =>
               window
-                .open(`https://etherscan.io/tx/${tx.hash}`, "_blank")
+                .open(`https://scrollscan.com/tx/${tx.hash}`, "_blank")
                 .focus(),
           });
-          this.$set(this.nfts[index], "minted", true);
+          this.nfts.splice(index, 1);
+          await this.getRandomNftContract();
         } else {
           this.toast.dismiss(toastWait);
           this.toast("Transaction has failed.", {
             type: "error",
             onClick: () =>
               window
-                .open(`https://etherscan.io/tx/${tx.hash}`, "_blank")
+                .open(`https://scrollscan.com/tx/${tx.hash}`, "_blank")
                 .focus(),
           });
         }

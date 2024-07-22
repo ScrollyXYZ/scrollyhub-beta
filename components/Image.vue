@@ -2,7 +2,7 @@
   <div class="image-container">
     <img
       @load="loading = false"
-      :src="parseImageLink"
+      :src="validatedUrl"
       @error="handleLoadError"
       :alt="alt"
       :class="cls"
@@ -20,6 +20,8 @@
 </template>
 
 <script>
+import { validateAndConvertUrl } from "~/utils/imageUtils";
+
 export default {
   name: "Image",
   props: ["alt", "cls", "url"],
@@ -49,6 +51,9 @@ export default {
         );
       }
       return parsedImage;
+    },
+    validatedUrl() {
+      return validateAndConvertUrl(this.parseImageLink);
     },
   },
   methods: {

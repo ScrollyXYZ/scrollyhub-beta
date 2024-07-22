@@ -13,8 +13,8 @@
             <div :class="['nft-svg-background', getSvgBackgroundClass()]">
               <div class="nft-card-content">
                 <div class="nft-card-title">{{ nft.name }}</div>
-                <img
-                  :src="convertIpfsToHttp(nft.image)"
+                <Image
+                  :url="nft.image"
                   :alt="nft.name"
                   class="nft-card-img-top"
                 />
@@ -74,9 +74,13 @@
 <script>
 import { ethers } from "ethers";
 import { useEthers } from "vue-dapp";
+import Image from "~/components/Image"; // Import the Image component
 
 export default {
   name: "LatestNfts",
+  components: {
+    Image,
+  },
   data() {
     return {
       lastNfts: [],
@@ -194,12 +198,6 @@ export default {
       const backgrounds = ["nftbondyellow"];
       return backgrounds[Math.floor(Math.random() * backgrounds.length)];
     },
-    convertIpfsToHttp(ipfsUrl) {
-      if (ipfsUrl.startsWith("ipfs://")) {
-        return ipfsUrl.replace("ipfs://", "https://ipfs.io/ipfs/");
-      }
-      return ipfsUrl;
-    },
     formatPrice(priceWei) {
       if (priceWei === null) {
         return null;
@@ -220,6 +218,7 @@ export default {
   },
 };
 </script>
+
 <style scoped>
 .nft-title {
   color: white;
@@ -245,15 +244,15 @@ export default {
   display: flex;
   flex-direction: column;
   height: 100%;
-  padding: 5px; /* Ajustez le padding pour réduire l'espace interne */
-  border: 1px solid transparent; /* Ajoutez une bordure pour voir les limites des cartes */
-  background: transparent; /* Supprimer le fond blanc */
+  padding: 5px;
+  border: 1px solid transparent;
+  background: transparent;
 }
 
 .nft-card-img-container {
   position: relative;
   width: 100%;
-  padding-top: 145%; /* Assurez-vous que le conteneur a un ratio carré */
+  padding-top: 145%;
   background: transparent;
   overflow: hidden;
 }
@@ -262,10 +261,10 @@ export default {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%; /* Assurez-vous que le SVG couvre tout le conteneur */
-  height: 100%; /* Assurez-vous que le SVG couvre tout le conteneur */
-  background-size: contain; /* Utilisez 'contain' pour conserver les proportions */
-  background-repeat: no-repeat; /* Empêchez la répétition du fond */
+  width: 100%;
+  height: 100%;
+  background-size: contain;
+  background-repeat: no-repeat;
   background-position: center;
   z-index: 1;
 }
