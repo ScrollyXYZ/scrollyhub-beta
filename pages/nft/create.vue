@@ -56,7 +56,7 @@
           <label for="cImage" class="form-label"
             >Collection Image (can be changed later)</label
           >
-          <div class="image-preview-container" @click="openModal">
+          <div class="image-preview-container" @click="handleImageClick">
             <div class="image-wrapper">
               <div
                 v-if="loadingImage"
@@ -277,11 +277,19 @@ export default {
     const isModalOpen = ref(false);
 
     const openModal = () => {
-      isModalOpen.value = true;
+      if (isActivated.value) {
+        isModalOpen.value = true;
+      }
     };
 
     const closeModal = () => {
       isModalOpen.value = false;
+    };
+
+    const handleImageClick = () => {
+      if (isActivated.value) {
+        openModal();
+      }
     };
 
     const removeImage = () => {
@@ -298,6 +306,7 @@ export default {
       isModalOpen,
       openModal,
       closeModal,
+      handleImageClick,
       removeImage,
     };
   },
