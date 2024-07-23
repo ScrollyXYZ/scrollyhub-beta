@@ -62,7 +62,7 @@
                   <img
                     :src="convertIpfsToHttp(nft.image)"
                     :alt="nft.name"
-                    class="nft-card-img-top"
+                    class="nft-card-img-top crop-image"
                   />
                   <div class="nft-card-price">
                     {{ formatPrice(nft.price) }} {{ $config.tokenSymbol }}
@@ -520,5 +520,13 @@ body {
   .nft-card-price {
     font-size: 1rem;
   }
+}
+
+.crop-image {
+  object-fit: contain;
+  max-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 </style>

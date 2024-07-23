@@ -201,7 +201,7 @@ export default {
   padding: 10% 5%;
 }
 .nft-card-img-small {
-  width: 50%;
+  width: 100%;
   height: auto;
   object-fit: cover;
   margin-bottom: 10px;
