@@ -14,7 +14,7 @@
     </video>
     <img
       ref="backgroundImage"
-      src="@/assets/video/backgroundnft.png"
+      :src="fullImageUrl"
       alt="Background"
       class="background-image"
       v-if="!videoLoaded"
@@ -35,13 +35,17 @@ export default {
   data() {
     return {
       videoLoaded: false,
-      baseVideoUrl: useRuntimeConfig().public.r2BaseUrl,
+      baseUrl: useRuntimeConfig().public.r2BaseUrl,
       videoPath: "/backgroundnft1.mp4",
+      imagePath: "/backgroundnft.png",
     };
   },
   computed: {
     fullVideoUrl() {
-      return `${this.baseVideoUrl}${this.videoPath}`;
+      return `${this.baseUrl}${this.videoPath}`;
+    },
+    fullImageUrl() {
+      return `${this.baseUrl}${this.imagePath}`;
     },
   },
   methods: {

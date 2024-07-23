@@ -2,7 +2,7 @@
   <div class="background-container">
     <img
       ref="backgroundImage"
-      src="/css/clouds/1500x500.jpg"
+      :src="fullImageUrl"
       alt="Background"
       class="background-image"
     />
@@ -17,6 +17,17 @@ export default {
     isDarkMode: {
       type: Boolean,
       required: true,
+    },
+  },
+  data() {
+    return {
+      baseUrl: useRuntimeConfig().public.r2BaseUrl,
+      imagePath: "/backgroundhub.jpg",
+    };
+  },
+  computed: {
+    fullImageUrl() {
+      return `${this.baseUrl}${this.imagePath}`;
     },
   },
 };
