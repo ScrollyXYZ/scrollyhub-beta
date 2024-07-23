@@ -450,7 +450,7 @@ export const useQuestStore = defineStore("questStore", {
             body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
             data: {
               type: "questclaimed",
-              points,
+              points: this.claimInfo.claimCount >= 7 ? points : 100, // Update points based on claim count
               userAddress,
               questTitle: title,
             },

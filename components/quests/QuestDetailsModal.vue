@@ -15,11 +15,15 @@
           Congratulations! You have successfully claimed
           {{ quest.points }} Mappy Points and the quest has ended!
         </p>
+        <p v-else-if="quest.validated && quest.id === 7">
+          Congratulations! You have successfully claimed 700 Mappy Points and
+          completed the quest!
+        </p>
         <p v-else-if="quest.validated">
           Congratulations! You have successfully claimed
           {{ quest.points }} Mappy Points!
         </p>
-        <p>Max points: {{ quest.points }} MP</p>
+        <p>Max points: {{ quest.id === 7 ? 100 : quest.points }} MP</p>
         <p>Description: {{ quest.description }}</p>
         <div v-if="quest.id === 7">
           <p>Days claimed: {{ quest.claimCount }} / 7</p>
@@ -84,11 +88,7 @@
       <div class="button-group">
         <button
           v-if="!ownershipVerified && quest.eligible"
-          :class="{
-            'quest-dm-verify-button': true,
-            'dark-mode': isDarkMode,
-            'light-mode': !isDarkMode,
-          }"
+          class="quest-dm-verify-button"
           data-bs-toggle="modal"
           data-bs-target="#verifyAccountModal"
         >
@@ -96,10 +96,9 @@
         </button>
         <button
           v-if="
+            !loadingStatus &&
             ownershipVerified &&
             quest.eligible &&
-            !loadingStatus &&
-            !quest.validated &&
             !quest.ended &&
             (quest.id !== 7 || quest.claimCount < 7)
           "
@@ -118,8 +117,6 @@
         </button>
       </div>
     </div>
-    <!-- Verify Account Ownership Modal -->
-    <VerifyAccountOwnership @verified="handleVerificationSuccess" />
   </div>
 </template>
 
@@ -131,9 +128,6 @@ import { useUserStore } from "~/store/user";
 import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
 
 export default {
-  components: {
-    VerifyAccountOwnership,
-  },
   props: {
     quest: {
       type: Object,
@@ -144,6 +138,9 @@ export default {
       default: false,
     },
   },
+  components: {
+    VerifyAccountOwnership,
+  },
   setup(props) {
     const themeStore = useThemeStore();
     const questStore = useQuestStore();
@@ -151,6 +148,7 @@ export default {
     const isDarkMode = computed(() => themeStore.getIsDarkMode);
     const loadingStatus = ref(true);
     const timeRemaining = ref(0);
+
     const ownershipVerified = computed(() => userStore.getIsConnectedToOrbis);
 
     const calculateTimeRemaining = () => {
@@ -172,14 +170,14 @@ export default {
       return `${hours}h ${minutes}m`;
     });
 
-    const handleVerificationSuccess = () => {
-      userStore.setIsConnectedToOrbis(true);
-    };
-
     watchEffect(() => {
       calculateTimeRemaining();
       loadingStatus.value = false;
     });
+
+    const handleVerificationSuccess = () => {
+      userStore.setIsConnectedToOrbis(true);
+    };
 
     return {
       isDarkMode,
@@ -211,6 +209,12 @@ export default {
       if (this.quest.validated) return "Validated";
       if (this.quest.ended) return "Quest Ended";
       return "Not validated";
+    },
+    claimStatus() {
+      return this.quest.claimStatus;
+    },
+    eligibilityStatus() {
+      return this.quest.eligible;
     },
   },
   methods: {
