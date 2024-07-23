@@ -18,7 +18,6 @@
         <div class="col-12 post-sizing">
           <!-- Post author and timestamp -->
           <p class="card-subtitle mb-2 text-muted">
-            <!--<UserLabel :address="authorAddress" :domain="authorDomain"> -->
             <NuxtLink
               class="link-without-color hover-color"
               :to="'/profile/?id=' + String(showDomainOrFullAddress)"
@@ -37,7 +36,10 @@
           </p>
 
           <!-- Post text -->
-          <div @click="openPostDetails">
+          <div
+            v-if="customDataType !== 'questclaimed'"
+            @click="openPostDetails"
+          >
             <div v-if="parsedText.length > postLengthLimit && !showFullText">
               <p
                 class="card-text text-break"
@@ -59,6 +61,24 @@
               class="card-text text-break"
               v-html="parsedText"
             ></p>
+          </div>
+
+          <!-- Quest Claimed Custom Data -->
+          <div
+            v-if="customDataType === 'questclaimed'"
+            class="quest-claimed-content"
+          >
+            <h5 class="card-title">🎉 Quest Claimed! 🎉</h5>
+            <p class="card-text">
+              Congratulations to {{ showDomainOrAddressOrAnon }} for completing
+              the quest: <b>{{ questTitle }}</b
+              >! 🌟
+            </p>
+            <p class="card-text">
+              You've earned <b>{{ points }}</b> Mappy Points! Keep going and
+              achieve more! 🚀
+            </p>
+            <div class="emoji-celebration">🎉 🏆 🌟 🎯 🥳</div>
           </div>
 
           <!-- link preview -->
@@ -388,6 +408,8 @@ export default {
       waitingDeletePost: false,
       balanceAp: 0,
       userTier: "Unknown",
+      questTitle: null, // Added for quest title
+      points: null, // Added for points
     };
   },
 
@@ -409,6 +431,11 @@ export default {
     // check if there is custom data attached to a post
     if (this.post?.content?.data) {
       this.customDataType = this.post.content.data?.type;
+
+      if (this.customDataType === "questclaimed") {
+        this.questTitle = this.post.content.data.questTitle;
+        this.points = this.post.content.data.points;
+      }
 
       this.collection = fetchCollection(
         window,
@@ -952,17 +979,30 @@ export default {
   border-radius: 50%; /* Optional: makes the image circular */
 }
 .card-img-size {
-  max-height: 300px; /* Remplace 300px par la taille maximale souhaitée */
-  max-width: 100%; /* La largeur maximale à 100% pour s'adapter à l'écran */
-  width: auto; /* Maintenir le rapport d'aspect de l'image */
-  height: auto; /* Maintenir le rapport d'aspect de l'image */
-  object-fit: cover; /* S'assurer que l'image couvre bien l'espace */
+  max-height: 300px;
+  max-width: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;
 }
 .card {
   border-radius: 30px; /* Larger radius for more pronounced rounded corners */
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Optional: adds a subtle shadow for depth */
   flex-grow: 1; /* Allow the card to take up the remaining space */
   margin: 10px;
+}
+
+.quest-claimed-content {
+  background-color: #e0f7fa; /* Light cyan background for quest claimed content */
+  padding: 20px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 1.2em;
+}
+
+.quest-claimed-content .emoji-celebration {
+  font-size: 1.5em;
+  margin-top: 10px;
 }
 
 @media (max-width: 768px) {
@@ -972,7 +1012,7 @@ export default {
   }
 
   .profile-image-container {
-    display: none; /* Masque le conteneur de l'image de profil */
+    display: none;
   }
 
   .card {

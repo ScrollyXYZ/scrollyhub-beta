@@ -83,10 +83,23 @@
       </div>
       <div class="button-group">
         <button
+          v-if="!ownershipVerified && quest.eligible"
+          :class="{
+            'quest-dm-verify-button': true,
+            'dark-mode': isDarkMode,
+            'light-mode': !isDarkMode,
+          }"
+          data-bs-toggle="modal"
+          data-bs-target="#verifyAccountModal"
+        >
+          Verify Ownership
+        </button>
+        <button
           v-if="
+            ownershipVerified &&
+            quest.eligible &&
             !loadingStatus &&
             !quest.validated &&
-            quest.eligible &&
             !quest.ended &&
             (quest.id !== 7 || quest.claimCount < 7)
           "
@@ -95,7 +108,7 @@
             disabled: timeRemaining > 0,
           }"
           :disabled="timeRemaining > 0"
-          @click="claim"
+          @click="claim(quest)"
         >
           <span v-if="timeRemaining > 0">{{ formattedTimeRemaining }}</span>
           <span v-else>Claim Reward</span>
@@ -105,6 +118,8 @@
         </button>
       </div>
     </div>
+    <!-- Verify Account Ownership Modal -->
+    <VerifyAccountOwnership @verified="handleVerificationSuccess" />
   </div>
 </template>
 
@@ -112,8 +127,13 @@
 import { computed, ref, watchEffect } from "vue";
 import { useQuestStore } from "~/store/questStore";
 import { useThemeStore } from "~/store/theme";
+import { useUserStore } from "~/store/user";
+import VerifyAccountOwnership from "~/components/VerifyAccountOwnership.vue";
 
 export default {
+  components: {
+    VerifyAccountOwnership,
+  },
   props: {
     quest: {
       type: Object,
@@ -127,9 +147,11 @@ export default {
   setup(props) {
     const themeStore = useThemeStore();
     const questStore = useQuestStore();
+    const userStore = useUserStore();
     const isDarkMode = computed(() => themeStore.getIsDarkMode);
     const loadingStatus = ref(true);
     const timeRemaining = ref(0);
+    const ownershipVerified = computed(() => userStore.getIsConnectedToOrbis);
 
     const calculateTimeRemaining = () => {
       if (props.quest.id === 7 && props.quest.lastClaimTime) {
@@ -150,6 +172,10 @@ export default {
       return `${hours}h ${minutes}m`;
     });
 
+    const handleVerificationSuccess = () => {
+      userStore.setIsConnectedToOrbis(true);
+    };
+
     watchEffect(() => {
       calculateTimeRemaining();
       loadingStatus.value = false;
@@ -158,9 +184,12 @@ export default {
     return {
       isDarkMode,
       questStore,
+      userStore,
       loadingStatus,
       timeRemaining,
       formattedTimeRemaining,
+      ownershipVerified,
+      handleVerificationSuccess,
     };
   },
   computed: {
@@ -183,19 +212,13 @@ export default {
       if (this.quest.ended) return "Quest Ended";
       return "Not validated";
     },
-    claimStatus() {
-      return this.quest.claimStatus;
-    },
-    eligibilityStatus() {
-      return this.quest.eligible;
-    },
   },
   methods: {
     close() {
       this.$emit("close");
     },
-    claim() {
-      this.$emit("claim");
+    claim(quest) {
+      this.$emit("claim", quest);
     },
   },
 };
@@ -305,6 +328,19 @@ export default {
 
 .quest-dm-claim-button:hover:not(.disabled) {
   background-color: #45a049;
+}
+
+.quest-dm-verify-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.quest-dm-verify-button:hover {
+  background-color: #0056b3;
 }
 
 .button-group {

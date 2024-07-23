@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import { ethers } from "ethers";
 import { getActivityPoints } from "~/utils/balanceUtils";
+import { createOrbisPost } from "~/utils/orbisUtils";
 
 export const useQuestStore = defineStore("questStore", {
   state: () => ({
@@ -102,6 +103,7 @@ export const useQuestStore = defineStore("questStore", {
             functions: {
               isEligible: "isEligible",
               hasUserClaimed: "hasUserClaimed",
+              claimInfo: "claimInfo",
               claim: "claim",
             },
           },
@@ -403,7 +405,7 @@ export const useQuestStore = defineStore("questStore", {
         console.error("Invalid user address:", userAddress);
       }
     },
-    async claimReward(contractAddress, functions, points) {
+    async claimReward(contractAddress, functions, points, title) {
       if (!this.userStore) {
         console.error("User store is not defined");
         return;
@@ -441,6 +443,18 @@ export const useQuestStore = defineStore("questStore", {
           setTimeout(async () => {
             await this.updateData(); // Refresh quest status
           }, 5000);
+
+          await createOrbisPost({
+            context:
+              "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
+            body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+            data: {
+              type: "questclaimed",
+              points,
+              userAddress,
+              questTitle: title,
+            },
+          });
         } catch (error) {
           console.error("Error claiming reward:", error);
           this.showPopupMessage(

@@ -173,10 +173,14 @@ export default {
         );
       }
     },
-    async claimReward() {
-      const { contractAddress, functions, points } =
-        this.questStore.selectedQuest;
-      await this.questStore.claimReward(contractAddress, functions, points);
+    async claimReward(quest) {
+      const { contractAddress, functions, points, title } = quest;
+      await this.questStore.claimReward(
+        contractAddress,
+        functions,
+        points,
+        title,
+      );
       this.questStore.closeModal();
     },
     toggleDetails() {
@@ -194,7 +198,6 @@ definePageMeta({
   layout: "quests",
 });
 </script>
-
 <style scoped>
 @import "animate.css";
 
