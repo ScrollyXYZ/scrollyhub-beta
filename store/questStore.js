@@ -434,7 +434,7 @@ export const useQuestStore = defineStore("questStore", {
             body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
             data: {
               type: "questclaimed",
-              points: points, // To update due to Quest id 7 different mechanism
+              points: points, // need future update
               userAddress,
               questTitle: title,
             },
@@ -444,3 +444,79 @@ export const useQuestStore = defineStore("questStore", {
           this.showPopupMessage(
             "There was an issue processing your claim. Please try again later.",
           );
+        }
+      } else {
+        console.error("Invalid user address:", userAddress);
+      }
+    },
+    showPopupMessage(message) {
+      this.popupMessage = message;
+      this.showPopup = true;
+      setTimeout(() => {
+        this.showPopup = false;
+      }, 5000);
+    },
+    filterCategory(category) {
+      this.selectedCategory = category;
+    },
+    async showQuestDetails(questId) {
+      for (const category of this.questCategories) {
+        const quest = category.quests.find((q) => q.id === questId);
+        if (quest) {
+          this.selectedQuest = quest;
+          this.questDetails = quest.description;
+          this.showModal = true;
+          if (quest.id === 1) {
+            await this.checkDomainOwnership();
+          } else if (quest.id === 6) {
+            const userAddress = this.userStore.getCurrentUserAddress;
+            if (ethers.utils.isAddress(userAddress)) {
+              const provider = new ethers.providers.Web3Provider(
+                window.ethereum,
+              );
+              const contract = new ethers.Contract(
+                quest.contractAddress,
+                [
+                  `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
+                  `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
+                ],
+                provider,
+              );
+              this.claimStatus =
+                await contract[quest.functions.checkEligibility](userAddress);
+              quest.validated =
+                await contract[quest.functions.hasUserClaimed](userAddress);
+            } else {
+              console.error("Invalid user address:", userAddress);
+            }
+          } else {
+            await this.checkEligibilityAndClaimStatus(
+              quest.contractAddress,
+              quest.functions,
+            );
+          }
+          console.log(
+            "Updated claimStatus in showQuestDetails:",
+            this.claimStatus,
+          );
+          console.log(
+            "Updated eligibilityStatus in showQuestDetails:",
+            this.eligibilityStatus,
+          );
+          break;
+        }
+      }
+    },
+    closeModal() {
+      this.showModal = false;
+      this.selectedQuest = null;
+      this.questDetails = "";
+    },
+    hoverQuest(questId) {
+      this.hoveredQuest = questId;
+    },
+    $reset() {
+      this.$state = this.$options.state();
+    },
+  },
+});
