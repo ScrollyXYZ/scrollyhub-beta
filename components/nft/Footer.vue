@@ -2,7 +2,7 @@
   <footer class="footer">
     <div class="container">
       <p class="text-muted">
-        &copy; 2024 NFT Launchpad. Bring to you by Scrolly Team & Iggy Social
+        &copy; 2024 Scrolly Hub. Bring to you by Scrolly Team & Iggy Social
       </p>
     </div>
   </footer>

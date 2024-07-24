@@ -75,7 +75,6 @@ export default {
       nfts: [],
       waitingData: false,
       retryNfts: [],
-      apiKey: "sqbpcbCNJHIZMXeDMGCS5mEc",
     };
   },
   mounted() {
@@ -99,13 +98,19 @@ export default {
       try {
         this.waitingData = true;
 
-        const nftScanResponse = await axios.get(
-          `https://scrollapi.nftscan.com/api/v2/collections/own/${this.address}?erc_type=erc721`,
-          {
-            headers: {
-              "X-API-KEY": this.apiKey,
+        const userAddress = this.isActivated
+          ? this.address
+          : this.$props.address;
+
+        const nftScanResponse = await this.fetchWithRetry(() =>
+          axios.get(
+            `https://scrollapi.nftscan.com/api/v2/collections/own/${userAddress}?erc_type=erc721`,
+            {
+              headers: {
+                "X-API-KEY": this.$config.apiKey,
+              },
             },
-          },
+          ),
         );
         const ownedContracts = nftScanResponse.data.data.map(
           (asset) => asset.contract_address,
@@ -136,8 +141,10 @@ export default {
     },
     async checkContractWhitelist(contractAddress) {
       try {
-        const response = await axios.get(
-          `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+        const response = await this.fetchWithRetry(() =>
+          axios.get(
+            `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+          ),
         );
         return response.data.exists;
       } catch (error) {
@@ -200,6 +207,16 @@ export default {
         }
       }
       this.$emit("validNftsCountUpdated", this.nfts.length); // Emit event after parsing array
+    },
+    async fetchWithRetry(fn, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          return await fn();
+        } catch (error) {
+          if (i === retries - 1) throw error;
+          await new Promise((resolve) => setTimeout(resolve, delay));
+        }
+      }
     },
     onImageError(nft) {
       nft.validImage = false;

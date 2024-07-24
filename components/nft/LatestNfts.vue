@@ -231,7 +231,7 @@ export default {
 .grid-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 10px; /* Ajustez cet écart pour rapprocher les cartes */
+  gap: 10px; 
 }
 
 .grid-item {
@@ -414,10 +414,9 @@ export default {
   }
 }
 
-/* Classe spécifique pour rogner les images dans la vue "latest" */
 .crop-image {
-  object-fit: contain; /* Assure que l'image est contenue sans déformation */
-  max-height: 200px; /* Ajustez la hauteur maximale pour le rognage */
+  object-fit: contain;
+  max-height: 200px; 
   display: flex;
   align-items: center;
   justify-content: center;

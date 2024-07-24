@@ -40,6 +40,7 @@ export default defineNuxtConfig({
   },
   runtimeConfig: {
     public: {
+      apiKey: process.env.API_KEY,
       activityPointsAddress: "0x9904CE72Cd7427F59bBe53bc69211081159fcf0a",
       r2BaseUrl:
         process.env.R2_BASE_URL ||

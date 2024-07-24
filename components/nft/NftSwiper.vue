@@ -23,7 +23,7 @@
 <script>
 import { useToast } from "vue-toastification";
 import NftCard from "./NftCard.vue";
-import { useNftStore } from "@/store/nftStore"; // Update the path if needed
+import { useNftStore } from "@/store/nftStore";
 
 export default {
   components: {

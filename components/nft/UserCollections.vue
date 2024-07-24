@@ -54,7 +54,7 @@ import Image from "~/components/Image.vue";
 
 export default {
   name: "UserCollections",
-  props: ["address"],
+  props: ["address", "uAddress"],
   components: {
     Image,
   },
@@ -63,7 +63,6 @@ export default {
       nfts: [],
       waitingData: false,
       retryNfts: [],
-      apiKey: "sqbpcbCNJHIZMXeDMGCS5mEc", 
     };
   },
   mounted() {
@@ -75,21 +74,24 @@ export default {
     async fetchUserNfts() {
       try {
         this.waitingData = true;
+        const userAddress = this.uAddress || this.address;
 
-        // Étape 1: Récupérer les adresses des contrats détenus par l'utilisateur via NFTScan
-        const nftScanResponse = await axios.get(
-          `https://scrollapi.nftscan.com/api/v2/collections/own/${this.address}?erc_type=erc721`,
-          {
-            headers: {
-              "X-API-KEY": this.apiKey,
+        // Step 1: Find contracts address owned by User via NFTScan API
+        const nftScanResponse = await this.fetchWithRetry(() =>
+          axios.get(
+            `https://scrollapi.nftscan.com/api/v2/collections/own/${userAddress}?erc_type=erc721`,
+            {
+              headers: {
+                "X-API-KEY": this.$config.apiKey,
+              },
             },
-          },
+          ),
         );
         const ownedContracts = nftScanResponse.data.data.map(
           (asset) => asset.contract_address,
         );
 
-        // Étape 2: Vérifier si chaque contrat est whitelisté et obtenir les détails
+        // Step 2: Vérify if Contract is Whitelisted
         const ownedNfts = [];
         for (const contractAddress of ownedContracts) {
           const isWhitelisted =
@@ -101,7 +103,7 @@ export default {
           }
         }
 
-        // Étape 3: Analyser les NFT whitelistés
+        // Step 3: Fetch Datas for WhitelistedNfts
         const provider = this.$getFallbackProvider(
           this.$config.supportedChainId,
         );
@@ -115,8 +117,10 @@ export default {
     },
     async checkContractWhitelist(contractAddress) {
       try {
-        const response = await axios.get(
-          `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+        const response = await this.fetchWithRetry(() =>
+          axios.get(
+            `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+          ),
         );
         return response.data.exists;
       } catch (error) {
@@ -173,6 +177,16 @@ export default {
             `Failed to fetch metadata for NFT: ${inputArray[i]}`,
             error,
           );
+        }
+      }
+    },
+    async fetchWithRetry(fn, retries = 3, delay = 1000) {
+      for (let i = 0; i < retries; i++) {
+        try {
+          return await fn();
+        } catch (error) {
+          if (i === retries - 1) throw error;
+          await new Promise((resolve) => setTimeout(resolve, delay));
         }
       }
     },
