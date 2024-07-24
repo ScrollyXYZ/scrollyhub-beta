@@ -2,7 +2,6 @@ import { defineStore } from "pinia";
 import { ethers } from "ethers";
 import { getActivityPoints } from "~/utils/balanceUtils";
 import { createOrbisPost } from "~/utils/orbisUtils";
-
 export const useQuestStore = defineStore("questStore", {
   state: () => ({
     activityPoints: 0,
@@ -184,12 +183,10 @@ export const useQuestStore = defineStore("questStore", {
     async initializeQuests(userStore) {
       this.userStore = userStore;
       await this.updateData();
-
       // Fetch claim info for quest ID 7
       const quest7 = this.questCategories
         .find((category) => category.quests.some((quest) => quest.id === 7))
         ?.quests.find((quest) => quest.id === 7);
-
       if (quest7) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
@@ -197,7 +194,6 @@ export const useQuestStore = defineStore("questStore", {
           ["function claimInfo(address) view returns (uint256, uint256)"],
           provider,
         );
-
         const [lastClaimTime, claimCount] = await contract.claimInfo(
           this.userStore.getCurrentUserAddress,
         );
@@ -216,12 +212,10 @@ export const useQuestStore = defineStore("questStore", {
       await this.fetchActivityPoints();
       await this.checkDomainOwnership();
       await this.checkQuestConditions();
-
       // Fetch claim info for quest ID 7 during update
       const quest7 = this.questCategories
         .find((category) => category.quests.some((quest) => quest.id === 7))
         ?.quests.find((quest) => quest.id === 7);
-
       if (quest7) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const contract = new ethers.Contract(
@@ -229,7 +223,6 @@ export const useQuestStore = defineStore("questStore", {
           ["function claimInfo(address) view returns (uint256, uint256)"],
           provider,
         );
-
         const [lastClaimTime, claimCount] = await contract.claimInfo(
           this.userStore.getCurrentUserAddress,
         );
@@ -287,7 +280,6 @@ export const useQuestStore = defineStore("questStore", {
       const userAddress = this.userStore.getCurrentUserAddress;
       if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-
         for (const category of this.questCategories) {
           for (const quest of category.quests) {
             if (quest.id === 1) {
@@ -317,14 +309,11 @@ export const useQuestStore = defineStore("questStore", {
                 await contract[quest.functions.claimInfo](userAddress);
               const isEligible =
                 await contract[quest.functions.isEligible](userAddress);
-
               quest.validated = claimCount >= 7;
               quest.eligible = isEligible;
-
               this.claimInfo = { lastClaimTime, claimCount };
               this.claimStatus = claimCount > 0;
               this.eligibilityStatus = isEligible;
-
               console.log(`Quest ${quest.id} lastClaimTime: ${lastClaimTime}`);
               console.log(`Quest ${quest.id} claimCount: ${claimCount}`);
               console.log(`Quest ${quest.id} isEligible: ${isEligible}`);
@@ -341,13 +330,10 @@ export const useQuestStore = defineStore("questStore", {
                 await contract[quest.functions.hasUserClaimed](userAddress);
               const isEligible =
                 await contract[quest.functions.isEligible](userAddress);
-
               quest.validated = hasClaimed;
               quest.eligible = isEligible;
-
               this.claimStatus = hasClaimed;
               this.eligibilityStatus = isEligible;
-
               console.log(`Quest ${quest.id} hasClaimed: ${hasClaimed}`);
               console.log(`Quest ${quest.id} isEligible: ${isEligible}`);
               console.log("Updated claimStatus:", this.claimStatus);
@@ -377,12 +363,10 @@ export const useQuestStore = defineStore("questStore", {
           ],
           signer,
         );
-
         try {
           const hasClaimed =
             await contract[functions.hasUserClaimed](userAddress);
           const isEligible = await contract[functions.isEligible](userAddress);
-
           if (hasClaimed) {
             this.claimStatus = true;
             this.eligibilityStatus = false;
@@ -405,19 +389,12 @@ export const useQuestStore = defineStore("questStore", {
         console.error("Invalid user address:", userAddress);
       }
     },
-
-    async claimReward(contractAddress, functions, questId) {
+    async claimReward(contractAddress, functions, points, title) {
       if (!this.userStore) {
         console.error("User store is not defined");
         return;
       }
       const userAddress = this.userStore.getCurrentUserAddress;
-      const quest = this.questCategories
-        .flatMap((category) => category.quests)
-        .find((quest) => quest.id === questId);
-      const points = quest ? quest.points : 0;
-      const title = quest ? quest.title : "Quest";
-
       if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
@@ -427,153 +404,43 @@ export const useQuestStore = defineStore("questStore", {
           signer,
         );
 
-        if (questId === 7) {
-          const currentTime = Math.floor(Date.now() / 1000);
-          const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
+        const currentTime = Math.floor(Date.now() / 1000);
+        const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
 
-          if (
-            this.claimInfo.claimCount >= 7 ||
-            timeSinceLastClaim < 86400 ||
-            !this.eligibilityStatus
-          ) {
-            this.showPopupMessage(
-              "You are not eligible to claim at this time.",
-            );
-            return;
-          }
-
-          try {
-            await contract[functions.claim](userAddress);
-            this.claimInfo.lastClaimTime = currentTime;
-            this.claimInfo.claimCount += 1;
-            this.claimStatus = true;
-            this.showPopupMessage(
-              `Congratulations! You have successfully claimed ${points} Mappy Points!`,
-            );
-            setTimeout(async () => {
-              await this.updateData(); // Refresh quest status
-            }, 5000);
-
-            await createOrbisPost({
-              context:
-                "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
-              body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
-              data: {
-                type: "questclaimed",
-                points: this.claimInfo.claimCount >= 7 ? points : 100, // Update points based on claim count
-                userAddress,
-                questTitle: title,
-              },
-            });
-          } catch (error) {
-            console.error("Error claiming reward:", error);
-            this.showPopupMessage(
-              "There was an issue processing your claim. Please try again later.",
-            );
-          }
-        } else {
-          try {
-            await contract[functions.claim](userAddress);
-            this.claimStatus = true;
-            this.showPopupMessage(
-              `Congratulations! You have successfully claimed ${points} Mappy Points!`,
-            );
-            setTimeout(async () => {
-              await this.updateData(); // Refresh quest status
-            }, 5000);
-
-            await createOrbisPost({
-              context:
-                "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
-              body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
-              data: {
-                type: "questclaimed",
-                points,
-                userAddress,
-                questTitle: title,
-              },
-            });
-          } catch (error) {
-            console.error("Error claiming reward:", error);
-            this.showPopupMessage(
-              "There was an issue processing your claim. Please try again later.",
-            );
-          }
+        if (
+          this.claimInfo.claimCount >= 7 ||
+          timeSinceLastClaim < 86400 ||
+          !this.eligibilityStatus
+        ) {
+          this.showPopupMessage("You are not eligible to claim at this time.");
+          return;
         }
-      } else {
-        console.error("Invalid user address:", userAddress);
-      }
-    },
 
-    showPopupMessage(message) {
-      this.popupMessage = message;
-      this.showPopup = true;
-      setTimeout(() => {
-        this.showPopup = false;
-      }, 5000);
-    },
+        try {
+          await contract[functions.claim](userAddress);
+          this.claimInfo.lastClaimTime = currentTime;
+          this.claimInfo.claimCount += 1;
+          this.claimStatus = true;
+          this.showPopupMessage(
+            `Congratulations! You have successfully claimed ${points} Mappy Points!`,
+          );
+          setTimeout(async () => {
+            await this.updateData(); // Refresh quest status
+          }, 5000);
 
-    filterCategory(category) {
-      this.selectedCategory = category;
-    },
-    async showQuestDetails(questId) {
-      for (const category of this.questCategories) {
-        const quest = category.quests.find((q) => q.id === questId);
-        if (quest) {
-          this.selectedQuest = quest;
-          this.questDetails = quest.description;
-          this.showModal = true;
-          if (quest.id === 1) {
-            await this.checkDomainOwnership();
-          } else if (quest.id === 6) {
-            const userAddress = this.userStore.getCurrentUserAddress;
-            if (ethers.utils.isAddress(userAddress)) {
-              const provider = new ethers.providers.Web3Provider(
-                window.ethereum,
-              );
-              const contract = new ethers.Contract(
-                quest.contractAddress,
-                [
-                  `function ${quest.functions.checkEligibility}(address _user) external view returns (bool)`,
-                  `function ${quest.functions.hasUserClaimed}(address _user) external view returns (bool)`,
-                ],
-                provider,
-              );
-              this.claimStatus =
-                await contract[quest.functions.checkEligibility](userAddress);
-              quest.validated =
-                await contract[quest.functions.hasUserClaimed](userAddress);
-            } else {
-              console.error("Invalid user address:", userAddress);
-            }
-          } else {
-            await this.checkEligibilityAndClaimStatus(
-              quest.contractAddress,
-              quest.functions,
-            );
-          }
-          console.log(
-            "Updated claimStatus in showQuestDetails:",
-            this.claimStatus,
+          await createOrbisPost({
+            context:
+              "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
+            body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+            data: {
+              type: "questclaimed",
+              points: points, // To update due to Quest id 7 different mechanism
+              userAddress,
+              questTitle: title,
+            },
+          });
+        } catch (error) {
+          console.error("Error claiming reward:", error);
+          this.showPopupMessage(
+            "There was an issue processing your claim. Please try again later.",
           );
-          console.log(
-            "Updated eligibilityStatus in showQuestDetails:",
-            this.eligibilityStatus,
-          );
-          break;
-        }
-      }
-    },
-    closeModal() {
-      this.showModal = false;
-      this.selectedQuest = null;
-      this.questDetails = "";
-    },
-    hoverQuest(questId) {
-      this.hoveredQuest = questId;
-    },
-    $reset() {
-      this.$state = this.$options.state();
-    },
-  },
-});
