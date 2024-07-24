@@ -2,6 +2,7 @@ import { defineStore } from "pinia";
 import { ethers } from "ethers";
 import { getActivityPoints } from "~/utils/balanceUtils";
 import { createOrbisPost } from "~/utils/orbisUtils";
+
 export const useQuestStore = defineStore("questStore", {
   state: () => ({
     activityPoints: 0,
@@ -201,6 +202,7 @@ export const useQuestStore = defineStore("questStore", {
         quest7.claimCount = claimCount;
         if (claimCount >= 7) {
           quest7.validated = true;
+          quest7.points = 100; // Assign points after validation
         }
       }
     },
@@ -230,6 +232,7 @@ export const useQuestStore = defineStore("questStore", {
         quest7.claimCount = claimCount;
         if (claimCount >= 7) {
           quest7.validated = true;
+          quest7.points = 100; // Assign points after validation
         }
       }
     },
@@ -332,6 +335,7 @@ export const useQuestStore = defineStore("questStore", {
                 await contract[quest.functions.isEligible](userAddress);
               quest.validated = hasClaimed;
               quest.eligible = isEligible;
+              quest.points = quest.points || 0; // Ensure points are assigned
               this.claimStatus = hasClaimed;
               this.eligibilityStatus = isEligible;
               console.log(`Quest ${quest.id} hasClaimed: ${hasClaimed}`);
@@ -389,7 +393,10 @@ export const useQuestStore = defineStore("questStore", {
         console.error("Invalid user address:", userAddress);
       }
     },
-    async claimReward(contractAddress, functions, points, title) {
+    isDailyClaimQuest(questId) {
+      return questId === 7;
+    },
+    async claimReward(contractAddress, functions, points, title, questId) {
       if (!this.userStore) {
         console.error("User store is not defined");
         return;
@@ -404,46 +411,84 @@ export const useQuestStore = defineStore("questStore", {
           signer,
         );
 
-        const currentTime = Math.floor(Date.now() / 1000);
-        const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
+        if (this.isDailyClaimQuest(questId)) {
+          const currentTime = Math.floor(Date.now() / 1000);
+          const timeSinceLastClaim = currentTime - this.claimInfo.lastClaimTime;
 
-        if (
-          this.claimInfo.claimCount >= 7 ||
-          timeSinceLastClaim < 86400 ||
-          !this.eligibilityStatus
-        ) {
-          this.showPopupMessage("You are not eligible to claim at this time.");
-          return;
-        }
+          if (
+            this.claimInfo.claimCount >= 7 ||
+            timeSinceLastClaim < 86400 ||
+            !this.eligibilityStatus
+          ) {
+            this.showPopupMessage(
+              "You are not eligible to claim at this time.",
+            );
+            return;
+          }
 
-        try {
-          await contract[functions.claim](userAddress);
-          this.claimInfo.lastClaimTime = currentTime;
-          this.claimInfo.claimCount += 1;
-          this.claimStatus = true;
-          this.showPopupMessage(
-            `Congratulations! You have successfully claimed ${points} Mappy Points!`,
-          );
-          setTimeout(async () => {
-            await this.updateData(); // Refresh quest status
-          }, 5000);
-
-          await createOrbisPost({
-            context:
-              "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
-            body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
-            data: {
-              type: "questclaimed",
-              points: points, // need future update
-              userAddress,
-              questTitle: title,
-            },
-          });
-        } catch (error) {
-          console.error("Error claiming reward:", error);
-          this.showPopupMessage(
-            "There was an issue processing your claim. Please try again later.",
-          );
+          try {
+            await contract[functions.claim](userAddress);
+            this.claimInfo.lastClaimTime = currentTime;
+            this.claimInfo.claimCount += 1;
+            this.claimStatus = true;
+            if (this.claimInfo.claimCount >= 7) {
+              this.activityPoints += points;
+              await createOrbisPost({
+                context:
+                  "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
+                body: `🎉 I just claimed <b>${(points * claimCount) / 7}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+                data: {
+                  type: "questclaimed",
+                  points: points / 7,
+                  userAddress,
+                  questTitle: title,
+                },
+              });
+              this.showPopupMessage(
+                `Congratulations! You have successfully claimed ${points} Mappy Points!`,
+              );
+            } else {
+              this.showPopupMessage(
+                "You have successfully claimed 100 Mappy Points!",
+              );
+            }
+            setTimeout(async () => {
+              await this.updateData(); // Refresh quest status
+            }, 5000);
+          } catch (error) {
+            console.error("Error claiming reward:", error);
+            this.showPopupMessage(
+              "There was an issue processing your claim. Please try again later.",
+            );
+          }
+        } else {
+          try {
+            await contract[functions.claim](userAddress);
+            this.activityPoints += points;
+            this.claimStatus = true;
+            this.showPopupMessage(
+              `Congratulations! You have successfully claimed ${points} Mappy Points!`,
+            );
+            await createOrbisPost({
+              context:
+                "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
+              body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+              data: {
+                type: "questclaimed",
+                points: points,
+                userAddress,
+                questTitle: title,
+              },
+            });
+            setTimeout(async () => {
+              await this.updateData(); // Refresh quest status
+            }, 5000);
+          } catch (error) {
+            console.error("Error claiming reward:", error);
+            this.showPopupMessage(
+              "There was an issue processing your claim. Please try again later.",
+            );
+          }
         }
       } else {
         console.error("Invalid user address:", userAddress);
