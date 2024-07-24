@@ -405,12 +405,19 @@ export const useQuestStore = defineStore("questStore", {
         console.error("Invalid user address:", userAddress);
       }
     },
-    async claimReward(contractAddress, functions, points, title, questId) {
+
+    async claimReward(contractAddress, functions, questId) {
       if (!this.userStore) {
         console.error("User store is not defined");
         return;
       }
       const userAddress = this.userStore.getCurrentUserAddress;
+      const quest = this.questCategories
+        .flatMap((category) => category.quests)
+        .find((quest) => quest.id === questId);
+      const points = quest ? quest.points : 0;
+      const title = quest ? quest.title : "Quest";
+
       if (ethers.utils.isAddress(userAddress)) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
@@ -419,8 +426,6 @@ export const useQuestStore = defineStore("questStore", {
           [`function ${functions.claim}(address _user) external`],
           signer,
         );
-
-        let currentPoints = points;
 
         if (questId === 7) {
           const currentTime = Math.floor(Date.now() / 1000);
@@ -442,9 +447,8 @@ export const useQuestStore = defineStore("questStore", {
             this.claimInfo.lastClaimTime = currentTime;
             this.claimInfo.claimCount += 1;
             this.claimStatus = true;
-            currentPoints = 100; // Chaque réclamation donne 100 points
             this.showPopupMessage(
-              `Congratulations! You have successfully claimed ${currentPoints} Mappy Points!`,
+              `Congratulations! You have successfully claimed ${points} Mappy Points!`,
             );
             setTimeout(async () => {
               await this.updateData(); // Refresh quest status
@@ -453,10 +457,10 @@ export const useQuestStore = defineStore("questStore", {
             await createOrbisPost({
               context:
                 "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
-              body: `🎉 I just claimed <b>${currentPoints}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+              body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
               data: {
                 type: "questclaimed",
-                points: currentPoints,
+                points: this.claimInfo.claimCount >= 7 ? points : 100, // Update points based on claim count
                 userAddress,
                 questTitle: title,
               },
@@ -472,7 +476,7 @@ export const useQuestStore = defineStore("questStore", {
             await contract[functions.claim](userAddress);
             this.claimStatus = true;
             this.showPopupMessage(
-              `Congratulations! You have successfully claimed ${currentPoints} Mappy Points!`,
+              `Congratulations! You have successfully claimed ${points} Mappy Points!`,
             );
             setTimeout(async () => {
               await this.updateData(); // Refresh quest status
@@ -481,10 +485,10 @@ export const useQuestStore = defineStore("questStore", {
             await createOrbisPost({
               context:
                 "kjzl6cwe1jw145d2rd0l68smmvsazouh91qd48m5qnqc3dsl6bfm9om6tti1sfx",
-              body: `🎉 I just claimed <b>${currentPoints}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
+              body: `🎉 I just claimed <b>${points}</b> Mappy Points for completing the quest: <b>${title}</b>! 🌟 Excited to keep progressing and earning more rewards. #MappyQuest #AchievementUnlocked #KeepGoing`,
               data: {
                 type: "questclaimed",
-                points: currentPoints,
+                points,
                 userAddress,
                 questTitle: title,
               },
@@ -500,6 +504,7 @@ export const useQuestStore = defineStore("questStore", {
         console.error("Invalid user address:", userAddress);
       }
     },
+
     showPopupMessage(message) {
       this.popupMessage = message;
       this.showPopup = true;
@@ -507,6 +512,7 @@ export const useQuestStore = defineStore("questStore", {
         this.showPopup = false;
       }, 5000);
     },
+
     filterCategory(category) {
       this.selectedCategory = category;
     },
