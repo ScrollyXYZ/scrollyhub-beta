@@ -23,12 +23,11 @@
                 {{ slide.buttonText }}
               </a>
             </template>
-            <template v-else-if="slide.link.startsWith('#')">
+            <template v-else-if="slide.link === 'referral'">
               <button
                 type="button"
                 class="slide-button"
-                data-bs-toggle="modal"
-                :data-bs-target="slide.link"
+                @click="copyReferralLink"
               >
                 {{ slide.buttonText }}
               </button>
@@ -42,9 +41,6 @@
         </div>
       </SwiperSlide>
     </Swiper>
-
-    <!-- Modal -->
-    <ReferralModal />
   </div>
 </template>
 
@@ -53,16 +49,19 @@ import { ref } from "vue";
 import { Swiper, SwiperSlide } from "swiper/vue";
 import "swiper/swiper-bundle.css";
 import { Navigation } from "swiper/modules";
-import ReferralModal from "~/components/referrals/ReferralModal.vue";
+import { useEthers } from "vue-dapp";
+import { useToast } from "vue-toastification/dist/index.mjs";
+import { useUserStore } from "~/store/user";
+import { getTextWithoutBlankCharacters } from "~/utils/textUtils";
 
 export default {
   name: "GetStartedCarousel",
   components: {
     Swiper,
     SwiperSlide,
-    ReferralModal,
   },
   setup() {
+    // Define slide data
     const slides = ref([
       {
         title: "",
@@ -82,30 +81,49 @@ export default {
       },
       {
         title: "",
-        img: "http://scrolly.xyz/online/vote1.png",
-        alt: "Progress Icon",
-        description: "",
-        buttonText: "Vote",
-        link: "/voting?id=1",
-      },
-      {
-        title: "",
         img: "http://scrolly.xyz/online/refer.png",
         alt: "Progress Icon",
         description: "",
         buttonText: "Get my Link",
-        link: "#referralModal",
+        link: "referral",
       },
     ]);
 
+    // Function to determine if a link is external
     const isExternalLink = (link) => {
       return link.startsWith("http");
+    };
+
+    const { address } = useEthers(); // Get the MetaMask address
+    const userStore = useUserStore(); // Access user store for domain info
+    const toast = useToast(); // Initialize toast notifications
+
+    // Determine whether to use the Scrolly domain or MetaMask address
+    const getDomainNameOrAddress = () => {
+      if (userStore.getDefaultDomain) {
+        return getTextWithoutBlankCharacters(userStore.getDefaultDomain);
+      }
+      return address;
+    };
+
+    // Generate the referral link with the user's domain or address
+    const getReferralLink = () => {
+      const url = new URL(window.location.href);
+      url.searchParams.set("ref", getDomainNameOrAddress());
+      return url.toString();
+    };
+
+    // Copy the referral link to the clipboard and show a success toast
+    const copyReferralLink = () => {
+      navigator.clipboard.writeText(getReferralLink());
+      toast("Referral link copied to your clipboard!", { type: "success" });
     };
 
     return {
       Navigation,
       slides,
       isExternalLink,
+      copyReferralLink,
     };
   },
 };
