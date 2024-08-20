@@ -76,7 +76,7 @@ export default defineNuxtConfig({
           "kjzl6cwe1jw14aatupsk2vajdwffgprn2yi17b7ej6lma9gff4apfkc50mrtqlr",
       },
       chatTokenAddress: "0xb65aD8d81d1E4Cb2975352338805AF6e39BA8Be8", // chat token address
-      chatTokenImage: "https://sns.scrolly.xyz/assets/logo.67955946.png", // chat token image
+      chatTokenImage: "https://sns.scrollyfi.xyz/assets/logo.67955946.png", // chat token image
       chatTokenSymbol: "SCROLLY", // chat token symbol or name
       domainRequiredToPost: true,
       expiryCollections: 1000 * 60 * 60 * 24 * 7, // must be in milliseconds (0 means no expiration)
@@ -129,8 +129,8 @@ export default defineNuxtConfig({
       projectDescription:
         "Scrolly Hub is a web3 place for all-things around the Scrolly web3 community.",
       projectTwitter: "https://twitter.com/scrollyxyz",
-      domainUrl: "https://sns.scrolly.xyz", // domain url
-      projectUrl: "https://hub.scrolly.xyz", // without trailing slash!
+      domainUrl: "https://domain.scrollyfi.xyz", // domain url
+      projectUrl: "https://scrollyfi.xyz", // without trailing slash!
       punkMinterAddress: "0xE806C55bd917Ccf93d66CE814e242878fc230CA2", // punk domain minter contract address
       punkNumberOfPrices: 6, // number of different prices (based on domain length), usually 1 (price()) or 5 (price1char() - price5char())
       punkTldAddress: "0xc2C543D39426bfd1dB66bBde2Dd9E4a5c7212876", // punk domain TLD address

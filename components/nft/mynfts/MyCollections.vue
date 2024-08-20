@@ -116,7 +116,7 @@ export default {
         if (newVal) {
           this.fetchCreatedNfts();
         }
-      },
+      }
     );
 
     this.$watch(
@@ -125,7 +125,7 @@ export default {
         if (newVal !== oldVal) {
           this.fetchCreatedNfts();
         }
-      },
+      }
     );
 
     if (this.$config.nftLaunchpadBondingAddress && this.isActivated) {
@@ -147,7 +147,7 @@ export default {
   },
   methods: {
     async fetchCollectionsFromAPI() {
-      const url = `https://apicreator.scrolly.xyz/collections/${this.address}`;
+      const url = `https://apicreator.scrollyfi.xyz/collections/${this.address}`;
       console.log(`Fetching collections from API: ${url}`);
       try {
         const response = await fetch(url, {
@@ -203,7 +203,7 @@ export default {
           const nftContract = new ethers.Contract(
             nftAddress,
             nftInterface,
-            provider,
+            provider
           );
 
           const owner = await nftContract.owner();
@@ -241,14 +241,14 @@ export default {
     },
     saveCollection(updatedData) {
       const index = this.createdNfts.findIndex(
-        (nft) => nft.address === updatedData.address,
+        (nft) => nft.address === updatedData.address
       );
       if (index !== -1) {
         Object.assign(this.createdNfts[index], updatedData);
         storeCollection(
           window,
           this.createdNfts[index].address,
-          this.createdNfts[index],
+          this.createdNfts[index]
         );
       }
     },

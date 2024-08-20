@@ -42,8 +42,8 @@
           <template v-else>
             <p class="no-domains-message">
               You don't have any domains yet. Mint one on
-              <a href="https://sns.scrolly.xyz" target="_blank"
-                >sns.scrolly.xyz</a
+              <a href="https://domain.scrollyfi.xyz" target="_blank"
+                >domain.scrollyfi.xyz</a
               >.
             </p>
           </template>

@@ -109,17 +109,18 @@ export default {
               headers: {
                 "X-API-KEY": this.$config.apiKey,
               },
-            },
-          ),
+            }
+          )
         );
         const ownedContracts = nftScanResponse.data.data.map(
-          (asset) => asset.contract_address,
+          (asset) => asset.contract_address
         );
 
         const ownedNfts = [];
         for (const contractAddress of ownedContracts) {
-          const isWhitelisted =
-            await this.checkContractWhitelist(contractAddress);
+          const isWhitelisted = await this.checkContractWhitelist(
+            contractAddress
+          );
           if (isWhitelisted) {
             ownedNfts.push(contractAddress);
           } else {
@@ -128,7 +129,7 @@ export default {
         }
 
         const provider = this.$getFallbackProvider(
-          this.$config.supportedChainId,
+          this.$config.supportedChainId
         );
         await this.parseNftsArray(ownedNfts, this.nfts, provider);
 
@@ -143,14 +144,14 @@ export default {
       try {
         const response = await this.fetchWithRetry(() =>
           axios.get(
-            `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
-          ),
+            `https://apicreator.scrollyfi.xyz/check-contract/${contractAddress}`
+          )
         );
         return response.data.exists;
       } catch (error) {
         console.error(
           `Error checking whitelist for contract: ${contractAddress}`,
-          error,
+          error
         );
         return false;
       }
@@ -166,7 +167,7 @@ export default {
         const nftContract = new ethers.Contract(
           inputArray[i],
           nftInterface,
-          provider,
+          provider
         );
         let collection = fetchCollection(window, inputArray[i]);
 
@@ -202,7 +203,7 @@ export default {
         } catch (error) {
           console.error(
             `Failed to fetch metadata for NFT: ${inputArray[i]}`,
-            error,
+            error
           );
         }
       }
@@ -227,7 +228,7 @@ export default {
     onImageLoad(nft) {
       nft.validImage = true;
       this.retryNfts = this.retryNfts.filter(
-        (retryNft) => retryNft.address !== nft.address,
+        (retryNft) => retryNft.address !== nft.address
       );
     },
     retryFailedImages() {

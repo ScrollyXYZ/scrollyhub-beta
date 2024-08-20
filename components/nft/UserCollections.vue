@@ -119,7 +119,7 @@ export default {
       try {
         const response = await this.fetchWithRetry(() =>
           axios.get(
-            `https://apicreator.scrolly.xyz/check-contract/${contractAddress}`,
+            `https://apicreator.scrollyfi.xyz/check-contract/${contractAddress}`,
           ),
         );
         return response.data.exists;

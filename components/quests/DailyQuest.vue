@@ -11,7 +11,7 @@
         <span v-if="loadingStatus">Loading...</span>
         <span v-else-if="hasClaimed">Already claimed today</span>
         <span v-else-if="!isEligible">
-          Not eligible to claim (Minimum 100,000 SCROLLY tokens required)
+          Not eligible to claim (Minimum 400,000 SCROLLY tokens required)
         </span>
         <span v-else>Eligible to claim</span>
       </p>
@@ -107,7 +107,7 @@ export default {
           const lastClaimedTimestamp = await contract.lastClaimed(userAddress);
           console.log(
             "Last claimed timestamp:",
-            lastClaimedTimestamp.toString(),
+            lastClaimedTimestamp.toString()
           );
 
           const nextClaimTimestamp = lastClaimedTimestamp.toNumber() + 86400; // 24 hours
@@ -139,14 +139,14 @@ export default {
           const contract = new ethers.Contract(
             contractAddress,
             contractABI,
-            signer,
+            signer
           );
 
           await fetchDailyQuestData(contract, signer);
         } catch (error) {
           console.error(
             "Error initializing ethers.js or fetching data:",
-            error,
+            error
           );
         }
       }
@@ -161,14 +161,14 @@ export default {
         const contract = new ethers.Contract(
           contractAddress,
           contractABI,
-          signer,
+          signer
         );
 
         const tx = await contract.claimDailyPoints();
         await tx.wait();
         await fetchDailyQuestData(contract, signer);
         showPopupMessage(
-          `Congratulations! You have successfully claimed ${dailyPoints.value} Mappy Points!`,
+          `Congratulations! You have successfully claimed ${dailyPoints.value} Mappy Points!`
         );
       } catch (error) {
         console.error("Error claiming daily points:", error);
@@ -196,7 +196,7 @@ export default {
         } else {
           resetDailyQuestData();
         }
-      },
+      }
     );
 
     const resetDailyQuestData = () => {
@@ -300,9 +300,7 @@ export default {
   font-size: 1em;
   z-index: 2000;
   text-align: center;
-  transition:
-    background-color 0.3s,
-    color 0.3s;
+  transition: background-color 0.3s, color 0.3s;
 }
 
 .light-mode .popup-notification-custom {
